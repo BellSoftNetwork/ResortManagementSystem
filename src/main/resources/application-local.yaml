@@ -1,7 +1,6 @@
 spring:
   config:
     import:
-      - classpath:config/common/optional-jwt.yaml
       - classpath:config/common/jpa-detail-logging.yaml
   mail:
     properties:

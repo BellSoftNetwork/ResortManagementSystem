@@ -55,9 +55,6 @@ dependencies {
     // NOTE: Security
     implementation(libs.springBootStarterSecurity)
     testImplementation(libs.springSecurityTest)
-    implementation(libs.jjwtApi)
-    runtimeOnly(libs.jjwtImpl)
-    runtimeOnly(libs.jjwtJackson)
 
     // NOTE: Validation
     implementation(libs.springBootStarterValidation)

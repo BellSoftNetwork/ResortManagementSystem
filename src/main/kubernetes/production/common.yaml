@@ -75,10 +75,5 @@ spec:
                 secretKeyRef:
                   name: ${APPLICATION_NAME}-connection
                   key: DATABASE_MYSQL_PASSWORD
-            - name: SECURITY_JWT_SIGNATURE_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: ${APPLICATION_NAME}-secret
-                  key: SECURITY_JWT_SIGNATURE_KEY
           ports:
             - containerPort: 8080
