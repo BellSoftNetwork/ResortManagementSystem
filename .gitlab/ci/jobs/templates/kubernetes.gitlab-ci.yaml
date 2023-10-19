@@ -1,0 +1,111 @@
+.setup_kubectl_context_script: &setup_kubectl_context_script
+  - kubectl config use-context ${KUBE_CONTEXT}
+  - kubectl config set-context --current --namespace="${APPLICATION_NAMESPACE}"
+  - echo "kubectl context ready"
+
+.convert_kubernetes_resource_script: &convert_kubernetes_resource_script
+  - export KUBERNETES_RESOURCE_NAMES="common ${DEPLOY_ENVIRONMENT}"
+  - |
+    for filename in ${KUBERNETES_RESOURCE_NAMES}; do
+      envsubst < ${KUBERNETES_RESOURCE_PATH}/${filename}.yaml > ${KUBERNETES_DEPLOY_YAML_PATH}/${filename}.yaml
+      echo "'${filename}' converted"
+    done
+
+.setup_kubectl:
+  image:
+    name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/thisiskj/kubectl-envsubst:latest
+    entrypoint: [ '' ]
+  before_script:
+    - *setup_kubectl_context_script
+
+.kubernetes_deploy_variables: &kubernetes_deploy_variables
+  CERT_MANAGER_CLUSTER_ISSUER: "letsencrypt-staging"
+  KUBERNETES_DEPLOY_YAML_PATH: ${CI_PROJECT_DIR}/.kubernetes
+  APPLICATION_ENVIRONMENT: ${CI_ENVIRONMENT_SLUG}
+  APPLICATION_API_ENVIRONMENT: ${APPLICATION_ENVIRONMENT}
+  APPLICATION_VIEW_ENVIRONMENT: ${APPLICATION_ENVIRONMENT}
+  APPLICATION_NAME: "${PROJECT_NAME}-${APPLICATION_ENVIRONMENT}"
+  APPLICATION_API_NAME: "${PROJECT_NAME}-${APPLICATION_API_ENVIRONMENT}-api"
+  APPLICATION_VIEW_NAME: "${PROJECT_NAME}-${APPLICATION_VIEW_ENVIRONMENT}-view"
+  APPLICATION_API_SERVICE_NAME: ${APPLICATION_API_NAME}
+  APPLICATION_VIEW_SERVICE_NAME: ${APPLICATION_VIEW_NAME}
+  APPLICATION_API_DEPLOYMENT_NAME: ${APPLICATION_API_NAME}
+  APPLICATION_VIEW_DEPLOYMENT_NAME: ${APPLICATION_VIEW_NAME}
+  APPLICATION_DEPLOYMENT_NAME: ${APPLICATION_API_NAME}
+  APPLICATION_CHANGE_CAUSE: "[${CI_JOB_STARTED_AT}] ${CI_COMMIT_AUTHOR} (${CI_COMMIT_SHORT_SHA})"
+
+.setup_kubernetes_application_resource_yaml:
+  variables:
+    <<: *kubernetes_deploy_variables
+    KUBERNETES_RESOURCE_PATH: ${CI_PROJECT_DIR}/src/main/kubernetes/production
+    APPLICATION_IMAGE_URL: ${CI_REGISTRY_IMAGE}/${CI_COMMIT_REF_NAME}:${CI_COMMIT_SHA}
+    APPLICATION_REPLICAS: 1
+  before_script:
+    - *setup_kubectl_context_script
+    - *convert_kubernetes_resource_script
+
+.save_kubernetes_resources_to_artifacts:
+  variables:
+    <<: *kubernetes_deploy_variables
+  artifacts:
+    name: kubernetes_yaml
+    when: always
+    paths:
+      - ${KUBERNETES_DEPLOY_YAML_PATH}
+
+.deployment_revision: &deployment_revision |
+  deployment_revision() {
+    echo $(kubectl rollout history deployment ${APPLICATION_DEPLOYMENT_NAME} -o=jsonpath='{.metadata.annotations.deployment\.kubernetes\.io/revision}')
+  }
+
+.deployment_change_cause: &deployment_change_cause |
+  deployment_change_cause() {
+    echo $(kubectl rollout history deployment ${APPLICATION_DEPLOYMENT_NAME} -o=jsonpath='{.metadata.annotations.kubernetes\.io/change-cause}')
+  }
+
+.print_deployment_status: &print_deployment_status |
+  print_deployment_status() {
+    echo "[$1] Deployment revision: $(deployment_revision)"
+    echo "[$1] Deployment change cause: $(deployment_change_cause)"
+  }
+
+.kubernetes_apply:
+  variables:
+    <<: *kubernetes_deploy_variables
+  script:
+    - *deployment_revision
+    - *deployment_change_cause
+    - *print_deployment_status
+    - print_deployment_status "Before"
+    - | # Kubernetes Apply Resources
+      echo "Start the deployment"
+      for filename in ${KUBERNETES_DEPLOY_YAML_PATH}/*.yaml; do
+        kubectl apply -f ${filename}
+      done
+    - print_deployment_status "Expected"
+    - | # Kubernetes Rollout Status Wait
+      if ! kubectl rollout status deployment ${APPLICATION_DEPLOYMENT_NAME}; then
+        echo "Rollback to the previous version because the application deployment failed."
+        kubectl rollout undo deployment ${APPLICATION_DEPLOYMENT_NAME}
+        print_deployment_status "Rollback"
+
+        if ! kubectl rollout status deployment ${APPLICATION_DEPLOYMENT_NAME}; then
+          echo "Application rollback is failed"
+        else
+          echo "Application rollback is complete"
+        fi
+
+        exit 1
+      fi
+      echo "Application successfully deployed!"
+    - print_deployment_status "Current"
+
+.kubernetes_delete:
+  variables:
+    <<: *kubernetes_deploy_variables
+  script:
+    - |
+      echo "Delete the application environment"
+      for filename in ${KUBERNETES_DEPLOY_YAML_PATH}/*.yaml; do
+        kubectl delete -f ${filename}
+      done

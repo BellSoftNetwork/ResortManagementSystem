@@ -1,0 +1,21 @@
+# gradle 기본 구성
+.gradle:
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:${GRADLE_VERSION}
+
+# 사용 시 gradle 명령 인자 추가 필요
+# `gradle ${GRADLE_CACHE_ARGS}`
+# ex) `gradle ${GRADLE_CACHE_ARGS} build`
+.gradle_cache:
+  extends:
+    - .gradle
+  variables:
+    GRADLE_USER_HOME_DIR: ${CI_PROJECT_DIR}/.gradle-cache
+    GRADLE_CACHE_ARGS: --build-cache --gradle-user-home ${GRADLE_USER_HOME_DIR}
+  cache:
+    key:
+      files:
+        - ${CI_PROJECT_DIR}/gradle/wrapper/gradle-wrapper.properties
+    paths:
+      - ${GRADLE_USER_HOME_DIR}/caches/
+      - ${GRADLE_USER_HOME_DIR}/notifications/
+      - ${GRADLE_USER_HOME_DIR}/wrapper/

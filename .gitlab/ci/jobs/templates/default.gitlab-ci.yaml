@@ -1,0 +1,10 @@
+# Kubernetes 기반 러너 사용 시 시작중 runner fail 발생하는 경우 대응
+default:
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - api_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
+  interruptible: true

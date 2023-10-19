@@ -1,0 +1,25 @@
+.wait_docker_process_running: &wait_docker_process_running
+  # NOTE: https://gitlab.com/gitlab-org/gitlab-runner/-/issues/27384#note_880351909
+  - |
+    echo "Waiting for docker daemon to be fully started..."
+    timeout=300
+    passed=0
+    until [ -f "${DOCKER_CERT_PATH}/ca.pem" ] || [ ${timeout} -lt ${passed} ]; do
+      passed=`expr $passed + 1`
+      sleep 1
+    done
+    echo "Docker daemon is fully started!"
+
+# NOTE: 사용 시 GitLab Runner 설정에서 docker in docker TLS 설정 필요
+# NOTE: https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#docker-in-docker-with-tls-enabled-in-kubernetes
+.in_docker:
+  services:
+    - name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_VERIFY: 1
+    DOCKER_CERT_PATH: "${DOCKER_TLS_CERTDIR}/client"
+  before_script:
+    - *wait_docker_process_running

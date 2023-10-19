@@ -1,0 +1,56 @@
+include:
+  - local: /.gitlab/ci/jobs/templates/gradle.gitlab-ci.yaml
+  - template: Code-Quality.gitlab-ci.yml # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Jobs/Code-Quality.gitlab-ci.yml
+
+.test_rules:
+  rules:
+    - if: "$TEST_DISABLED"
+      when: never
+    - if: "$CI"
+
+# gradle jacoco 설정에서 xml 출력 설정 필요
+.test:
+  extends:
+    - .gradle
+    - .test_rules
+  variables:
+    JACOCO_XML_LOCATION: "${CI_PROJECT_DIR}/build/jacoco/jacoco.xml"
+  stage: test
+
+test:
+  extends:
+    - .test
+    - .gradle_cache
+  script:
+    - gradle ${GRADLE_CACHE_ARGS} ktlintCheck test jacocoTestReport
+  coverage: '/    - Instruction Coverage: ([0-9.]+)%/'
+  artifacts:
+    paths:
+      - ${JACOCO_XML_LOCATION}
+    when: always
+    reports:
+      junit: ${CI_PROJECT_DIR}/build/test-results/test/**/TEST-*.xml
+
+test_coverage_visualize:
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/haynes/jacoco2cobertura:${JACOCO2COBERTURA_VERSION}
+  extends:
+    - .test
+  needs:
+    - test
+  variables:
+    COVERAGE_REPORT_PATH: "${CI_PROJECT_DIR}/build/cobertura.xml"
+  script:
+    - python /opt/cover2cover.py ${JACOCO_XML_LOCATION} ${CI_PROJECT_DIR}/src/main/kotlin/ > ${COVERAGE_REPORT_PATH}
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: ${COVERAGE_REPORT_PATH}
+
+code_quality:
+  extends:
+    - default
+  rules:
+    - if: $CODE_QUALITY_DISABLED
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"

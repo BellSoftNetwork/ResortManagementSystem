@@ -1,0 +1,31 @@
+include:
+  - local: /.gitlab/ci/jobs/templates/kubernetes.gitlab-ci.yaml
+
+.deploy:
+  extends:
+    - .setup_kubectl
+  stage: deploy
+  needs:
+    - deploy_staging
+  interruptible: false
+  rules:
+    - if: "$TEST_DISABLED || $BUILD_DISABLED || $DEPLOY_DISABLED"
+      when: never
+
+deploy_production:
+  extends:
+    - .deploy
+    - .setup_kubernetes_application_resource_yaml
+    - .kubernetes_apply
+    - .save_kubernetes_resources_to_artifacts
+  variables:
+    APPLICATION_URL: ${KUBE_INGRESS_BASE_DOMAIN}
+    APPLICATION_NAMESPACE: ${KUBE_PRODUCTION_NAMESPACE}
+    CERT_MANAGER_CLUSTER_ISSUER: "letsencrypt-prod"
+    DEPLOY_ENVIRONMENT: "production"
+  environment:
+    name: production
+    url: https://${APPLICATION_URL}/api/
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
