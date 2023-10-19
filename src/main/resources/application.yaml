@@ -33,11 +33,6 @@ spring:
     change-log: classpath:/db/changelog-master.yaml
     database-change-log-table: database_changelog
     database-change-log-lock-table: database_changelog_lock
-  thymeleaf:
-    prefix: classpath:templates/
-    suffix: .html
-    mode: HTML
-    encoding: UTF-8
 
 logging:
   level:
