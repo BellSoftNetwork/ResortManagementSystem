@@ -1,9 +1,12 @@
-HELP.md
 .gradle
+.gradle-cache
 build/
-!gradle/wrapper/gradle-wrapper.jar
+!app/gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+
+.kubernetes/
+!.kubernetes/.gitkeep
 
 ### STS ###
 .apt_generated
