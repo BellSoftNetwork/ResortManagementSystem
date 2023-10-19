@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1663624939377-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addPrimaryKey:
+            columnNames: ID
+            constraintName: pk_id
+            tableName: database_changelog

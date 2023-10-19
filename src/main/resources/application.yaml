@@ -1,0 +1,48 @@
+application:
+  deploy:
+    environment: "default"
+
+# Swagger
+springdoc:
+  api-docs:
+    path: "/docs/schema"
+  swagger-ui:
+    path: "/docs/swagger-ui"
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DATABASE_MYSQL_HOST}/${DATABASE_MYSQL_SCHEMA:rms}?${DATABASE_MYSQL_OPTION:charset=utf8mb4,utf8&createDatabaseIfNotExist=true}
+    username: ${DATABASE_MYSQL_USER}
+    password: ${DATABASE_MYSQL_PASSWORD}
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        default_batch_size: 100
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+  sql:
+    init:
+      platform: mysql
+      encoding: utf-8
+  test:
+    database:
+      replace: none
+  liquibase:
+    change-log: classpath:/db/changelog-master.yaml
+    database-change-log-table: database_changelog
+    database-change-log-lock-table: database_changelog_lock
+  thymeleaf:
+    prefix: classpath:templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+
+logging:
+  level:
+    liquibase: INFO
+    org:
+      springframework:
+        transaction:
+          interceptor: TRACE

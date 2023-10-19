@@ -1,0 +1,3 @@
+application:
+  deploy:
+    environment: ${DEPLOY_ENVIRONMENT}
