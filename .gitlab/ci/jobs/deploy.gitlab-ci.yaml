@@ -25,7 +25,7 @@ deploy_production:
     DEPLOY_ENVIRONMENT: "production"
   environment:
     name: production
-    url: https://${APPLICATION_URL}/api/
+    url: https://${APPLICATION_URL}/
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: manual

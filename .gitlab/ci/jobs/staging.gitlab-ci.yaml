@@ -25,6 +25,6 @@ deploy_staging:
     DEPLOY_ENVIRONMENT: "staging"
   environment:
     name: staging
-    url: https://${APPLICATION_URL}/api/
+    url: https://${APPLICATION_URL}/
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

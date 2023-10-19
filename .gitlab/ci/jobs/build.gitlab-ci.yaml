@@ -23,7 +23,7 @@ build_boot_image:
   variables:
     PROPERTY_REGISTRY: "-PproxyRegistryUrl=${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX} -PprojectRegistryUrl=${CI_REGISTRY_URL} -PregistryUser=${CI_REGISTRY_USER} -PregistryPassword=${CI_REGISTRY_PASSWORD} -PregistryEmail=${GITLAB_USER_EMAIL}"
     PROPERTY_BUILD: "-PbindingsDir=${CI_PROJECT_DIR}/bindings -PgradleDir=${CI_PROJECT_DIR}/.gradle-cache"
-    PROPERTY_IMAGE: "-PimagePath=${CI_REGISTRY_IMAGE} -PimageBaseName=${CI_COMMIT_REF_NAME} -PimageTag=${CI_COMMIT_SHA}"
+    PROPERTY_IMAGE: "-PimagePath=${CI_REGISTRY_IMAGE} -PimageBaseName=${CI_COMMIT_REF_SLUG} -PimageTag=${CI_COMMIT_SHA}"
     PROPERTY_DOCKER: "-PdockerHost=${DOCKER_HOST} -PisDockerTlsVerify=true -PdockerCertPath=${DOCKER_CERT_PATH}"
     # PROPERTY_BUILDER_IMAGE: "--builder ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/paketobuildpacks/builder:base"
   script:

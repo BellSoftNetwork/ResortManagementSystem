@@ -1,51 +1,47 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ${APPLICATION_API_SERVICE_NAME}
+  name: ${APPLICATION_SERVICE_NAME}
   namespace: ${APPLICATION_NAMESPACE}
 spec:
   ports:
     - port: 8080
       targetPort: 8080
-      name: ${APPLICATION_API_SERVICE_NAME}
+      name: ${APPLICATION_SERVICE_NAME}
   selector:
     app: ${PROJECT_NAME}
-    env: ${APPLICATION_API_ENVIRONMENT}
-    type: api
+    env: ${APPLICATION_ENVIRONMENT}
   type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ${APPLICATION_API_DEPLOYMENT_NAME}
+  name: ${APPLICATION_DEPLOYMENT_NAME}
   namespace: ${APPLICATION_NAMESPACE}
   annotations:
     kubernetes.io/change-cause: "${APPLICATION_CHANGE_CAUSE}"
     bellsoft.net/application: ${PROJECT_NAME}
-    bellsoft.net/environment: ${APPLICATION_API_ENVIRONMENT}
+    bellsoft.net/environment: ${APPLICATION_ENVIRONMENT}
   labels:
     app: ${PROJECT_NAME}
-    env: ${APPLICATION_API_ENVIRONMENT}
-    type: api
+    env: ${APPLICATION_ENVIRONMENT}
 spec:
   replicas: ${APPLICATION_REPLICAS}
   selector:
     matchLabels:
       app: ${PROJECT_NAME}
-      env: ${APPLICATION_API_ENVIRONMENT}
-      type: api
+      env: ${APPLICATION_ENVIRONMENT}
   template:
     metadata:
       labels:
         app: ${PROJECT_NAME}
-        env: ${APPLICATION_API_ENVIRONMENT}
-        type: api
+        env: ${APPLICATION_ENVIRONMENT}
       annotations:
         bellsoft.net/application: ${PROJECT_NAME}
-        bellsoft.net/environment: ${APPLICATION_API_ENVIRONMENT}
+        bellsoft.net/environment: ${APPLICATION_ENVIRONMENT}
     spec:
       containers:
-        - name: ${APPLICATION_API_NAME}
+        - name: ${APPLICATION_NAME}
           image: ${APPLICATION_IMAGE_URL}
           env:
             - name: SPRING_PROFILES_ACTIVE

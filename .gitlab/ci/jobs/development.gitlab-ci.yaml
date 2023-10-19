@@ -24,7 +24,7 @@ deploy_development:
     DEPLOY_ENVIRONMENT: "development"
   environment:
     name: development
-    url: https://${APPLICATION_URL}/api/
+    url: https://${APPLICATION_URL}/
   rules:
     - if: $CI_MERGE_REQUEST_ID
       when: manual
