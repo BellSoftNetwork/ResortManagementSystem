@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${APPLICATION_API_SERVICE_NAME}
+  namespace: ${APPLICATION_NAMESPACE}
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: ${APPLICATION_API_SERVICE_NAME}
+  selector:
+    app: ${PROJECT_NAME}
+    env: ${APPLICATION_API_ENVIRONMENT}
+    type: api
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${APPLICATION_API_DEPLOYMENT_NAME}
+  namespace: ${APPLICATION_NAMESPACE}
+  annotations:
+    kubernetes.io/change-cause: "${APPLICATION_CHANGE_CAUSE}"
+    bellsoft.net/application: ${PROJECT_NAME}
+    bellsoft.net/environment: ${APPLICATION_API_ENVIRONMENT}
+  labels:
+    app: ${PROJECT_NAME}
+    env: ${APPLICATION_API_ENVIRONMENT}
+    type: api
+spec:
+  replicas: ${APPLICATION_REPLICAS}
+  selector:
+    matchLabels:
+      app: ${PROJECT_NAME}
+      env: ${APPLICATION_API_ENVIRONMENT}
+      type: api
+  template:
+    metadata:
+      labels:
+        app: ${PROJECT_NAME}
+        env: ${APPLICATION_API_ENVIRONMENT}
+        type: api
+      annotations:
+        bellsoft.net/application: ${PROJECT_NAME}
+        bellsoft.net/environment: ${APPLICATION_API_ENVIRONMENT}
+    spec:
+      containers:
+        - name: ${APPLICATION_API_NAME}
+          image: ${APPLICATION_IMAGE_URL}
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "production"
+            - name: DEPLOY_ENVIRONMENT
+              value: "${DEPLOY_ENVIRONMENT}"
+            - name: DATABASE_MYSQL_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: ${APPLICATION_NAME}-connection
+                  key: DATABASE_MYSQL_HOST
+            - name: DATABASE_MYSQL_SCHEMA
+              valueFrom:
+                secretKeyRef:
+                  name: ${APPLICATION_NAME}-connection
+                  key: DATABASE_MYSQL_SCHEMA
+                  optional: true
+            - name: DATABASE_MYSQL_OPTION
+              valueFrom:
+                secretKeyRef:
+                  name: ${APPLICATION_NAME}-connection
+                  key: DATABASE_MYSQL_OPTION
+                  optional: true
+            - name: DATABASE_MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: ${APPLICATION_NAME}-connection
+                  key: DATABASE_MYSQL_USER
+            - name: DATABASE_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ${APPLICATION_NAME}-connection
+                  key: DATABASE_MYSQL_PASSWORD
+            - name: SECURITY_JWT_SIGNATURE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ${APPLICATION_NAME}-secret
+                  key: SECURITY_JWT_SIGNATURE_KEY
+          ports:
+            - containerPort: 8080

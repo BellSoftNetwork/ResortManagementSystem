@@ -1,0 +1,28 @@
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: ${APPLICATION_NAME}
+  namespace: ${APPLICATION_NAMESPACE}
+  annotations:
+    cert-manager.io/cluster-issuer: "${CERT_MANAGER_CLUSTER_ISSUER}"
+    acme.cert-manager.io/http01-edit-in-place: "true"
+    nginx.org/websocket-services: "${APPLICATION_API_SERVICE_NAME}"
+  labels:
+    app: ${PROJECT_NAME}
+    env: ${APPLICATION_ENVIRONMENT}
+spec:
+  tls:
+    - hosts:
+        - ${APPLICATION_URL}
+      secretName: ${APPLICATION_URL}-tls
+  rules:
+    - host: ${APPLICATION_URL}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ${APPLICATION_API_SERVICE_NAME}
+                port:
+                  number: 8080
