@@ -26,10 +26,10 @@ variables:
 stages:
   - test
   - build
-#  - review
-#  - staging
-#  - deploy
-#  - cleanup
+  - review
+  - staging
+  - deploy
+  - cleanup
 
 include:
   - local: /.gitlab/ci/jobs/templates/default.gitlab-ci.yaml # 공통 구성요소 템플릿
