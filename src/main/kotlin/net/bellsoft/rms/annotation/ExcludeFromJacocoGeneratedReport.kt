@@ -1,4 +1,4 @@
-package net.bellsoft.bellsafehouse.annotation
+package net.bellsoft.rms.annotation
 
 @MustBeDocumented
 @Retention(AnnotationRetention.RUNTIME)

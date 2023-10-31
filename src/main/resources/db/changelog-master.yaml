@@ -1,5 +1,5 @@
 databaseChangeLog:
   - includeAll:
       path: db/init/
-#  - includeAll: # TODO: 마이그레이션 생성 시 주석 해제 필요
-#      path: db/changelogs/
+  - includeAll:
+      path: db/changelog/

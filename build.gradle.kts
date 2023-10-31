@@ -212,6 +212,7 @@ private object JacocoViolationRuleSet {
         val EXCLUDE_FILES = listOf(
             "*ApplicationKt",
             "*.config.*Config",
+            "*.domain.*Converter",
             "*.exception.*Exception",
             "*Dto",
             "*DTO",
