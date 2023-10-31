@@ -28,6 +28,7 @@ internal class ReservationRepositoryTest(
                 fixture {
                     property(Reservation::user) { user }
                     property(Reservation::reservationMethod) { reservationMethod }
+                    property(Reservation::room) { null }
                 },
             )
 
