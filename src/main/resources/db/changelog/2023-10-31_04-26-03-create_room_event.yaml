@@ -1,0 +1,63 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1698737163816-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_room_event
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: room_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: type
+                  type: TINYINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: detail
+                  type: VARCHAR(1000)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: deleted_at
+                  type: DATETIME
+            tableName: room_event
+        - addForeignKeyConstraint:
+            baseColumnNames: room_id
+            baseTableName: room_event
+            constraintName: FK_ROOM_EVENT_ON_ROOM
+            referencedColumnNames: id
+            referencedTableName: room
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: room_event
+            constraintName: FK_ROOM_EVENT_ON_USER
+            referencedColumnNames: id
+            referencedTableName: user
+

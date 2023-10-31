@@ -1,7 +1,7 @@
 [versions]
-springBoot = "3.1.4"
+springBoot = "3.1.5"
 springDependencyManagement = "1.1.3"
-springSecurity = "6.1.4"
+springSecurity = "6.1.5"
 springRabbit = "3.0.2"
 springBatch = "5.0.1"
 ktlint = "11.3.1"

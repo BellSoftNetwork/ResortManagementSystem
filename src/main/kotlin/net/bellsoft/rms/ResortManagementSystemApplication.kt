@@ -1,6 +1,6 @@
 package net.bellsoft.rms
 
-import net.bellsoft.bellsafehouse.annotation.ExcludeFromJacocoGeneratedReport
+import net.bellsoft.rms.annotation.ExcludeFromJacocoGeneratedReport
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 

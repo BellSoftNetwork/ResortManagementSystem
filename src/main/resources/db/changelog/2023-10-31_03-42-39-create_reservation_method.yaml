@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1698734559669-3
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_reservation_method
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(20)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: commission_rate
+                  type: DOUBLE
+              - column:
+                  constraints:
+                    nullable: false
+                  name: status
+                  type: TINYINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: deleted_at
+                  type: DATETIME
+            tableName: reservation_method
+

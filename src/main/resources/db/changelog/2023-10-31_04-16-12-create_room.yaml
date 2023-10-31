@@ -1,0 +1,57 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1698736572592-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_room
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: number
+                  type: VARCHAR(10)
+              - column:
+                  name: peek_price
+                  type: INT
+              - column:
+                  name: off_peek_price
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: status
+                  type: TINYINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: desciption
+                  type: VARCHAR(200)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: note
+                  type: VARCHAR(200)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: deleted_at
+                  type: DATETIME
+            tableName: room
+

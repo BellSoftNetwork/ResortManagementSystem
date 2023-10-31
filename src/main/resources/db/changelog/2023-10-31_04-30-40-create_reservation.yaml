@@ -1,0 +1,127 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1698737440169-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_reservation
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: reservation_method_id
+                  type: BIGINT
+              - column:
+                  name: room_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(30)
+              - column:
+                  name: phone
+                  type: VARCHAR(20)
+              - column:
+                  name: people_count
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: stay_start_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: stay_end_at
+                  type: DATETIME
+              - column:
+                  name: check_in_at
+                  type: DATETIME
+              - column:
+                  name: check_out_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: price
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: payment_amount
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: refund_amount
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: reservation_fee
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: broker_fee
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: note
+                  type: VARCHAR(200)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: status
+                  type: TINYINT
+              - column:
+                  name: canceled_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: deleted_at
+                  type: DATETIME
+            tableName: reservation
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: reservation
+            constraintName: FK_RESERVATION_ON_USER
+            referencedColumnNames: id
+            referencedTableName: user
+        - addForeignKeyConstraint:
+            baseColumnNames: reservation_method_id
+            baseTableName: reservation
+            constraintName: FK_RESERVATION_ON_RESERVATION_METHOD
+            referencedColumnNames: id
+            referencedTableName: reservation_method
+        - addForeignKeyConstraint:
+            baseColumnNames: room_id
+            baseTableName: reservation
+            constraintName: FK_RESERVATION_ON_ROOM
+            referencedColumnNames: id
+            referencedTableName: room
+
