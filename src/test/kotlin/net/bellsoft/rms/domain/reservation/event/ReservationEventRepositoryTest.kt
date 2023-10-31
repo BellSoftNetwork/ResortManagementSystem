@@ -31,6 +31,7 @@ internal class ReservationEventRepositoryTest(
                 fixture {
                     property(Reservation::user) { user }
                     property(Reservation::reservationMethod) { reservationMethod }
+                    property(Reservation::room) { null }
                 },
             )
             val reservationEvent = reservationEventRepository.save(
