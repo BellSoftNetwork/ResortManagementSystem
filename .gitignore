@@ -8,6 +8,8 @@ build/
 .kubernetes/
 !.kubernetes/.gitkeep
 
+/src/main/resources/static/
+
 ### STS ###
 .apt_generated
 .classpath

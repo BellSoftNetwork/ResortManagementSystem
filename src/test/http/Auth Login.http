@@ -1,0 +1,25 @@
+### 1. Login
+POST http://localhost:8080/api/v1/auth/login
+Content-Type: application/json
+X-XSRF-TOKEN: {{XSRF-TOKEN}}
+
+{
+    "email": "{{email}}",
+    "password": "{{password}}"
+}
+
+
+### 2. Whoami
+GET http://localhost:8080/api/v1/whoami
+Content-Type: application/json
+
+
+### 3. Logout
+POST http://localhost:8080/api/v1/auth/logout
+Content-Type: application/json
+X-XSRF-TOKEN: {{XSRF-TOKEN}}
+
+
+### 4. Whoami
+GET http://localhost:8080/api/v1/whoami
+Content-Type: application/json
