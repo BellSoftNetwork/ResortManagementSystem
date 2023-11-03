@@ -2,6 +2,12 @@ application:
   deploy:
     environment: "default"
 
+server:
+  servlet:
+    encoding:
+      charset: utf-8
+      force: true
+
 # Swagger
 springdoc:
   api-docs:

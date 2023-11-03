@@ -13,14 +13,14 @@ import org.hibernate.annotations.Where
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 
 @Entity
 @Table(name = "user")
 @SQLDelete(sql = "UPDATE user SET deleted_at = NOW() WHERE id = ?")
 @Where(clause = "deleted_at IS NULL")
 class User(
-    @Column(name = "password", nullable = false, length = 60)
+    @Column(name = "password", nullable = false, length = 100)
     private var password: String,
 
     email: String,
@@ -59,8 +59,8 @@ class User(
         return password
     }
 
-    fun setPassword(password: String) {
-        this.password = PASSWORD_ENCODER.encode(password)
+    fun changePassword(passwordEncoder: PasswordEncoder, rawPassword: String) {
+        this.password = passwordEncoder.encode(rawPassword)
     }
 
     override fun getUsername(): String {
@@ -90,9 +90,5 @@ class User(
     override fun toString(): String {
         return "User(id=$id, email='$email', password='$password', name='$name', role='$role', status='$status', " +
             "createdAt='$createdAt', updatedAt='$updatedAt', deletedAt=$deletedAt)"
-    }
-
-    companion object {
-        private val PASSWORD_ENCODER = BCryptPasswordEncoder()
     }
 }
