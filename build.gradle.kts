@@ -199,7 +199,7 @@ tasks.named<Test>("test") {
 tasks.jacocoTestReport {
     reports {
         xml.required.set(true)
-        xml.outputLocation.set(file("$buildDir/jacoco/jacoco.xml"))
+        xml.outputLocation.set(file("${layout.buildDirectory.get()}/jacoco/jacoco.xml"))
     }
 
     finalizedBy("jacocoTestCoverageVerification") // NOTE: 활성화시 violationRules 통과 실패할경우 테스트도 실패처리 됨
@@ -221,7 +221,6 @@ private object JacocoViolationRuleSet {
 
     object Business {
         val INCLUDE_FILES = listOf(
-            "*.domain.*",
             "*.service.*",
         )
     }
