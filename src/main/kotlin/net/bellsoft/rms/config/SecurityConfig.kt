@@ -58,6 +58,7 @@ class SecurityConfig(
                     it.requestMatchers("/h2-console/**").permitAll()
 
                 it.requestMatchers("/api/*/auth/**").permitAll()
+                it.requestMatchers("/api/v1/env").permitAll()
                 it.requestMatchers("/api/**").authenticated()
                 it.requestMatchers("/api/*/admin/**").hasAnyRole("ADMIN", "SUPERADMIN")
                 it.requestMatchers("/docs/**").permitAll()
