@@ -21,6 +21,7 @@ deploy_development:
   variables:
     APPLICATION_URL: development.${KUBE_INGRESS_BASE_DOMAIN}
     APPLICATION_NAMESPACE: ${KUBE_NAMESPACE}
+    CERT_MANAGER_CLUSTER_ISSUER: "letsencrypt-prod"
     DEPLOY_ENVIRONMENT: "development"
   environment:
     name: development

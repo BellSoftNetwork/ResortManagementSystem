@@ -1,13 +1,10 @@
 include:
   - local: /.gitlab/ci/jobs/templates/gradle.gitlab-ci.yaml
+  - local: /.gitlab/ci/jobs/templates/node.gitlab-ci.yaml
   - local: /.gitlab/ci/jobs/templates/docker.gitlab-ci.yaml
 
 .build:
-  extends:
-    - .gradle_cache
   stage: build
-  needs:
-    - test
   rules:
     - if: "$TEST_DISABLED || $BUILD_DISABLED"
       when: never
@@ -16,10 +13,28 @@ include:
     - if: "$CI_COMMIT_REF_NAME"
       when: manual
 
+build_vue_app:
+  extends:
+    - .build
+    - .node_yarn_cache
+  needs: [ ]
+  variables:
+    NODE_ENV: "production"
+  script:
+    - yarn build
+  artifacts:
+    name: vue_dist
+    paths:
+      - src/main/resources/static/
+
 build_boot_image:
   extends:
     - .build
+    - .gradle_cache
     - .in_docker
+  needs:
+    - test
+    - build_vue_app
   variables:
     PROPERTY_REGISTRY: "-PproxyRegistryUrl=${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX} -PprojectRegistryUrl=${CI_REGISTRY_URL} -PregistryUser=${CI_REGISTRY_USER} -PregistryPassword=${CI_REGISTRY_PASSWORD} -PregistryEmail=${GITLAB_USER_EMAIL}"
     PROPERTY_BUILD: "-PbindingsDir=${CI_PROJECT_DIR}/bindings -PgradleDir=${CI_PROJECT_DIR}/.gradle-cache"

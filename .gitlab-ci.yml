@@ -14,6 +14,7 @@
 #
 # [설정 가능한 변수]
 # - GRADLE_VERSION: gradle 버전
+# - NODE_VERSION: node 버전
 # - TEST_DISABLED: 테스트 비활성 (값 설정 시)
 # - BUILD_DISABLED: 빌드 비활성 (값 설정 시)
 # - DEPLOY_DISABLED: 배포 비활성 (값 설정 시)
@@ -21,6 +22,7 @@
 
 variables:
   GRADLE_VERSION: 7.5.0-jdk17
+  NODE_VERSION: 16-alpine
   JACOCO2COBERTURA_VERSION: 1.0.8
 
 stages:
