@@ -14,6 +14,6 @@ class MainController {
     @GetMapping("/env")
     fun displayEnv() = EnvResponse.of("Resort Management System", "RMS", "v1.0")
 
-    @GetMapping("/whoami")
+    @RequestMapping("/whoami")
     fun displayMySelf(@AuthenticationPrincipal user: User) = WhoAmIResponse.of(user)
 }

@@ -1,15 +1,18 @@
 <template>
   <v-app>
-    <TopBar />
+    <SideBar></SideBar>
 
-    <ContentView />
-
-    <LinkFooter />
+    <v-main>
+      <v-container
+        class="py-8 px-6"
+        fluid
+      >
+        <router-view />
+      </v-container>
+    </v-main>
   </v-app>
 </template>
 
 <script setup>
-import TopBar from "./TopBar.vue"
-import ContentView from "./ContentView.vue"
-import LinkFooter from "./LinkFooter.vue"
+import SideBar from "./SideBar.vue"
 </script>
