@@ -21,7 +21,7 @@ class JsonAuthenticationFailureHandler : AuthenticationFailureHandler {
         exception: AuthenticationException,
     ) {
         val email = request.getAttribute("email") as String
-        logger.warn { "인증 실패 ($email)" }
+        logger.warn { "인증 실패 - ${exception.message} (email: $email)" }
 
         response.apply {
             this.status = HttpStatus.UNAUTHORIZED.value()
@@ -32,7 +32,7 @@ class JsonAuthenticationFailureHandler : AuthenticationFailureHandler {
             response.writer,
             AuthenticationResponse(
                 email = email,
-                message = "인증 실패",
+                message = exception.message.toString(),
             ),
         )
     }

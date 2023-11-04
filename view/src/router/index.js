@@ -13,6 +13,16 @@ const routes = [
       },
     ],
   },
+  {
+    path: "/login",
+    children: [
+      {
+        path: "",
+        name: "Login",
+        component: () => import(/* webpackChunkName: "login" */ "@/views/MainLogin.vue"),
+      },
+    ],
+  },
 ]
 
 const router = createRouter({
