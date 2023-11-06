@@ -7,7 +7,9 @@ import jakarta.validation.ConstraintViolationException
 import mu.KLogging
 import net.bellsoft.rms.controller.dto.ErrorResponse
 import net.bellsoft.rms.exception.BadRequestException
+import net.bellsoft.rms.exception.DataNotFoundException
 import net.bellsoft.rms.exception.InvalidTokenException
+import net.bellsoft.rms.exception.PermissionRequiredDataException
 import net.bellsoft.rms.exception.UnprocessableEntityException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
@@ -146,6 +148,26 @@ class ExceptionController {
 
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse(ex.message.toString()))
+    }
+
+    @ApiResponse(responseCode = "404", content = [Content(schema = Schema(implementation = ErrorResponse::class))])
+    @ExceptionHandler(DataNotFoundException::class)
+    fun handleDataNotFoundException(ex: DataNotFoundException): ResponseEntity<ErrorResponse> {
+        logger.info(ex.message.toString())
+
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(ErrorResponse(ex.message.toString()))
+    }
+
+    @ApiResponse(responseCode = "403", content = [Content(schema = Schema(implementation = ErrorResponse::class))])
+    @ExceptionHandler(PermissionRequiredDataException::class)
+    fun handlePermissionRequiredDataException(ex: PermissionRequiredDataException): ResponseEntity<ErrorResponse> {
+        logger.info(ex.message.toString())
+
+        return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
             .body(ErrorResponse(ex.message.toString()))
     }
 

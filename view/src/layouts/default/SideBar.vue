@@ -37,8 +37,8 @@
 </template>
 
 <script setup>
-import { useAuthStore } from "@/store/auth.js"
 import { ref } from "vue"
+import { useAuthStore } from "@/store/auth.js"
 
 import LogoutDialog from "@/components/auth/LogoutDialog.vue"
 
@@ -48,4 +48,7 @@ const drawer = ref(null)
 const links = [
   ["fa-solid fa-table-columns", "대시보드", "Home"],
 ]
+
+if (authStore.isAdminRole)
+  links.push(["fa-solid fa-id-card", "계정 관리", "AdminAccounts"])
 </script>

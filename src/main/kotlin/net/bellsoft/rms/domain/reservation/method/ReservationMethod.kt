@@ -17,7 +17,13 @@ import org.hibernate.annotations.Where
 class ReservationMethod(
     name: String,
     commissionRate: Double,
-    status: ReservationMethodStatus = ReservationMethodStatus.INACTIVE,
+
+    @Column(
+        name = "status",
+        nullable = false,
+        columnDefinition = "TINYINT",
+    )
+    var status: ReservationMethodStatus = ReservationMethodStatus.INACTIVE,
 ) : BaseTime() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,9 +36,5 @@ class ReservationMethod(
 
     @Column(name = "commission_rate", nullable = false)
     var commissionRate: Double = commissionRate
-        private set
-
-    @Column(name = "status", nullable = false, columnDefinition = "TINYINT")
-    var status: ReservationMethodStatus = status
         private set
 }

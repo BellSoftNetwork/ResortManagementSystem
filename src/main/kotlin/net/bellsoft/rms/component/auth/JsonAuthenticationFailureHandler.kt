@@ -1,10 +1,10 @@
 package net.bellsoft.rms.component.auth
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KLogging
-import net.bellsoft.rms.component.auth.dto.AuthenticationResponse
+import net.bellsoft.rms.component.auth.dto.AuthenticationFailureResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.core.AuthenticationException
@@ -12,9 +12,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.stereotype.Component
 
 @Component
-class JsonAuthenticationFailureHandler : AuthenticationFailureHandler {
-    private val objectMapper = jacksonObjectMapper()
-
+class JsonAuthenticationFailureHandler(private val objectMapper: ObjectMapper) : AuthenticationFailureHandler {
     override fun onAuthenticationFailure(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -30,7 +28,7 @@ class JsonAuthenticationFailureHandler : AuthenticationFailureHandler {
 
         objectMapper.writeValue(
             response.writer,
-            AuthenticationResponse(
+            AuthenticationFailureResponse(
                 email = email,
                 message = exception.message.toString(),
             ),

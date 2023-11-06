@@ -18,9 +18,15 @@ class Room(
     number: String,
     peekPrice: Int? = null,
     offPeekPrice: Int? = null,
-    status: RoomStatus = RoomStatus.INACTIVE,
     description: String = "",
     note: String = "",
+
+    @Column(
+        name = "status",
+        nullable = false,
+        columnDefinition = "TINYINT",
+    )
+    var status: RoomStatus = RoomStatus.INACTIVE,
 ) : BaseTime() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,10 +44,6 @@ class Room(
 
     @Column(name = "off_peek_price")
     var offPeekPrice: Int? = offPeekPrice
-        private set
-
-    @Column(name = "status", nullable = false, columnDefinition = "TINYINT")
-    var status: RoomStatus = status
         private set
 
     @Column(name = "desciption", nullable = false, length = 200)

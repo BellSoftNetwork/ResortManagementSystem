@@ -24,13 +24,20 @@ class UserFixture {
                 property(User::status) { UserStatus.ACTIVE }
             }
         },
+        SUPER_ADMIN {
+            override fun config() = fixtureConfig {
+                property(User::name) { "super_admin-${FAKER.random().hex(5)}" }
+                property(User::role) { UserRole.SUPER_ADMIN }
+                property(User::status) { UserStatus.ACTIVE }
+            }
+        },
     }
 
     companion object {
         private val FAKER = Faker(Locale.KOREA)
 
         val BASE_CONFIGURATION = fixtureConfig {
-            property(User::email) { FAKER.internet().emailAddress() }
+            property(User::email) { "${FAKER.random().hex(5)}-${FAKER.internet().emailAddress()}" }
             property(User::name) { "name-${FAKER.random().hex(10)}" }
         }
     }

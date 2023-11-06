@@ -1,10 +1,10 @@
 package net.bellsoft.rms.component.auth
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KLogging
-import net.bellsoft.rms.component.auth.dto.AuthenticationResponse
+import net.bellsoft.rms.component.auth.dto.AuthenticationSuccessResponse
 import net.bellsoft.rms.domain.user.User
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -13,9 +13,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component
 
 @Component
-class JsonAuthenticationSuccessHandler : AuthenticationSuccessHandler {
-    private val objectMapper = jacksonObjectMapper()
-
+class JsonAuthenticationSuccessHandler(private val objectMapper: ObjectMapper) : AuthenticationSuccessHandler {
     override fun onAuthenticationSuccess(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -31,10 +29,9 @@ class JsonAuthenticationSuccessHandler : AuthenticationSuccessHandler {
 
         objectMapper.writeValue(
             response.writer,
-            AuthenticationResponse(
-                email = user.email,
+            AuthenticationSuccessResponse.of(
+                user = user,
                 message = "인증 성공",
-                authorities = user.authorities,
             ),
         )
     }

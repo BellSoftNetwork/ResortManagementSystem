@@ -16,6 +16,9 @@ springdoc:
     path: "/docs/swagger-ui"
 
 spring:
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DATABASE_MYSQL_HOST}/${DATABASE_MYSQL_SCHEMA:rms}?${DATABASE_MYSQL_OPTION:charset=utf8mb4,utf8&createDatabaseIfNotExist=true}

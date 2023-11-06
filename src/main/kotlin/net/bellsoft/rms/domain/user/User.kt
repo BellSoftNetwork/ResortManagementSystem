@@ -20,34 +20,25 @@ import org.springframework.security.crypto.password.PasswordEncoder
 @SQLDelete(sql = "UPDATE user SET deleted_at = NOW() WHERE id = ?")
 @Where(clause = "deleted_at IS NULL")
 class User(
+    @Column(name = "email", nullable = false, unique = true, length = 100)
+    var email: String,
+
+    @Column(name = "name", nullable = false, length = 20)
+    var name: String,
+
     @Column(name = "password", nullable = false, length = 100)
     private var password: String,
 
-    email: String,
-    name: String,
-    status: UserStatus = UserStatus.INACTIVE,
-    role: UserRole = UserRole.NORMAL,
+    @Column(name = "status", nullable = false, columnDefinition = "TINYINT")
+    var status: UserStatus = UserStatus.INACTIVE,
+
+    @Column(name = "role", nullable = false, columnDefinition = "TINYINT")
+    var role: UserRole = UserRole.NORMAL,
 ) : BaseTime(), UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     var id: Long = 0
-        private set
-
-    @Column(name = "email", nullable = false, unique = true, length = 100)
-    var email: String = email
-        private set
-
-    @Column(name = "role", nullable = false, columnDefinition = "TINYINT")
-    var role = role
-        private set
-
-    @Column(name = "name", nullable = false, length = 20)
-    var name: String = name
-        private set
-
-    @Column(name = "status", nullable = false, columnDefinition = "TINYINT")
-    var status: UserStatus = status
         private set
 
     @ExcludeFromJacocoGeneratedReport

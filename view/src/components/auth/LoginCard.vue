@@ -1,9 +1,9 @@
 <template>
   <v-card
     title="Login"
-    color="primary"
-    min-width="500"
     subtitle="Resort Management System"
+    color=""
+    min-width="400"
     variant="outlined"
     :loading="status.isProgress"
   >
