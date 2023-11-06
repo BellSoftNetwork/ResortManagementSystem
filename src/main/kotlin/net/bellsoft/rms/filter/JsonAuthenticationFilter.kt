@@ -1,6 +1,6 @@
 package net.bellsoft.rms.filter
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import net.bellsoft.rms.component.auth.dto.LoginRequest
@@ -14,10 +14,8 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.springframework.util.StringUtils
 
-class JsonAuthenticationFilter(requestMatcher: AntPathRequestMatcher) :
+class JsonAuthenticationFilter(requestMatcher: AntPathRequestMatcher, private val objectMapper: ObjectMapper) :
     AbstractAuthenticationProcessingFilter(requestMatcher) {
-    private val objectMapper = jacksonObjectMapper()
-
     override fun attemptAuthentication(
         request: HttpServletRequest,
         response: HttpServletResponse,

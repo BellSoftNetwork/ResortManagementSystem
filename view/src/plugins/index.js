@@ -6,8 +6,8 @@
 
 // Plugins
 import vuetify from "./vuetify"
-import pinia from "../store"
-import router from "../router"
+import pinia from "@/store"
+import router from "@/router"
 
 // Font Awesome
 import { library } from "@fortawesome/fontawesome-svg-core"
@@ -22,6 +22,6 @@ export function registerPlugins(app) {
   app.component("font-awesome-icon", FontAwesomeIcon)
 
   app.use(vuetify)
-  app.use(router)
   app.use(pinia)
+  app.use(router)
 }

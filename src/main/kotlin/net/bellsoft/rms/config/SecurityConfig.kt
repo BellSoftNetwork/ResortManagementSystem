@@ -1,5 +1,6 @@
 package net.bellsoft.rms.config
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import net.bellsoft.rms.component.auth.JsonAuthenticationFailureHandler
 import net.bellsoft.rms.component.auth.JsonAuthenticationSuccessHandler
 import net.bellsoft.rms.filter.JsonAuthenticationFilter
@@ -30,6 +31,7 @@ class SecurityConfig(
     private val authenticationConfiguration: AuthenticationConfiguration,
     private val jsonAuthenticationSuccessHandler: JsonAuthenticationSuccessHandler,
     private val jsonAuthenticationFailureHandler: JsonAuthenticationFailureHandler,
+    private val objectMapper: ObjectMapper,
 ) {
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
@@ -60,7 +62,7 @@ class SecurityConfig(
                 it.requestMatchers("/api/*/auth/**").permitAll()
                 it.requestMatchers("/api/v1/env").permitAll()
                 it.requestMatchers("/api/**").authenticated()
-                it.requestMatchers("/api/*/admin/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                it.requestMatchers("/api/*/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                 it.requestMatchers("/docs/**").permitAll()
                 it.anyRequest().permitAll()
             }
@@ -71,6 +73,7 @@ class SecurityConfig(
     fun jsonAuthenticationFilter(): JsonAuthenticationFilter {
         return JsonAuthenticationFilter(
             AntPathRequestMatcher("/api/v1/auth/login", HttpMethod.POST.name()),
+            objectMapper,
         ).apply {
             setSecurityContextRepository(securityContextRepository())
             setAuthenticationManager(authenticationConfiguration.authenticationManager)

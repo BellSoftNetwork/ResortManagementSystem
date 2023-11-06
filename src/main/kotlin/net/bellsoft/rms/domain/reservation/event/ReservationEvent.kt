@@ -22,8 +22,10 @@ import org.hibernate.annotations.Where
 class ReservationEvent(
     user: User,
     reservation: Reservation,
-    type: ReservationEventType,
     detail: String,
+
+    @Column(name = "type", nullable = false, columnDefinition = "TINYINT")
+    var type: ReservationEventType,
 ) : BaseTime() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,10 +41,6 @@ class ReservationEvent(
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "reservation_id", nullable = false)
     var reservation: Reservation = reservation
-        private set
-
-    @Column(name = "type", nullable = false, columnDefinition = "TINYINT")
-    var type: ReservationEventType = type
         private set
 
     @Column(name = "detail", nullable = false, length = 1000)

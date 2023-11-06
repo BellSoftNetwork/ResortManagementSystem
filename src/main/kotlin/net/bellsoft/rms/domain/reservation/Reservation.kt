@@ -39,8 +39,14 @@ class Reservation(
     reservationFee: Int = 0,
     brokerFee: Int = 0,
     note: String = "",
-    status: ReservationStatus = ReservationStatus.PENDING,
     canceledAt: LocalDateTime? = null,
+
+    @Column(
+        name = "status",
+        nullable = false,
+        columnDefinition = "TINYINT",
+    )
+    var status: ReservationStatus = ReservationStatus.PENDING,
 ) : BaseTime() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -112,10 +118,6 @@ class Reservation(
 
     @Column(name = "note", nullable = false, length = 200)
     var note: String = note
-        private set
-
-    @Column(name = "status", nullable = false, columnDefinition = "TINYINT")
-    var status: ReservationStatus = status
         private set
 
     @Column(name = "canceled_at")
