@@ -29,7 +29,7 @@
             <v-text-field
               v-model="account.email"
               label="이메일"
-              readonly="true"
+              :readonly="true"
             ></v-text-field>
 
             <v-text-field
@@ -60,13 +60,12 @@
 
           <v-btn
             text="취소"
-            color="primary"
             @click="status.isDialogActive = false"
           ></v-btn>
 
           <v-btn
-            text="계정 수정"
-            color="red"
+            text="수정"
+            color="primary"
             @click="updateAccount"
             :disabled="!(status.isValid && isChanged())"
           ></v-btn>

@@ -1,0 +1,78 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1699525139956-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: DATETIME
+            columnName: deleted_at
+            defaultNullValue: "1970-01-01 00:00:00"
+            tableName: reservation
+            validate: true
+  - changeSet:
+      id: 1699525139956-2
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: DATETIME
+            columnName: deleted_at
+            defaultNullValue: "1970-01-01 00:00:00"
+            tableName: reservation_event
+            validate: true
+  - changeSet:
+      id: 1699525139956-3
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: DATETIME
+            columnName: deleted_at
+            defaultNullValue: "1970-01-01 00:00:00"
+            tableName: reservation_method
+            validate: true
+  - changeSet:
+      id: 1699525139956-4
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: DATETIME
+            columnName: deleted_at
+            defaultNullValue: "1970-01-01 00:00:00"
+            tableName: room
+            validate: true
+  - changeSet:
+      id: 1699525139956-5
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: DATETIME
+            columnName: deleted_at
+            defaultNullValue: "1970-01-01 00:00:00"
+            tableName: room_event
+            validate: true
+  - changeSet:
+      id: 1699525139956-6
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: DATETIME
+            columnName: deleted_at
+            defaultNullValue: "1970-01-01 00:00:00"
+            tableName: user
+            validate: true
+  - changeSet:
+      id: 1699525139956-7
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: VARCHAR(100)
+            columnName: password
+            tableName: user
+            validate: true
+

@@ -21,7 +21,7 @@ import java.util.*
 @Entity
 @Table(name = "reservation")
 @SQLDelete(sql = "UPDATE reservation SET deleted_at = NOW() WHERE id = ?")
-@Where(clause = "deleted_at IS NULL")
+@Where(clause = BaseTime.SOFT_DELETE_CONDITION)
 class Reservation(
     user: User,
     reservationMethod: ReservationMethod,

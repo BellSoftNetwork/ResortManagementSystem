@@ -18,7 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 @Entity
 @Table(name = "user")
 @SQLDelete(sql = "UPDATE user SET deleted_at = NOW() WHERE id = ?")
-@Where(clause = "deleted_at IS NULL")
+@Where(clause = BaseTime.SOFT_DELETE_CONDITION)
 class User(
     @Column(name = "email", nullable = false, unique = true, length = 100)
     var email: String,

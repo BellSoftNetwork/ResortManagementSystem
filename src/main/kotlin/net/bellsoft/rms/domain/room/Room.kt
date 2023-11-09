@@ -13,7 +13,7 @@ import org.hibernate.annotations.Where
 @Entity
 @Table(name = "room")
 @SQLDelete(sql = "UPDATE room SET deleted_at = NOW() WHERE id = ?")
-@Where(clause = "deleted_at IS NULL")
+@Where(clause = BaseTime.SOFT_DELETE_CONDITION)
 class Room(
     number: String,
     peekPrice: Int? = null,

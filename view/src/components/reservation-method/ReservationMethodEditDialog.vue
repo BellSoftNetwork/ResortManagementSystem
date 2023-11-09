@@ -7,15 +7,15 @@
     <template v-slot:activator="{ props }">
       <v-btn
         v-bind="props"
-        color="primary"
-        text="계정 추가"
-        block
-      ></v-btn>
+        variant="text"
+      >
+        <slot>예약 수단 수정</slot>
+      </v-btn>
     </template>
 
     <template v-slot:default>
       <v-card
-        title="계정 추가"
+        title="예약 수단 수정"
         :loading="status.isProgress"
         :disabled="status.isProgress"
       >
@@ -27,33 +27,21 @@
             ref="form"
           >
             <v-text-field
-              v-model="account.name"
-              label="이름"
+              v-model="reservationMethod.name"
               :rules="rules.name"
-              required
+              label="이름"
             ></v-text-field>
 
             <v-text-field
-              v-model="account.email"
-              label="이메일"
-              :rules="rules.email"
+              v-model="reservationMethod.commissionRatePercent"
+              label="수수료율"
+              :rules="rules.commissionRatePercent"
+              append-inner-icon="fa-solid fa-percent"
+              type="number"
+              min="0"
+              max="100"
               required
             ></v-text-field>
-
-            <v-text-field
-              v-model="account.password"
-              type="password"
-              label="비밀번호"
-              :rules="rules.password"
-              required
-            ></v-text-field>
-
-            <v-select
-              v-model="account.role"
-              label="권한"
-              :items="rules.role"
-              required
-            ></v-select>
           </v-form>
         </v-card-text>
 
@@ -66,9 +54,10 @@
           ></v-btn>
 
           <v-btn
-            text="추가"
+            text="수정"
             color="primary"
-            @click="createAccount"
+            @click="updateReservationMethod"
+            :disabled="!(status.isValid && isChanged())"
           ></v-btn>
         </v-card-actions>
       </v-card>
@@ -78,7 +67,7 @@
   <v-snackbar
     v-model="status.isError"
   >
-    계정 추가 실패 ({{ status.errorMessage }})
+    예약 수단 수정 실패 ({{ status.errorMessage }})
 
     <template v-slot:actions>
       <v-btn
@@ -101,7 +90,10 @@ import axios from "@/modules/axios-wrapper"
 const router = useRouter()
 const authStore = useAuthStore()
 
-const emit = defineEmits(["created"])
+const emit = defineEmits(["complete"])
+const props = defineProps({
+  reservationMethod: Object,
+})
 const status = ref({
   isDialogActive: false,
   isValid: false,
@@ -109,34 +101,23 @@ const status = ref({
   isError: false,
   errorMessage: null,
 })
-const account = ref({
-  name: "",
-  email: "",
-  password: "",
-  role: "NORMAL",
+const reservationMethod = ref({
+  name: props.reservationMethod.name,
+  commissionRatePercent: props.reservationMethod.commissionRate * 100,
 })
 const rules = {
   name: [value => (value.length >= 2 && value.length <= 20) || "2~20 글자가 필요합니다"],
-  email: [value => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) || "이메일이 유효하지 않습니다."],
-  password: [value => (value.length >= 8 && value.length <= 20) || "비밀번호는 8~20 글자가 필요합니다."],
-  role: [
-    { title: "일반", value: "NORMAL" },
-  ],
+  commissionRatePercent: [value => (value >= 0 && value <= 100) || "수수료율이 유효하지 않습니다."],
 }
 
-if (authStore.isSuperAdminRole)
-  rules.role.push({ title: "관리자", value: "ADMIN" })
 
-
-function createAccount() {
+function updateReservationMethod() {
   status.value.isProgress = true
 
-  axios.post("/api/v1/admin/accounts", account.value)
+  axios.patch(`/api/v1/reservation-methods/${props.reservationMethod.id}`, patchedData())
     .then(() => {
-      emit("created")
+      emit("complete")
       status.value.isDialogActive = false
-
-      resetForm()
     })
     .catch((error) => {
       status.value.errorMessage = error.response.data.message
@@ -147,10 +128,19 @@ function createAccount() {
     })
 }
 
-function resetForm() {
-  account.value.name = ""
-  account.value.email = ""
-  account.value.password = ""
-  account.value.role = "NORMAL"
+function isChanged() {
+  return reservationMethod.value.name !== props.reservationMethod.name ||
+    reservationMethod.value.commissionRatePercent / 100 !== props.reservationMethod.commissionRate
+}
+
+function patchedData() {
+  const patchData = {}
+
+  if (props.reservationMethod.name !== reservationMethod.value.name)
+    patchData.name = reservationMethod.value.name
+  if (props.reservationMethod.commissionRate !== reservationMethod.value.commissionRatePercent / 100)
+    patchData.commissionRate = reservationMethod.value.commissionRatePercent / 100
+
+  return patchData
 }
 </script>

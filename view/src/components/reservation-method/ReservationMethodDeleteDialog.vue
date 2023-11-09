@@ -7,53 +7,41 @@
     <template v-slot:activator="{ props }">
       <v-btn
         v-bind="props"
-        color="primary"
-        text="계정 추가"
-        block
-      ></v-btn>
+        color="red"
+        variant="text"
+      >
+        <slot>예약 수단 삭제</slot>
+      </v-btn>
     </template>
 
     <template v-slot:default>
       <v-card
-        title="계정 추가"
+        title="예약 수단 삭제"
         :loading="status.isProgress"
         :disabled="status.isProgress"
       >
         <v-card-text>
           <v-form
-            v-model="status.isValid"
             @submit.prevent
             fast-fail
             ref="form"
           >
             <v-text-field
-              v-model="account.name"
+              v-model="reservationMethod.name"
               label="이름"
-              :rules="rules.name"
-              required
+              :readonly="true"
             ></v-text-field>
 
             <v-text-field
-              v-model="account.email"
-              label="이메일"
-              :rules="rules.email"
+              v-model="reservationMethod.commissionRatePercent"
+              label="수수료율"
+              append-inner-icon="fa-solid fa-percent"
+              :readonly="true"
+              type="number"
+              min="0"
+              max="100"
               required
             ></v-text-field>
-
-            <v-text-field
-              v-model="account.password"
-              type="password"
-              label="비밀번호"
-              :rules="rules.password"
-              required
-            ></v-text-field>
-
-            <v-select
-              v-model="account.role"
-              label="권한"
-              :items="rules.role"
-              required
-            ></v-select>
           </v-form>
         </v-card-text>
 
@@ -66,9 +54,9 @@
           ></v-btn>
 
           <v-btn
-            text="추가"
-            color="primary"
-            @click="createAccount"
+            text="삭제"
+            color="red"
+            @click="updateReservationMethod"
           ></v-btn>
         </v-card-actions>
       </v-card>
@@ -78,7 +66,7 @@
   <v-snackbar
     v-model="status.isError"
   >
-    계정 추가 실패 ({{ status.errorMessage }})
+    예약 수단 삭제 실패 ({{ status.errorMessage }})
 
     <template v-slot:actions>
       <v-btn
@@ -101,7 +89,10 @@ import axios from "@/modules/axios-wrapper"
 const router = useRouter()
 const authStore = useAuthStore()
 
-const emit = defineEmits(["created"])
+const emit = defineEmits(["complete"])
+const props = defineProps({
+  reservationMethod: Object,
+})
 const status = ref({
   isDialogActive: false,
   isValid: false,
@@ -109,34 +100,18 @@ const status = ref({
   isError: false,
   errorMessage: null,
 })
-const account = ref({
-  name: "",
-  email: "",
-  password: "",
-  role: "NORMAL",
+const reservationMethod = ref({
+  name: props.reservationMethod.name,
+  commissionRatePercent: props.reservationMethod.commissionRate * 100,
 })
-const rules = {
-  name: [value => (value.length >= 2 && value.length <= 20) || "2~20 글자가 필요합니다"],
-  email: [value => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) || "이메일이 유효하지 않습니다."],
-  password: [value => (value.length >= 8 && value.length <= 20) || "비밀번호는 8~20 글자가 필요합니다."],
-  role: [
-    { title: "일반", value: "NORMAL" },
-  ],
-}
 
-if (authStore.isSuperAdminRole)
-  rules.role.push({ title: "관리자", value: "ADMIN" })
-
-
-function createAccount() {
+function updateReservationMethod() {
   status.value.isProgress = true
 
-  axios.post("/api/v1/admin/accounts", account.value)
+  axios.delete(`/api/v1/reservation-methods/${props.reservationMethod.id}`)
     .then(() => {
-      emit("created")
+      emit("complete")
       status.value.isDialogActive = false
-
-      resetForm()
     })
     .catch((error) => {
       status.value.errorMessage = error.response.data.message
@@ -145,12 +120,5 @@ function createAccount() {
     .finally(() => {
       status.value.isProgress = false
     })
-}
-
-function resetForm() {
-  account.value.name = ""
-  account.value.email = ""
-  account.value.password = ""
-  account.value.role = "NORMAL"
 }
 </script>

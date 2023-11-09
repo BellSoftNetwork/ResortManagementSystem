@@ -6,17 +6,26 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 import net.bellsoft.rms.domain.base.BaseTime
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
 
 @Entity
-@Table(name = "reservation_method")
+@Table(
+    name = "reservation_method",
+    uniqueConstraints = [
+        UniqueConstraint(name = "uc_reservation_method_name", columnNames = ["name", "deleted_at"]),
+    ],
+)
 @SQLDelete(sql = "UPDATE reservation_method SET deleted_at = NOW() WHERE id = ?")
-@Where(clause = "deleted_at IS NULL")
+@Where(clause = BaseTime.SOFT_DELETE_CONDITION)
 class ReservationMethod(
-    name: String,
-    commissionRate: Double,
+    @Column(name = "name", nullable = false, length = 20)
+    var name: String,
+
+    @Column(name = "commission_rate", nullable = false)
+    var commissionRate: Double,
 
     @Column(
         name = "status",
@@ -29,12 +38,5 @@ class ReservationMethod(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     var id: Long = 0
-        private set
-
-    @Column(name = "name", nullable = false, length = 20)
-    var name: String = name
-
-    @Column(name = "commission_rate", nullable = false)
-    var commissionRate: Double = commissionRate
         private set
 }

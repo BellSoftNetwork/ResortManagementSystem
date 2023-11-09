@@ -47,6 +47,7 @@ const authStore = useAuthStore()
 const drawer = ref(null)
 const links = [
   ["fa-solid fa-table-columns", "대시보드", "Home"],
+  ["fa-solid fa-comment-dollar", "예약 수단", "ReservationMethods"],
 ]
 
 if (authStore.isAdminRole)
