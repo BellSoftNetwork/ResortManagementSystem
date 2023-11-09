@@ -12,7 +12,7 @@
     <v-list>
       <v-list-item>
         <AccountEditDialog @complete="emit('complete')" :account="props.account">
-          <v-list-item-title>계정 수정</v-list-item-title>
+          <v-list-item-title>수정</v-list-item-title>
         </AccountEditDialog>
       </v-list-item>
 
@@ -24,7 +24,7 @@
           <template v-slot:activator="{ props }">
             <div v-bind="props">
               <v-btn variant="text" color="red" disabled>
-                <v-list-item-title>계정 잠금</v-list-item-title>
+                <v-list-item-title>잠금</v-list-item-title>
               </v-btn>
             </div>
           </template>
@@ -37,7 +37,7 @@
           <template v-slot:activator="{ props }">
             <div v-bind="props">
               <v-btn variant="text" color="red" disabled>
-                <v-list-item-title>계정 삭제</v-list-item-title>
+                <v-list-item-title>삭제</v-list-item-title>
               </v-btn>
             </div>
           </template>

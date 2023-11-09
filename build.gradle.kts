@@ -192,8 +192,6 @@ tasks.named<Test>("test") {
         "--add-opens",
         "java.base/java.lang.reflect=ALL-UNNAMED",
     )
-
-    finalizedBy("jacocoTestReport")
 }
 
 tasks.jacocoTestReport {
@@ -214,6 +212,7 @@ private object JacocoViolationRuleSet {
             "*.config.*Config",
             "*.domain.*Converter",
             "*.exception.*Exception",
+            "*.dto.*",
             "*Dto",
             "*DTO",
         ) + QUERY_DSL_DOMAINS

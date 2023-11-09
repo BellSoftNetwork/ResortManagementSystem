@@ -21,6 +21,20 @@ const routes = [
     ],
   },
   {
+    path: "/reservation-methods",
+    component: DefaultLayout,
+    meta: {
+      isAuthenticated: true,
+    },
+    children: [
+      {
+        path: "",
+        name: "ReservationMethods",
+        component: () => import(/* webpackChunkName: "reservationMethods" */ "@/views/reservation-method/ReservationMethodList.vue"),
+      },
+    ],
+  },
+  {
     path: "/admin",
     component: DefaultLayout,
     meta: {
