@@ -58,6 +58,7 @@
             text="추가"
             color="primary"
             @click="createReservationMethod"
+            :disabled="!status.isValid"
           ></v-btn>
         </v-card-actions>
       </v-card>

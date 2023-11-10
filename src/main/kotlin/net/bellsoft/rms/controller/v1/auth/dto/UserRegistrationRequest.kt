@@ -18,7 +18,7 @@ data class UserRegistrationRequest(
     val password: String,
 
     @Schema(description = "이름", example = "방울")
-    @field:Size(max = 20)
+    @field:Size(min = 2, max = 20)
     val name: String,
 ) {
     fun toEntity(passwordEncoder: PasswordEncoder): User {

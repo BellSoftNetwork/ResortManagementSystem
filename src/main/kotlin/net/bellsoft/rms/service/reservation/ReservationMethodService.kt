@@ -3,7 +3,7 @@ package net.bellsoft.rms.service.reservation
 import net.bellsoft.rms.domain.reservation.method.ReservationMethodRepository
 import net.bellsoft.rms.exception.DataNotFoundException
 import net.bellsoft.rms.exception.DuplicateDataException
-import net.bellsoft.rms.service.dto.EntityListDto
+import net.bellsoft.rms.service.common.dto.EntityListDto
 import net.bellsoft.rms.service.reservation.dto.ReservationMethodCreateDto
 import net.bellsoft.rms.service.reservation.dto.ReservationMethodDto
 import net.bellsoft.rms.service.reservation.dto.ReservationMethodUpdateDto

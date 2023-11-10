@@ -5,7 +5,6 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import net.bellsoft.rms.controller.v1.auth.dto.UserRegistrationRequest
 import net.bellsoft.rms.fixture.baseFixture
-import net.bellsoft.rms.service.AuthService
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.core.userdetails.UsernameNotFoundException

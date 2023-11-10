@@ -1,10 +1,10 @@
-package net.bellsoft.rms.service
+package net.bellsoft.rms.service.auth
 
-import net.bellsoft.rms.controller.v1.auth.dto.RegisteredUserResponse
 import net.bellsoft.rms.controller.v1.auth.dto.UserRegistrationRequest
 import net.bellsoft.rms.domain.user.UserRepository
 import net.bellsoft.rms.exception.UnprocessableEntityException
 import net.bellsoft.rms.exception.UserNotFoundException
+import net.bellsoft.rms.service.auth.dto.UserDto
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -23,9 +23,9 @@ class AuthService(
             ?: throw UserNotFoundException("$username 은 존재하지 않는 사용자입니다")
     }
 
-    fun register(userRegistrationRequest: UserRegistrationRequest): RegisteredUserResponse {
+    fun register(userRegistrationRequest: UserRegistrationRequest): UserDto {
         try {
-            return RegisteredUserResponse.of(userRepository.save(userRegistrationRequest.toEntity(passwordEncoder)))
+            return UserDto.of(userRepository.save(userRegistrationRequest.toEntity(passwordEncoder)))
         } catch (ex: DataIntegrityViolationException) {
             throw UnprocessableEntityException("${userRegistrationRequest.email} 로 가입할 수 없습니다")
         }

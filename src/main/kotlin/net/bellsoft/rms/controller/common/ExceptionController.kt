@@ -1,11 +1,11 @@
-package net.bellsoft.rms.controller
+package net.bellsoft.rms.controller.common
 
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.validation.ConstraintViolationException
 import mu.KLogging
-import net.bellsoft.rms.controller.dto.ErrorResponse
+import net.bellsoft.rms.controller.common.dto.ErrorResponse
 import net.bellsoft.rms.exception.BadRequestException
 import net.bellsoft.rms.exception.DataNotFoundException
 import net.bellsoft.rms.exception.InvalidTokenException

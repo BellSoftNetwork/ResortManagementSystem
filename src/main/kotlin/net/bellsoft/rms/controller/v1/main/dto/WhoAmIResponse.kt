@@ -1,4 +1,4 @@
-package net.bellsoft.rms.controller.v1.dto
+package net.bellsoft.rms.controller.v1.main.dto
 
 import net.bellsoft.rms.domain.user.User
 import java.time.LocalDateTime

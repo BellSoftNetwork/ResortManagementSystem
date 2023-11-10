@@ -6,11 +6,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import mu.KLogging
-import net.bellsoft.rms.controller.v1.auth.dto.RegisteredUserResponse
+import net.bellsoft.rms.controller.common.dto.SingleResponse
 import net.bellsoft.rms.controller.v1.auth.dto.UserRegistrationRequest
-import net.bellsoft.rms.service.AuthService
+import net.bellsoft.rms.service.auth.AuthService
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -18,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @Tag(name = "인증", description = "인증 API")
-@RestController
 @Validated
+@RestController
 @RequestMapping("/api/v1/auth")
 class AuthController(
     val authService: AuthService,
@@ -34,11 +33,9 @@ class AuthController(
     fun registerUser(
         @RequestBody @Valid
         userRegistrationRequest: UserRegistrationRequest,
-    ): ResponseEntity<RegisteredUserResponse> {
-        return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(authService.register(userRegistrationRequest))
-    }
+    ) = SingleResponse
+        .of((authService.register(userRegistrationRequest)))
+        .toResponseEntity(HttpStatus.CREATED)
 
     companion object : KLogging()
 }

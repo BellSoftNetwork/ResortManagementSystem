@@ -36,7 +36,7 @@
 
   <v-pagination
     v-model="requestPage"
-    :length="responseData.totalPages"
+    :length="responseData.page.totalPages"
   ></v-pagination>
 
   <ReservationMethodCreateDialog @created="fetchReservationMethods" />

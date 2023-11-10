@@ -36,7 +36,7 @@
 
   <v-pagination
     v-model="requestPage"
-    :length="responseData.totalPages"
+    :length="responseData.page.totalPages"
   ></v-pagination>
 
   <AccountCreateDialog @created="fetchAccounts" />
@@ -56,9 +56,12 @@ const status = ref({
 })
 const requestPage = ref(1)
 const responseData = ref({
-  page: 0,
-  totalPages: 1,
-  totalElements: 0,
+  page: {
+    index: 0,
+    size: 0,
+    totalPages: 0,
+    totalElements: 0,
+  },
   values: [
     {
       id: 1,
