@@ -1,4 +1,4 @@
-package net.bellsoft.rms.controller.dto
+package net.bellsoft.rms.controller.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 

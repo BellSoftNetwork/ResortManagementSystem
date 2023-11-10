@@ -6,17 +6,17 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.ints.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.longs.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.shouldBe
-import net.bellsoft.rms.controller.v1.admin.dto.AccountCreateRequest
-import net.bellsoft.rms.controller.v1.admin.dto.AccountPatchRequest
 import net.bellsoft.rms.domain.user.User
 import net.bellsoft.rms.domain.user.UserRepository
 import net.bellsoft.rms.domain.user.UserRole
 import net.bellsoft.rms.exception.DataNotFoundException
 import net.bellsoft.rms.exception.PermissionRequiredDataException
 import net.bellsoft.rms.fixture.baseFixture
-import net.bellsoft.rms.fixture.controller.v1.admin.AccountCreateRequestFixture
+import net.bellsoft.rms.fixture.controller.v1.admin.AccountCreateDtoFixture
 import net.bellsoft.rms.fixture.domain.user.UserFixture
 import net.bellsoft.rms.fixture.util.feature
+import net.bellsoft.rms.service.admin.dto.AccountCreateDto
+import net.bellsoft.rms.service.admin.dto.AccountPatchDto
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.PageRequest
@@ -38,17 +38,17 @@ internal class AdminAccountServiceTest(
             )
 
             When("계정 리스트 조회 시") {
-                val accountResponses = adminAccountService.findAll(PageRequest.of(0, 20, Sort.by("id").descending()))
+                val accountsDto = adminAccountService.findAll(PageRequest.of(0, 20, Sort.by("id").descending()))
 
                 Then("정상적으로 모두 조회된다") {
                     val accountIds = accounts.map { it.id }.sortedDescending()
 
                     assertSoftly {
-                        accountResponses.run {
-                            pageable.pageNumber shouldBe 0
-                            pageable.pageSize shouldBe 20
-                            totalPages shouldBeGreaterThanOrEqual 3
-                            totalElements shouldBeGreaterThanOrEqual 50
+                        accountsDto.run {
+                            page.index shouldBe 0
+                            page.size shouldBe 20
+                            page.totalPages shouldBeGreaterThanOrEqual 3
+                            page.totalElements shouldBeGreaterThanOrEqual 50
                             values.size shouldBe 20
                             values.first().id shouldBe accountIds.first()
                             values.last().id shouldBe accountIds[19]
@@ -62,32 +62,32 @@ internal class AdminAccountServiceTest(
             val user = userRepository.save(fixture.feature(UserFixture.Feature.SUPER_ADMIN)())
 
             When("최고 관리자 권한 계정 추가 시도 시") {
-                val accountCreateRequest: AccountCreateRequest = fixture
-                    .feature(AccountCreateRequestFixture.Feature.SUPER_ADMIN)()
-                val createdUser = adminAccountService.createAccount(user, accountCreateRequest)
+                val accountCreateDto: AccountCreateDto = fixture
+                    .feature(AccountCreateDtoFixture.Feature.SUPER_ADMIN)()
+                val createdUser = adminAccountService.createAccount(user, accountCreateDto)
 
                 Then("정상적으로 추가된다") {
-                    createdUser.email shouldBe accountCreateRequest.email
+                    createdUser.email shouldBe accountCreateDto.email
                 }
             }
 
             When("관리자 권한 계정 추가 시도 시") {
-                val accountCreateRequest: AccountCreateRequest = fixture
-                    .feature(AccountCreateRequestFixture.Feature.ADMIN)()
-                val createdUser = adminAccountService.createAccount(user, accountCreateRequest)
+                val accountCreateDto: AccountCreateDto = fixture
+                    .feature(AccountCreateDtoFixture.Feature.ADMIN)()
+                val createdUser = adminAccountService.createAccount(user, accountCreateDto)
 
                 Then("정상적으로 추가된다") {
-                    createdUser.email shouldBe accountCreateRequest.email
+                    createdUser.email shouldBe accountCreateDto.email
                 }
             }
 
             When("동일한 계정을 반복해서 추가 시도 시") {
-                val accountCreateRequest: AccountCreateRequest = fixture()
-                adminAccountService.createAccount(user, accountCreateRequest)
+                val accountCreateDto: AccountCreateDto = fixture()
+                adminAccountService.createAccount(user, accountCreateDto)
 
                 Then("중복 등록으로 유저 추가에 실패한다") {
                     shouldThrow<DataIntegrityViolationException> {
-                        adminAccountService.createAccount(user, accountCreateRequest)
+                        adminAccountService.createAccount(user, accountCreateDto)
                     }
                 }
             }
@@ -97,7 +97,7 @@ internal class AdminAccountServiceTest(
                 val updatedUser = adminAccountService.updateAccount(
                     requestUser = user,
                     updateUserId = createdUser.id,
-                    accountPatchRequest = AccountPatchRequest(
+                    accountPatchDto = AccountPatchDto(
                         password = "CHANGE_PASSWORD",
                         name = "CHANGE_NAME",
                         isLock = true,
@@ -119,7 +119,7 @@ internal class AdminAccountServiceTest(
                         adminAccountService.updateAccount(
                             requestUser = user,
                             updateUserId = -1,
-                            accountPatchRequest = AccountPatchRequest(
+                            accountPatchDto = AccountPatchDto(
                                 name = "CHANGE_NAME",
                             ),
                         )
@@ -132,23 +132,23 @@ internal class AdminAccountServiceTest(
             val user = userRepository.save(fixture.feature(UserFixture.Feature.ADMIN)())
 
             When("관리자 권한 계정 추가 시도 시") {
-                val accountCreateRequest: AccountCreateRequest = fixture
-                    .feature(AccountCreateRequestFixture.Feature.ADMIN)()
+                val accountCreateDto: AccountCreateDto = fixture
+                    .feature(AccountCreateDtoFixture.Feature.ADMIN)()
 
                 Then("권한 부족으로 계정 추가에 실패한다") {
                     shouldThrow<PermissionRequiredDataException> {
-                        adminAccountService.createAccount(user, accountCreateRequest)
+                        adminAccountService.createAccount(user, accountCreateDto)
                     }
                 }
             }
 
             When("일반 권한 계정 추가 시도 시") {
-                val accountCreateRequest: AccountCreateRequest = fixture
-                    .feature(AccountCreateRequestFixture.Feature.NORMAL)()
-                val createdUser = adminAccountService.createAccount(user, accountCreateRequest)
+                val accountCreateDto: AccountCreateDto = fixture
+                    .feature(AccountCreateDtoFixture.Feature.NORMAL)()
+                val createdUser = adminAccountService.createAccount(user, accountCreateDto)
 
                 Then("정상적으로 추가된다") {
-                    createdUser.email shouldBe accountCreateRequest.email
+                    createdUser.email shouldBe accountCreateDto.email
                 }
             }
 
@@ -157,7 +157,7 @@ internal class AdminAccountServiceTest(
                 val updatedUser = adminAccountService.updateAccount(
                     requestUser = user,
                     updateUserId = createdUser.id,
-                    accountPatchRequest = AccountPatchRequest(
+                    accountPatchDto = AccountPatchDto(
                         name = "CHANGE_NAME",
                     ),
                 )
@@ -177,7 +177,7 @@ internal class AdminAccountServiceTest(
                         adminAccountService.updateAccount(
                             requestUser = user,
                             updateUserId = createdUser.id,
-                            accountPatchRequest = AccountPatchRequest(
+                            accountPatchDto = AccountPatchDto(
                                 name = "CHANGE_NAME",
                             ),
                         )
@@ -193,7 +193,7 @@ internal class AdminAccountServiceTest(
                         adminAccountService.updateAccount(
                             requestUser = user,
                             updateUserId = createdUser.id,
-                            accountPatchRequest = AccountPatchRequest(
+                            accountPatchDto = AccountPatchDto(
                                 role = UserRole.ADMIN,
                             ),
                         )
@@ -206,12 +206,12 @@ internal class AdminAccountServiceTest(
             val user = userRepository.save(fixture.feature(UserFixture.Feature.NORMAL)())
 
             When("일반 권한 계정 추가 시도 시") {
-                val accountCreateRequest: AccountCreateRequest = fixture
-                    .feature(AccountCreateRequestFixture.Feature.NORMAL)()
+                val accountCreateDto: AccountCreateDto = fixture
+                    .feature(AccountCreateDtoFixture.Feature.NORMAL)()
 
                 Then("권한 부족으로 계정 추가에 실패한다") {
                     shouldThrow<PermissionRequiredDataException> {
-                        adminAccountService.createAccount(user, accountCreateRequest)
+                        adminAccountService.createAccount(user, accountCreateDto)
                     }
                 }
             }
@@ -224,7 +224,7 @@ internal class AdminAccountServiceTest(
                         adminAccountService.updateAccount(
                             requestUser = user,
                             updateUserId = createdUser.id,
-                            accountPatchRequest = AccountPatchRequest(
+                            accountPatchDto = AccountPatchDto(
                                 role = UserRole.ADMIN,
                             ),
                         )

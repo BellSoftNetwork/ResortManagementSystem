@@ -1,4 +1,4 @@
-package net.bellsoft.rms.controller.v1.dto
+package net.bellsoft.rms.controller.v1.main.dto
 
 data class EnvResponse(
     val applicationFullName: String,

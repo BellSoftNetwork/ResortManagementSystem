@@ -1,4 +1,4 @@
-package net.bellsoft.rms.service.dto
+package net.bellsoft.rms.service.common.dto
 
 import org.springframework.data.domain.Page
 

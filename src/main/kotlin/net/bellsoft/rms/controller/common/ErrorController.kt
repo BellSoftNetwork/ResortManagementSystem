@@ -1,4 +1,4 @@
-package net.bellsoft.rms.controller
+package net.bellsoft.rms.controller.common
 
 import org.springframework.boot.web.servlet.error.ErrorController
 import org.springframework.stereotype.Controller

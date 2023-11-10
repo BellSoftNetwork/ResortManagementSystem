@@ -1,6 +1,6 @@
 package net.bellsoft.rms.fixture.config
 
-import net.bellsoft.rms.fixture.controller.v1.admin.AccountCreateRequestFixture
+import net.bellsoft.rms.fixture.controller.v1.admin.AccountCreateDtoFixture
 import net.bellsoft.rms.fixture.controller.v1.auth.UserRegistrationRequestFixture
 import net.bellsoft.rms.fixture.domain.reservation.ReservationFixture
 import net.bellsoft.rms.fixture.domain.reservation.event.ReservationEventFixture
@@ -24,7 +24,7 @@ private val domainConfigurations = listOf(
 // @Suppress("ktlint:experimental:property-naming")
 private val dtoFixtureConfigurations = listOf(
     UserRegistrationRequestFixture.BASE_CONFIGURATION,
-    AccountCreateRequestFixture.BASE_CONFIGURATION,
+    AccountCreateDtoFixture.BASE_CONFIGURATION,
 )
 
 // NOTE: 신규 설정 리스트 생성 시 해당 설정 리스트를 아래에 등록 필요

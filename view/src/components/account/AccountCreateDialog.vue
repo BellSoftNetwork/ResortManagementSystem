@@ -69,6 +69,7 @@
             text="추가"
             color="primary"
             @click="createAccount"
+            :disabled="!status.isValid"
           ></v-btn>
         </v-card-actions>
       </v-card>
