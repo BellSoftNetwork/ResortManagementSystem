@@ -1,18 +1,23 @@
 <template>
-  <v-app>
-    <SideBar></SideBar>
+  <q-layout view="hHh lpR fFf" class="bg-grey-1">
+    <TopHeader @toggle-left-drawer="toggleLeftDrawer" />
 
-    <v-main>
-      <v-container
-        class="py-8 px-6"
-        fluid
-      >
-        <router-view />
-      </v-container>
-    </v-main>
-  </v-app>
+    <LeftDrawer ref="leftDrawerRef" />
+
+    <q-page-container>
+      <router-view />
+    </q-page-container>
+  </q-layout>
 </template>
 
 <script setup>
-import SideBar from "./SideBar.vue"
+import { ref } from "vue"
+import TopHeader from "./TopHeader.vue"
+import LeftDrawer from "./LeftDrawer.vue"
+
+const leftDrawerRef = ref()
+
+function toggleLeftDrawer() {
+  leftDrawerRef.value.toggleLeftDrawer()
+}
 </script>

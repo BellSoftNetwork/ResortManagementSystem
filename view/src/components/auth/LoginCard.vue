@@ -1,76 +1,61 @@
 <template>
-  <v-card
-    title="Login"
-    subtitle="Resort Management System"
-    color=""
-    min-width="400"
-    variant="outlined"
+  <q-card
     :loading="status.isProgress"
+    class="q-pa-lg shadow-1" style="min-width: 400px;"
+    square
+    bordered
   >
-    <v-card-text>
-      <v-form fast-fail @submit.prevent ref="form" v-model="status.isValid">
-        <v-text-field
+    <q-card-section>
+      <div class="text-h5 text-center">Login</div>
+    </q-card-section>
+
+    <q-card-section>
+      <q-form @submit="login">
+        <q-input
           v-model="account.email"
           label="이메일"
           :rules="rules.email"
           :disabled="status.isProgress"
           required
-        ></v-text-field>
+          autofocus
+        ></q-input>
 
-        <v-text-field
+        <q-input
           v-model="account.password"
           type="password"
           label="비밀번호"
           :rules="rules.password"
           :disabled="status.isProgress"
           required
-        ></v-text-field>
+        ></q-input>
 
-        <v-btn
+        <q-btn
           type="submit"
           color="primary"
-          class="mt-2"
-          block
-          @click="login"
+          class="mt-2 full-width"
           :loading="status.isProgress"
-          :disabled="status.isProgress || !status.isValid"
+          :disabled="status.isProgress"
         >
           로그인
-        </v-btn>
-      </v-form>
-    </v-card-text>
-  </v-card>
-
-  <v-snackbar
-    v-model="status.isError"
-  >
-    로그인 실패 ({{ status.errorMessage }})
-
-    <template v-slot:actions>
-      <v-btn
-        color="pink"
-        variant="text"
-        @click="status.isError = false"
-      >
-        닫기
-      </v-btn>
-    </template>
-  </v-snackbar>
+        </q-btn>
+      </q-form>
+    </q-card-section>
+  </q-card>
 </template>
 
 <script setup>
 import { ref } from "vue"
 import { useRouter } from "vue-router"
-import { useAuthStore } from "@/store/auth.js"
+import { useAuthStore } from "stores/auth.js"
+import { useQuasar } from "quasar"
 
 const router = useRouter()
 const authStore = useAuthStore()
+const $q = useQuasar()
 
 const status = ref({
   isValid: false,
   isProgress: false,
-  isError: false,
-  errorMessage: null,
 })
 const account = ref({
   email: "",
@@ -83,16 +68,21 @@ const rules = {
 
 function login() {
   status.value.isProgress = true
-  status.value.isError = false
-  status.value.errorMessage = null
 
   authStore.login(account.value.email, account.value.password)
     .then(() => {
       router.push({ name: "Home" })
     })
     .catch((error) => {
-      status.value.errorMessage = error.response.data.message
-      status.value.isError = true
+      $q.notify({
+        message: error.response.data.message,
+        type: "negative",
+        actions: [
+          {
+            icon: "close", color: "white", round: true,
+          },
+        ],
+      })
     })
     .finally(() => {
       status.value.isProgress = false

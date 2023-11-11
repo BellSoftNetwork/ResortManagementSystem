@@ -1,105 +1,84 @@
 <template>
-  <v-dialog
-    v-model="status.isDialogActive"
+  <slot :dialog="dialog">
+    <q-btn @click="dialog.isOpen = true">
+      추가
+    </q-btn>
+  </slot>
+
+  <q-dialog
+    v-model="dialog.isOpen"
     :persistent="status.isProgress"
-    width="500"
+    @beforeShow="resetForm"
   >
-    <template v-slot:activator="{ props }">
-      <v-btn
-        v-bind="props"
-        color="primary"
-        text="예약 수단 추가"
-        block
-      ></v-btn>
-    </template>
+    <q-card style="width: 500px">
+      <q-card-section class="text-h6">
+        예약 수단 추가
+      </q-card-section>
 
-    <template v-slot:default>
-      <v-card
-        title="예약 수단 추가"
-        :loading="status.isProgress"
-        :disabled="status.isProgress"
-      >
-        <v-card-text>
-          <v-form
-            v-model="status.isValid"
-            @submit.prevent
-            fast-fail
-            ref="form"
+      <q-form @submit="create">
+        <q-card-section>
+          <q-input
+            v-model="formData.name"
+            :rules="rules.name"
+            label="이름"
+            required
+          ></q-input>
+
+          <q-input
+            v-model="formData.commissionRatePercent"
+            :rules="rules.commissionRatePercent"
+            label="수수료율"
+            type="number"
+            min="0"
+            max="100"
+            required
           >
-            <v-text-field
-              v-model="reservationMethod.name"
-              label="이름"
-              :rules="rules.name"
-              required
-            ></v-text-field>
+            <template v-slot:after>
+              <q-icon name="percent" />
+            </template>
+          </q-input>
+        </q-card-section>
 
-            <v-text-field
-              v-model="reservationMethod.commissionRatePercent"
-              label="수수료율"
-              :rules="rules.commissionRatePercent"
-              append-inner-icon="fa-solid fa-percent"
-              type="number"
-              min="0"
-              max="100"
-              required
-            ></v-text-field>
-          </v-form>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn
-            text="취소"
-            @click="status.isDialogActive = false"
-          ></v-btn>
-
-          <v-btn
-            text="추가"
+        <q-card-actions align="right">
+          <q-btn
+            v-close-popup
+            :disable="status.isProgress"
             color="primary"
-            @click="createReservationMethod"
-            :disabled="!status.isValid"
-          ></v-btn>
-        </v-card-actions>
-      </v-card>
-    </template>
-  </v-dialog>
-
-  <v-snackbar
-    v-model="status.isError"
-  >
-    예약 수단 추가 실패 ({{ status.errorMessage }})
-
-    <template v-slot:actions>
-      <v-btn
-        color="pink"
-        variant="text"
-        @click="status.isError = false"
-      >
-        닫기
-      </v-btn>
-    </template>
-  </v-snackbar>
+            label="취소"
+            flat
+          />
+          <q-btn
+            :loading="status.isProgress"
+            type="submit"
+            color="red"
+            label="추가"
+            flat
+          />
+        </q-card-actions>
+      </q-form>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup>
 import { ref } from "vue"
 import { useRouter } from "vue-router"
-import { useAuthStore } from "@/store/auth.js"
-import axios from "@/modules/axios-wrapper"
+import { useAuthStore } from "stores/auth.js"
+import { useQuasar } from "quasar"
+import { api } from "boot/axios"
 
 const router = useRouter()
 const authStore = useAuthStore()
+const $q = useQuasar()
 
-const emit = defineEmits(["created"])
-const status = ref({
-  isDialogActive: false,
-  isValid: false,
-  isProgress: false,
-  isError: false,
-  errorMessage: null,
+const emit = defineEmits(["complete"])
+const dialog = ref({
+  isOpen: false,
 })
-const reservationMethod = ref({
+const status = ref({
+  isProgress: false,
+})
+const formData = ref({
   name: "",
   commissionRatePercent: 0,
 })
@@ -108,24 +87,31 @@ const rules = {
   commissionRatePercent: [value => (value >= 0 && value <= 100) || "수수료율이 유효하지 않습니다."],
 }
 
-function createReservationMethod() {
+function create() {
   status.value.isProgress = true
 
   const data = {
-    name: reservationMethod.value.name,
-    commissionRate: reservationMethod.value.commissionRatePercent / 100,
+    name: formData.value.name,
+    commissionRate: formData.value.commissionRatePercent / 100,
   }
 
-  axios.post("/api/v1/reservation-methods", data)
+  api.post("/api/v1/reservation-methods", data)
     .then(() => {
-      emit("created")
-      status.value.isDialogActive = false
+      emit("complete")
+      dialog.value.isOpen = false
 
       resetForm()
     })
     .catch((error) => {
-      status.value.errorMessage = error.response.data.message
-      status.value.isError = true
+      $q.notify({
+        message: error.response.data.message,
+        type: "negative",
+        actions: [
+          {
+            icon: "close", color: "white", round: true,
+          },
+        ],
+      })
     })
     .finally(() => {
       status.value.isProgress = false
@@ -133,7 +119,8 @@ function createReservationMethod() {
 }
 
 function resetForm() {
-  reservationMethod.value.name = ""
-  reservationMethod.value.commissionRate = 0
+  formData.value.name = ""
+  formData.value.commissionRate = 0
+  formData.value.commissionRatePercent = 0
 }
 </script>

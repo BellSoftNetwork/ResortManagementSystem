@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/store/auth.js"
+import { useAuthStore } from "stores/auth.js"
 
 export default (router) => {
   router.beforeEach((to, from, next) => {

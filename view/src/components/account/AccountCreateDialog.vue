@@ -1,116 +1,94 @@
 <template>
-  <v-dialog
-    v-model="status.isDialogActive"
+  <slot :dialog="dialog">
+    <q-btn @click="dialog.isOpen = true">
+      추가
+    </q-btn>
+  </slot>
+
+  <q-dialog
+    v-model="dialog.isOpen"
     :persistent="status.isProgress"
-    width="500"
+    @beforeShow="resetForm"
   >
-    <template v-slot:activator="{ props }">
-      <v-btn
-        v-bind="props"
-        color="primary"
-        text="계정 추가"
-        block
-      ></v-btn>
-    </template>
+    <q-card style="width: 500px">
+      <q-card-section class="text-h6">
+        계정 추가
+      </q-card-section>
 
-    <template v-slot:default>
-      <v-card
-        title="계정 추가"
-        :loading="status.isProgress"
-        :disabled="status.isProgress"
-      >
-        <v-card-text>
-          <v-form
-            v-model="status.isValid"
-            @submit.prevent
-            fast-fail
-            ref="form"
-          >
-            <v-text-field
-              v-model="account.name"
-              label="이름"
-              :rules="rules.name"
-              required
-            ></v-text-field>
+      <q-form @submit="create">
+        <q-card-section>
+          <q-input
+            v-model="formData.name"
+            :rules="rules.name"
+            label="이름"
+            required
+          ></q-input>
 
-            <v-text-field
-              v-model="account.email"
-              label="이메일"
-              :rules="rules.email"
-              required
-            ></v-text-field>
+          <q-input
+            v-model="formData.email"
+            :rules="rules.email"
+            label="이메일"
+            required
+          ></q-input>
 
-            <v-text-field
-              v-model="account.password"
-              type="password"
-              label="비밀번호"
-              :rules="rules.password"
-              required
-            ></v-text-field>
+          <q-input
+            v-model="formData.password"
+            :rules="rules.password"
+            type="password"
+            label="비밀번호"
+            required
+          ></q-input>
 
-            <v-select
-              v-model="account.role"
-              label="권한"
-              :items="rules.role"
-              required
-            ></v-select>
-          </v-form>
-        </v-card-text>
+          <q-select
+            v-model="formData.role"
+            :options="options.role"
+            label="권한"
+            required
+            emit-value
+            map-options
+          ></q-select>
+        </q-card-section>
 
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn
-            text="취소"
-            @click="status.isDialogActive = false"
-          ></v-btn>
-
-          <v-btn
-            text="추가"
+        <q-card-actions align="right">
+          <q-btn
+            v-close-popup
+            :disable="status.isProgress"
             color="primary"
-            @click="createAccount"
-            :disabled="!status.isValid"
-          ></v-btn>
-        </v-card-actions>
-      </v-card>
-    </template>
-  </v-dialog>
-
-  <v-snackbar
-    v-model="status.isError"
-  >
-    계정 추가 실패 ({{ status.errorMessage }})
-
-    <template v-slot:actions>
-      <v-btn
-        color="pink"
-        variant="text"
-        @click="status.isError = false"
-      >
-        닫기
-      </v-btn>
-    </template>
-  </v-snackbar>
+            label="취소"
+            flat
+          />
+          <q-btn
+            :loading="status.isProgress"
+            type="submit"
+            color="red"
+            label="추가"
+            flat
+          />
+        </q-card-actions>
+      </q-form>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup>
 import { ref } from "vue"
 import { useRouter } from "vue-router"
-import { useAuthStore } from "@/store/auth.js"
-import axios from "@/modules/axios-wrapper"
+import { useAuthStore } from "stores/auth.js"
+import { useQuasar } from "quasar"
+import { api } from "boot/axios"
 
 const router = useRouter()
 const authStore = useAuthStore()
+const $q = useQuasar()
 
-const emit = defineEmits(["created"])
-const status = ref({
-  isDialogActive: false,
-  isValid: false,
-  isProgress: false,
-  isError: false,
-  errorMessage: null,
+const emit = defineEmits(["complete"])
+const dialog = ref({
+  isOpen: false,
 })
-const account = ref({
+const status = ref({
+  isProgress: false,
+})
+const formData = ref({
   name: "",
   email: "",
   password: "",
@@ -120,28 +98,34 @@ const rules = {
   name: [value => (value.length >= 2 && value.length <= 20) || "2~20 글자가 필요합니다"],
   email: [value => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) || "이메일이 유효하지 않습니다."],
   password: [value => (value.length >= 8 && value.length <= 20) || "비밀번호는 8~20 글자가 필요합니다."],
+}
+const options = {
   role: [
-    { title: "일반", value: "NORMAL" },
+    { label: "일반", value: "NORMAL" },
+    { label: "관리자", value: "ADMIN", disable: !authStore.isSuperAdminRole },
   ],
 }
 
-if (authStore.isSuperAdminRole)
-  rules.role.push({ title: "관리자", value: "ADMIN" })
-
-
-function createAccount() {
+function create() {
   status.value.isProgress = true
 
-  axios.post("/api/v1/admin/accounts", account.value)
+  api.post("/api/v1/admin/accounts", formData.value)
     .then(() => {
-      emit("created")
-      status.value.isDialogActive = false
+      emit("complete")
+      dialog.value.isOpen = false
 
       resetForm()
     })
     .catch((error) => {
-      status.value.errorMessage = error.response.data.message
-      status.value.isError = true
+      $q.notify({
+        message: error.response.data.message,
+        type: "negative",
+        actions: [
+          {
+            icon: "close", color: "white", round: true,
+          },
+        ],
+      })
     })
     .finally(() => {
       status.value.isProgress = false
@@ -149,9 +133,9 @@ function createAccount() {
 }
 
 function resetForm() {
-  account.value.name = ""
-  account.value.email = ""
-  account.value.password = ""
-  account.value.role = "NORMAL"
+  formData.value.name = ""
+  formData.value.email = ""
+  formData.value.password = ""
+  formData.value.role = "NORMAL"
 }
 </script>

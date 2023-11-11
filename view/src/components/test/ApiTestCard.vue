@@ -1,13 +1,14 @@
 <template>
-  <v-container>
-    <v-card
-      title="API Test Result"
-      color="primary"
-      :subtitle="env.applicationFullName"
-      :text="env.version"
-      variant="outlined"
-    ></v-card>
-  </v-container>
+  <q-card bordered>
+    <q-card-section>
+      <div class="text-h6">API Test Result</div>
+      <div class="text-subtitle1">{{ env.applicationFullName }}</div>
+    </q-card-section>
+
+    <q-card-section>
+      <div>Version: {{ env.version }}</div>
+    </q-card-section>
+  </q-card>
 </template>
 
 <script setup>
