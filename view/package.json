@@ -1,40 +1,41 @@
 {
   "name": "resort-management-system",
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "description": "Resort Management System",
+  "productName": "Resort Management System",
+  "author": "Bell <bell04204@gmail.com>",
   "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev": "quasar dev",
+    "test": "echo \"No test specified\" && exit 0",
+    "build": "quasar build",
     "lint:js": "eslint --ext \".js,.ts,.vue\" --ignore-path .gitignore .",
     "lint:prettier": "prettier --check .",
     "lint": "yarn lint:js && yarn lint:prettier",
-    "lintfix": "prettier --write --list-different . && yarn lint:js --fix"
+    "lintfix": "prettier --write --list-different . && yarn lint:js --fix",
+    "format": "prettier --write \"**/*.{js,vue,scss,html,md,json}\" --ignore-path .gitignore"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.4.2",
-    "@fortawesome/free-brands-svg-icons": "^6.4.2",
-    "@fortawesome/free-regular-svg-icons": "^6.4.2",
-    "@fortawesome/free-solid-svg-icons": "^6.4.2",
-    "@fortawesome/vue-fontawesome": "^3.0.3",
-    "@mdi/font": "7.0.96",
-    "axios": "^1.6.0",
-    "core-js": "^3.29.0",
+    "@quasar/extras": "^1.16.4",
+    "axios": "^1.2.1",
     "dayjs": "^1.11.10",
-    "pinia": "^2.0.0",
-    "roboto-fontface": "*",
-    "vue": "^3.2.0",
-    "vue-router": "^4.0.0",
-    "vuetify": "^3.0.0"
+    "pinia": "^2.0.11",
+    "quasar": "^2.6.0",
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.0.0",
-    "eslint": "^8.37.0",
-    "eslint-plugin-vue": "^9.3.0",
-    "prettier": "3.0.3",
-    "sass": "^1.60.0",
-    "unplugin-fonts": "^1.0.3",
-    "vite": "^4.2.0",
-    "vite-plugin-vuetify": "^1.0.0"
+    "@quasar/app-vite": "^1.3.0",
+    "autoprefixer": "^10.4.2",
+    "eslint": "^8.10.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-vue": "^9.0.0",
+    "postcss": "^8.4.14",
+    "prettier": "^2.5.1"
+  },
+  "engines": {
+    "node": "^18 || ^16 || ^14.19",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
   }
 }

@@ -1,6 +1,6 @@
-import accountInfoLoader from "@/router/guards/account-info-loader"
-import authGuard from "@/router/guards/authenticate-guard"
-import roleGuard from "@/router/guards/role-guard"
+import accountInfoLoader from "./account-info-loader"
+import authGuard from "./authenticate-guard"
+import roleGuard from "./role-guard"
 
 export default function registerRouterGuards(router) {
   accountInfoLoader(router)
