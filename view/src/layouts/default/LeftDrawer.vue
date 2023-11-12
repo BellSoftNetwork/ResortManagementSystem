@@ -15,7 +15,7 @@
           <q-item
             v-for="link in links"
             :key="link.text"
-            :to="{name: link.to}"
+            :to="{ name: link.to }"
             class="GNL__drawer-item"
             v-ripple
             clickable

@@ -58,6 +58,19 @@ const routes = [
     ],
   },
   {
+    path: "/register",
+    meta: {
+      isAuthenticated: false,
+    },
+    children: [
+      {
+        path: "",
+        name: "Register",
+        component: () => import("pages/auth/MainRegister.vue"),
+      },
+    ],
+  },
+  {
     path: "/error/403",
     component: DefaultLayout,
     children: [

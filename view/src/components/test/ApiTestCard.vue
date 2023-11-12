@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 
 let env = ref({
   applicationFullName: "",
@@ -26,7 +26,9 @@ let env = ref({
   commitTimestamp: "",
 })
 
-fetch("/api/v1/env")
-  .then((response) => response.json())
-  .then((data) => (env.value = data))
+onMounted(() => {
+  fetch("/api/v1/env")
+    .then((response) => response.json())
+    .then((data) => (env.value = data.value))
+})
 </script>

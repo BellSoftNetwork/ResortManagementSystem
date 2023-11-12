@@ -65,7 +65,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue"
+import { onBeforeMount, onMounted, ref } from "vue"
 import dayjs from "dayjs"
 import { useQuasar } from "quasar"
 import AccountCreateDialog from "components/account/AccountCreateDialog.vue"
@@ -235,8 +235,11 @@ function resetData() {
   responseData.value.values = []
 }
 
-onMounted(() => {
+onBeforeMount(() => {
   resetData()
+})
+
+onMounted(() => {
   reloadData()
 })
 </script>

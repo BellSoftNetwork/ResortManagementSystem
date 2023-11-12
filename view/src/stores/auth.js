@@ -28,11 +28,13 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     loadAccountInfo() {
       return api.post("/api/v1/whoami").then((response) => {
-        this.user.email = response.data.email
-        this.user.name = response.data.name
-        this.user.role = response.data.role
-        this.user.profileImageUrl = response.data.profileImageUrl
-        this.user.createdAt = response.data.createdAt
+        const responseValue = response.data.value
+
+        this.user.email = responseValue.email
+        this.user.name = responseValue.name
+        this.user.role = responseValue.role
+        this.user.profileImageUrl = responseValue.profileImageUrl
+        this.user.createdAt = responseValue.createdAt
         this.status.isLoggedIn = true
       }).catch(() => {
         this.status.isLoggedIn = false
@@ -60,11 +62,13 @@ export const useAuthStore = defineStore("auth", {
       }
 
       return api.post("/api/v1/auth/login", account).then((response) => {
-        this.user.email = response.data.email
-        this.user.name = response.data.name
-        this.user.role = response.data.role
-        this.user.profileImageUrl = response.data.profileImageUrl
-        this.user.createdAt = response.data.createdAt
+        const responseValue = response.data.value
+
+        this.user.email = responseValue.email
+        this.user.name = responseValue.name
+        this.user.role = responseValue.role
+        this.user.profileImageUrl = responseValue.profileImageUrl
+        this.user.createdAt = responseValue.createdAt
         this.status.isLoggedIn = true
       })
     },

@@ -6,10 +6,10 @@
     bordered
   >
     <q-card-section>
-      <div class="text-h5 text-center">Login</div>
+      <div class="text-h5 text-center">Register</div>
     </q-card-section>
 
-    <q-form @submit="login">
+    <q-form @submit="register">
       <q-card-section>
         <q-input
           v-model="formData.email"
@@ -21,10 +21,27 @@
         ></q-input>
 
         <q-input
+          v-model="formData.name"
+          label="이름"
+          :rules="rules.name"
+          :disabled="status.isProgress"
+          required
+        ></q-input>
+
+        <q-input
           v-model="formData.password"
           type="password"
           label="비밀번호"
           :rules="rules.password"
+          :disabled="status.isProgress"
+          required
+        ></q-input>
+
+        <q-input
+          v-model="formData.passwordConfirm"
+          type="password"
+          label="비밀번호 확인"
+          :rules="rules.passwordConfirm"
           :disabled="status.isProgress"
           required
         ></q-input>
@@ -38,20 +55,17 @@
           :loading="status.isProgress"
           :disabled="status.isProgress"
         >
-          로그인
+          회원가입
         </q-btn>
       </q-card-section>
 
-      <q-card-section
-        v-if="appConfigStore.config.isAvailableRegistration"
-        class="text-center q-py-none"
-      >
+      <q-card-section class="text-center q-py-none">
         <q-btn
-          :to="{ name: 'Register' }"
+          :to="{ name: 'Login' }"
           class="text-grey-6 mt-2 full-width"
           flat
         >
-          회원 가입
+          로그인
         </q-btn>
       </q-card-section>
     </q-form>
@@ -59,39 +73,61 @@
 </template>
 
 <script setup>
-import { onBeforeMount, ref } from "vue"
+import { ref } from "vue"
 import { useRouter } from "vue-router"
 import { useAuthStore } from "stores/auth.js"
 import { useQuasar } from "quasar"
-import { useAppConfigStore } from "stores/appConfig"
+import { api } from "boot/axios"
 
 const router = useRouter()
 const $q = useQuasar()
 const authStore = useAuthStore()
-const appConfigStore = useAppConfigStore()
 
 const status = ref({
   isProgress: false,
 })
 const formData = ref({
   email: "",
+  name: "",
   password: "",
+  passwordConfirm: "",
 })
 const rules = {
+  name: [value => (value.length >= 2 && value.length <= 20) || "2~20 글자가 필요합니다"],
   email: [value => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) || "이메일이 유효하지 않습니다."],
   password: [value => (value?.length >= 8 && value?.length <= 20) || "비밀번호는 8~20 글자가 필요합니다."],
+  passwordConfirm: [value => (formData.value.password === value) || "비밀번호가 일치하지 않습니다."],
 }
 
-function login() {
+function register() {
   status.value.isProgress = true
 
-  authStore.login(formData.value.email, formData.value.password)
+  api.post(`/api/v1/auth/register`, formData.value)
     .then(() => {
-      router.push({ name: "Home" })
+      authStore.login(formData.value.email, formData.value.password)
+        .then(() => {
+          router.push({ name: "Home" })
+        })
+        .catch((error) => {
+          $q.notify({
+            message: `로그인 실패 (${error.response.data.message})`,
+            type: "negative",
+            actions: [
+              {
+                icon: "close", color: "white", round: true,
+              },
+            ],
+          })
+
+          router.push({ name: "Login" })
+        })
+        .finally(() => {
+          status.value.isProgress = false
+        })
     })
     .catch((error) => {
       $q.notify({
-        message: `로그인 실패 (${error.response.data.message})`,
+        message: `회원 가입 실패 (${error.response.data.message})`,
         type: "negative",
         actions: [
           {
@@ -104,8 +140,4 @@ function login() {
       status.value.isProgress = false
     })
 }
-
-onBeforeMount(() => {
-  appConfigStore.loadAppConfig()
-})
 </script>
