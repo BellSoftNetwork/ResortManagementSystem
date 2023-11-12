@@ -61,6 +61,7 @@ class SecurityConfig(
 
                 it.requestMatchers("/api/*/auth/**").permitAll()
                 it.requestMatchers("/api/v1/env").permitAll()
+                it.requestMatchers("/api/v1/config").permitAll()
                 it.requestMatchers("/api/**").authenticated()
                 it.requestMatchers("/api/*/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                 it.requestMatchers("/docs/**").permitAll()

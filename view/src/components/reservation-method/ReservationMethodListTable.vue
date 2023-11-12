@@ -91,7 +91,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue"
+import { onBeforeMount, onMounted, ref } from "vue"
 import dayjs from "dayjs"
 import { useQuasar } from "quasar"
 import ReservationMethodCreateDialog from "components/reservation-method/ReservationMethodCreateDialog.vue"
@@ -278,8 +278,11 @@ function resetData() {
   responseData.value.values = []
 }
 
-onMounted(() => {
+onBeforeMount(() => {
   resetData()
+})
+
+onMounted(() => {
   reloadData()
 })
 </script>
