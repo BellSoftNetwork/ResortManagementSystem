@@ -3,6 +3,7 @@ package net.bellsoft.rms.service.auth.dto
 import io.swagger.v3.oas.annotations.media.Schema
 import net.bellsoft.rms.domain.user.User
 import net.bellsoft.rms.domain.user.UserRole
+import net.bellsoft.rms.util.MD5Util
 import java.time.LocalDateTime
 
 @Schema(description = "사용자 정보")
@@ -19,6 +20,9 @@ data class UserDto(
     @Schema(description = "사용자 권한", example = "NORMAL")
     val role: UserRole,
 
+    @Schema(description = "프로필 이미지 주소", example = "https://gravatar.com/avatar/00000000000000000000")
+    val profileImageUrl: String,
+
     @Schema(description = "사용자 등록 시각", example = "2020-01-01 00:00:00")
     val createdAt: LocalDateTime,
 ) {
@@ -29,6 +33,7 @@ data class UserDto(
                 email = user.email,
                 name = user.name,
                 role = user.role,
+                profileImageUrl = "https://gravatar.com/avatar/${MD5Util.md5Hex(user.email)}",
                 createdAt = user.createdAt,
             )
         }

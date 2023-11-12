@@ -6,8 +6,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import net.bellsoft.rms.controller.v1.main.dto.EnvResponse
-import net.bellsoft.rms.controller.v1.main.dto.WhoAmIResponse
 import net.bellsoft.rms.domain.user.User
+import net.bellsoft.rms.service.auth.dto.UserDto
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -35,5 +35,5 @@ class MainController {
         ],
     )
     @RequestMapping("/whoami", method = [RequestMethod.GET, RequestMethod.POST])
-    fun displayMySelf(@AuthenticationPrincipal user: User) = WhoAmIResponse.of(user)
+    fun displayMySelf(@AuthenticationPrincipal user: User) = UserDto.of(user)
 }
