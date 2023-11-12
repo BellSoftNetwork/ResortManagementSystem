@@ -12,6 +12,7 @@ export const useAuthStore = defineStore("auth", {
       email: String,
       name: String,
       role: String,
+      profileImageUrl: String,
       createdAt: String,
     },
   }),
@@ -30,6 +31,7 @@ export const useAuthStore = defineStore("auth", {
         this.user.email = response.data.email
         this.user.name = response.data.name
         this.user.role = response.data.role
+        this.user.profileImageUrl = response.data.profileImageUrl
         this.user.createdAt = response.data.createdAt
         this.status.isLoggedIn = true
       }).catch(() => {
@@ -37,6 +39,7 @@ export const useAuthStore = defineStore("auth", {
         this.user.email = ""
         this.user.name = ""
         this.user.role = ""
+        this.user.profileImageUrl = "https://gravatar.com/avatar"
         this.user.createdAt = ""
       }).finally(() => {
         this.status.isFirstRequest = false
@@ -48,6 +51,7 @@ export const useAuthStore = defineStore("auth", {
       this.user.email = ""
       this.user.name = ""
       this.user.role = ""
+      this.user.profileImageUrl = "https://gravatar.com/avatar"
       this.user.createdAt = ""
 
       const account = {
@@ -59,6 +63,7 @@ export const useAuthStore = defineStore("auth", {
         this.user.email = response.data.email
         this.user.name = response.data.name
         this.user.role = response.data.role
+        this.user.profileImageUrl = response.data.profileImageUrl
         this.user.createdAt = response.data.createdAt
         this.status.isLoggedIn = true
       })
@@ -70,6 +75,7 @@ export const useAuthStore = defineStore("auth", {
         this.user.email = ""
         this.user.name = ""
         this.user.role = ""
+        this.user.profileImageUrl = "https://gravatar.com/avatar"
         this.user.createdAt = ""
       })
     },

@@ -20,7 +20,7 @@
       <div class="q-gutter-sm row items-center no-wrap">
         <q-btn round flat>
           <q-avatar size="26px">
-            <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+            <img :src="authStore.user.profileImageUrl" alt="Profile Image">
           </q-avatar>
           <q-menu auto-close>
             <q-list>
