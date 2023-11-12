@@ -6,7 +6,10 @@
     </q-card-section>
 
     <q-card-section>
-      <div>Version: {{ env.version }}</div>
+      <div>Commit SHA: {{ env.commitSha }}</div>
+      <div>commit Short SHA: {{ env.commitShortSha }}</div>
+      <div>Commit Title: {{ env.commitTitle }}</div>
+      <div>Commit Timestamp: {{ env.commitTimestamp }}</div>
     </q-card-section>
   </q-card>
 </template>
@@ -17,7 +20,10 @@ import { ref } from "vue"
 let env = ref({
   applicationFullName: "",
   applicationShortName: "",
-  version: "",
+  commitSha: "",
+  commitShortSha: "",
+  commitTitle: "",
+  commitTimestamp: "",
 })
 
 fetch("/api/v1/env")

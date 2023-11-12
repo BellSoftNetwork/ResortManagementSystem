@@ -1,6 +1,10 @@
 application:
   deploy:
     environment: "default"
+    commit_sha: ${DEPLOY_COMMIT_SHA:aaaaabbbbbcccccdddddeeeeefffffggggghhhhh}
+    commit_short_sha: ${DEPLOY_COMMIT_SHORT_SHA:aaaaabbb}
+    commit_title: ${DEPLOY_COMMIT_TITLE:커밋 타이틀}
+    commit_timestamp: ${DEPLOY_COMMIT_TIMESTAMP:1970-01-02T00:00:00+09:00}
 
 server:
   servlet:
