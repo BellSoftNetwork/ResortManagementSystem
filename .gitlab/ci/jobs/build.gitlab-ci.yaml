@@ -20,6 +20,7 @@ build_vue_app:
   needs: [ ]
   variables:
     NODE_ENV: "production"
+    FRONTEND_SRC_PATH: view
   script:
     - yarn build
   artifacts:

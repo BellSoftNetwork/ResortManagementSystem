@@ -9,9 +9,10 @@
   variables:
     YARN_CACHE_DIR: .yarn-cache
     YARN_NODE_ENV: development
+    FRONTEND_SRC_PATH: .
   before_script:
-    - cd view
-    - echo 'yarn-offline-mirror "${YARN_CACHE_DIR}"' >> .yarnrc
+    - cd ${FRONTEND_SRC_PATH}
+    - echo "yarn-offline-mirror \"${YARN_CACHE_DIR}\"" >> .yarnrc
     - echo 'yarn-offline-mirror-pruning true' >> .yarnrc
     - NODE_ENV=${YARN_NODE_ENV} yarn install --frozen-lockfile --no-progress
   cache:
@@ -19,7 +20,7 @@
         files:
           - yarn.lock
       paths:
-        - ${CI_PROJECT_DIR}/${YARN_CACHE_DIR}/
+        - ${FRONTEND_SRC_PATH}/${YARN_CACHE_DIR}/
     - key: $CI_COMMIT_REF_SLUG
       paths:
-        - node_modules/
+        - ${FRONTEND_SRC_PATH}/node_modules/
