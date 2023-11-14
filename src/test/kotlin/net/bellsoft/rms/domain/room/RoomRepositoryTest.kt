@@ -2,20 +2,29 @@ package net.bellsoft.rms.domain.room
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.mockkStatic
-import net.bellsoft.rms.domain.JpaEntityTest
+import net.bellsoft.rms.domain.user.User
 import net.bellsoft.rms.fixture.baseFixture
+import net.bellsoft.rms.util.SecurityTestSupport
+import net.bellsoft.rms.util.TestDatabaseSupport
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
-import java.time.LocalDateTime
+import org.springframework.test.context.ActiveProfiles
 
-@JpaEntityTest
+@SpringBootTest
+@ActiveProfiles("test")
 internal class RoomRepositoryTest(
+    private val testDatabaseSupport: TestDatabaseSupport,
+    private val securityTestSupport: SecurityTestSupport,
     private val roomRepository: RoomRepository,
 ) : BehaviorSpec(
     {
         val fixture = baseFixture
+        val loginUser: User = fixture()
 
-        mockkStatic(LocalDateTime::class)
+        beforeContainer {
+            if (it.descriptor.isRootTest())
+                securityTestSupport.login(loginUser)
+        }
 
         Given("한 객실이 생성된 상황에서") {
             val room = roomRepository.save(fixture())
@@ -44,6 +53,10 @@ internal class RoomRepositoryTest(
                     roomRepository.findByIdOrNull(roomId) shouldBe null
                 }
             }
+        }
+
+        afterSpec {
+            testDatabaseSupport.clear()
         }
     },
 )

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DatabaseMigrationSettings" lastSelectedDirectory="db/changelog" liquibaseFileType="YAML" mainChangeLogDir="db/changelog" mainChangeLogName="#date(&quot;yyyy&quot;)-#date(&quot;MM&quot;)-#date(&quot;dd&quot;)_#date(&quot;hh&quot;)-#date(&quot;mm&quot;)-#date(&quot;ss&quot;)-CHANGE_MESSAGE" secondaryChangeLogName="#date(&quot;dd&quot;)-#date(&quot;hh&quot;)#date(&quot;mm&quot;)#date(&quot;ss&quot;)-#increment(1, 1, &quot;00&quot;)-changelog">
+    <component name="DatabaseMigrationSettings" lastSelectedDirectory="db/changelog" liquibaseFileType="YAML"
+               mainChangeLogDir="db/changelog"
+               mainChangeLogName="#date(&quot;yyyy&quot;)-#date(&quot;MM&quot;)-#date(&quot;dd&quot;)_#date(&quot;HH&quot;)-#date(&quot;mm&quot;)-#date(&quot;ss&quot;)-CHANGE_MESSAGE"
+               secondaryChangeLogName="#date(&quot;dd&quot;)-#date(&quot;HH&quot;)#date(&quot;mm&quot;)#date(&quot;ss&quot;)-#increment(1, 1, &quot;00&quot;)-changelog">
     <database-infos>
       <database-info>
         <option name="enabled" value="true" />

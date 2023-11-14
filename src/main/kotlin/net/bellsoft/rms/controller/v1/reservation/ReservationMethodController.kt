@@ -90,7 +90,7 @@ class ReservationMethodController(
     @Operation(summary = "예약 수단 삭제", description = "기존 예약 수단 삭제")
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "201"),
+            ApiResponse(responseCode = "204"),
         ],
     )
     @DeleteMapping("/{id}")

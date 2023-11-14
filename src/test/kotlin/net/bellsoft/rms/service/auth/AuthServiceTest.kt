@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import net.bellsoft.rms.controller.v1.auth.dto.UserRegistrationRequest
 import net.bellsoft.rms.fixture.baseFixture
+import net.bellsoft.rms.util.TestDatabaseSupport
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -13,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles
 @SpringBootTest
 @ActiveProfiles("test")
 internal class AuthServiceTest(
+    private val testDatabaseSupport: TestDatabaseSupport,
     private val authService: AuthService,
 ) : BehaviorSpec(
     {
@@ -44,9 +46,7 @@ internal class AuthServiceTest(
         }
 
         Given("기존에 가입한 사용자가 있는 상황에서") {
-            val userRegistrationRequest: UserRegistrationRequest = fixture {
-                property(UserRegistrationRequest::email) { "exists@mail.com" }
-            }
+            val userRegistrationRequest: UserRegistrationRequest = fixture()
             authService.register(userRegistrationRequest)
 
             When("기존 사용자 ID 와 동일한 ID 로 가입 요청 시") {
@@ -75,6 +75,10 @@ internal class AuthServiceTest(
                     authService.loadUserByUsername(email).username shouldBe email
                 }
             }
+        }
+
+        afterSpec {
+            testDatabaseSupport.clear()
         }
     },
 )

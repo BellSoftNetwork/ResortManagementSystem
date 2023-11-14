@@ -5,14 +5,18 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockkStatic
-import net.bellsoft.rms.domain.JpaEntityTest
 import net.bellsoft.rms.fixture.baseFixture
+import net.bellsoft.rms.util.TestDatabaseSupport
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDateTime
 
-@JpaEntityTest
+@SpringBootTest
+@ActiveProfiles("test")
 internal class UserRepositoryTest(
+    private val testDatabaseSupport: TestDatabaseSupport,
     private val userRepository: UserRepository,
     private val jdbcTemplate: JdbcTemplate,
 ) : BehaviorSpec(
@@ -23,16 +27,6 @@ internal class UserRepositoryTest(
 
         Given("한 유저가 생성된 상황에서") {
             val user = userRepository.save(fixture())
-
-            When("한 유저를 같은 트랜잭션 안에서 여러번 조회하면") {
-                Then("캐싱된 값이 나온다") {
-                    val selectedUser1 = userRepository.findByIdOrNull(user.id)
-                    val selectedUser2 = userRepository.findByIdOrNull(user.id)
-
-                    selectedUser1 shouldNotBe null
-                    selectedUser1 shouldBe selectedUser2
-                }
-            }
 
             When("등록된 이메일로 유저를 조회하면") {
                 val selectedUser = userRepository.findByEmail(user.email)
@@ -88,6 +82,10 @@ internal class UserRepositoryTest(
                     users.size shouldBe 2
                 }
             }
+        }
+
+        afterSpec {
+            testDatabaseSupport.clear()
         }
     },
 )

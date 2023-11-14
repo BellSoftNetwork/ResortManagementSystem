@@ -6,20 +6,40 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
+import net.bellsoft.rms.domain.base.BaseMustAudit
 import net.bellsoft.rms.domain.base.BaseTime
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
+import org.hibernate.envers.AuditTable
+import org.hibernate.envers.Audited
 
 @Entity
-@Table(name = "room")
+@Audited(withModifiedFlag = true)
+@AuditTable("room_history")
+@Table(
+    name = "room",
+    uniqueConstraints = [
+        UniqueConstraint(name = "uc_room_number", columnNames = ["number", "deleted_at"]),
+    ],
+)
 @SQLDelete(sql = "UPDATE room SET deleted_at = NOW() WHERE id = ?")
 @Where(clause = BaseTime.SOFT_DELETE_CONDITION)
 class Room(
-    number: String,
-    peekPrice: Int? = null,
-    offPeekPrice: Int? = null,
-    description: String = "",
-    note: String = "",
+    @Column(name = "number", nullable = false, length = 10)
+    var number: String,
+
+    @Column(name = "peek_price", nullable = false)
+    var peekPrice: Int = 0,
+
+    @Column(name = "off_peek_price", nullable = false)
+    var offPeekPrice: Int = 0,
+
+    @Column(name = "description", nullable = false, length = 200)
+    var description: String = "",
+
+    @Column(name = "note", nullable = false, length = 200)
+    var note: String = "",
 
     @Column(
         name = "status",
@@ -27,30 +47,10 @@ class Room(
         columnDefinition = "TINYINT",
     )
     var status: RoomStatus = RoomStatus.INACTIVE,
-) : BaseTime() {
+) : BaseMustAudit() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     var id: Long = 0
-        private set
-
-    @Column(name = "number", nullable = false, length = 10)
-    var number: String = number
-        private set
-
-    @Column(name = "peek_price")
-    var peekPrice: Int? = peekPrice
-        private set
-
-    @Column(name = "off_peek_price")
-    var offPeekPrice: Int? = offPeekPrice
-        private set
-
-    @Column(name = "desciption", nullable = false, length = 200)
-    var description: String = description
-        private set
-
-    @Column(name = "note", nullable = false, length = 200)
-    var note: String = note
         private set
 }

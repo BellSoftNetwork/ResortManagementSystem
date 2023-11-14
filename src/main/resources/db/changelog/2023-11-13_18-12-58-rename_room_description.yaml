@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1699850378258-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - renameColumn:
+            columnDataType: VARCHAR(200)
+            newColumnName: description
+            oldColumnName: desciption
+            tableName: room
+

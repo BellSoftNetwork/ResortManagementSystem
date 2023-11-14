@@ -3,21 +3,34 @@ package net.bellsoft.rms.domain.room.event
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.mockkStatic
-import net.bellsoft.rms.domain.JpaEntityTest
 import net.bellsoft.rms.domain.room.RoomRepository
+import net.bellsoft.rms.domain.user.User
 import net.bellsoft.rms.domain.user.UserRepository
 import net.bellsoft.rms.fixture.baseFixture
+import net.bellsoft.rms.util.SecurityTestSupport
+import net.bellsoft.rms.util.TestDatabaseSupport
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDateTime
 
-@JpaEntityTest
+@SpringBootTest
+@ActiveProfiles("test")
 internal class RoomEventRepositoryTest(
+    private val testDatabaseSupport: TestDatabaseSupport,
+    private val securityTestSupport: SecurityTestSupport,
     private val userRepository: UserRepository,
     private val roomRepository: RoomRepository,
     private val roomEventRepository: RoomEventRepository,
 ) : BehaviorSpec(
     {
         val fixture = baseFixture
+        val loginUser: User = fixture()
+
+        beforeContainer {
+            if (it.descriptor.isRootTest())
+                securityTestSupport.login(loginUser)
+        }
 
         mockkStatic(LocalDateTime::class)
 
@@ -55,6 +68,10 @@ internal class RoomEventRepositoryTest(
                     roomEventRepository.findByIdOrNull(roomEventId) shouldBe null
                 }
             }
+        }
+
+        afterSpec {
+            testDatabaseSupport.clear()
         }
     },
 )

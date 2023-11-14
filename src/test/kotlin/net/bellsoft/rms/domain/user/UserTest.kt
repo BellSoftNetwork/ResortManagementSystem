@@ -7,13 +7,17 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockkStatic
-import net.bellsoft.rms.domain.JpaEntityTest
 import net.bellsoft.rms.fixture.baseNullFixture
+import net.bellsoft.rms.util.TestDatabaseSupport
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDateTime
 
-@JpaEntityTest
+@SpringBootTest
+@ActiveProfiles("test")
 internal class UserTest(
+    private val testDatabaseSupport: TestDatabaseSupport,
     private val userRepository: UserRepository,
 ) : BehaviorSpec(
     {
@@ -65,6 +69,10 @@ internal class UserTest(
                     }
                 }
             }
+        }
+
+        afterSpec {
+            testDatabaseSupport.clear()
         }
     },
 ) {

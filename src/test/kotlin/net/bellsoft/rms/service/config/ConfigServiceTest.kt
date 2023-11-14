@@ -5,12 +5,14 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import net.bellsoft.rms.domain.user.UserRepository
+import net.bellsoft.rms.util.TestDatabaseSupport
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest
 @ActiveProfiles("test")
 internal class ConfigServiceTest(
+    private val testDatabaseSupport: TestDatabaseSupport,
     private val configService: ConfigService,
     @MockkBean private val userRepository: UserRepository,
 ) : BehaviorSpec(
@@ -37,6 +39,10 @@ internal class ConfigServiceTest(
                     appConfigDto.isAvailableRegistration shouldBe false
                 }
             }
+        }
+
+        afterSpec {
+            testDatabaseSupport.clear()
         }
     },
 )

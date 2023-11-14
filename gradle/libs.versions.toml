@@ -24,7 +24,7 @@ kotestExtensionsSpring = "1.1.2"
 mockk = "1.13.4"
 ninjaSquadSpringMockk = "4.0.2"
 kotlinFixture = "1.2.0"
-
+p6spy = "1.9.0"
 
 [plugins]
 springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
@@ -45,6 +45,7 @@ springBootStarterHateoas = { module = "org.springframework.boot:spring-boot-star
 
 # NOTE: Database
 springBootStarterDataJpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa", version.ref = "springBoot" }
+springDataEnvers = { module = "org.springframework.data:spring-data-envers", version.ref = "springBoot" }
 liquibase = { module = "org.liquibase:liquibase-core", version.ref = "liquibase" }
 h2database = { module = "com.h2database:h2", version.ref = "h2database" }
 mysqlConnector = { module = "com.mysql:mysql-connector-j", version.ref = "mysqlConnector" }
@@ -88,6 +89,7 @@ springBootStarterAop = { module = "org.springframework.boot:spring-boot-starter-
 
 # NOTE: Logging
 kotlinLogging = { module = "io.github.microutils:kotlin-logging", version.ref = "kotlinLogging" }
+p6spy = { module = "com.github.gavlyukovskiy:p6spy-spring-boot-starter", version.ref = "p6spy" }
 
 # NOTE: Monitoring
 springBootStarterActuator = { module = "org.springframework.boot:spring-boot-starter-actuator", version.ref = "springBoot" }

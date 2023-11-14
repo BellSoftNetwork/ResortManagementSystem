@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1699863019849-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: number, deleted_at
+            constraintName: uc_room_number
+            tableName: room
+
