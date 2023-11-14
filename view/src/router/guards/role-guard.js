@@ -9,7 +9,7 @@ export default (router) => {
       return next()
 
     if (!roles.includes(authStore.user.role))
-      return next({ name: "forbidden" })
+      return next({ name: "ErrorForbidden" })
 
     return next()
   })

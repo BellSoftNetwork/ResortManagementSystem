@@ -34,6 +34,10 @@ spring:
       hibernate:
         format_sql: false
         default_batch_size: 100
+      org:
+        hibernate:
+          envers:
+            store_data_at_delete: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
   sql:
     init:
@@ -54,3 +58,8 @@ logging:
       springframework:
         transaction:
           interceptor: TRACE
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false

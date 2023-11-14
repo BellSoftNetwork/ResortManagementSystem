@@ -15,10 +15,15 @@ import net.bellsoft.rms.domain.room.Room
 import net.bellsoft.rms.domain.user.User
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
+import org.hibernate.envers.AuditTable
+import org.hibernate.envers.Audited
+import org.hibernate.envers.RelationTargetAuditMode
 import java.time.LocalDateTime
 import java.util.*
 
 @Entity
+@Audited(withModifiedFlag = true)
+@AuditTable("reservation_history")
 @Table(name = "reservation")
 @SQLDelete(sql = "UPDATE reservation SET deleted_at = NOW() WHERE id = ?")
 @Where(clause = BaseTime.SOFT_DELETE_CONDITION)
@@ -54,16 +59,19 @@ class Reservation(
     var id: Long = 0
         private set
 
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     var user: User = user
         private set
 
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "reservation_method_id", nullable = false)
     var reservationMethod: ReservationMethod = reservationMethod
         private set
 
+    @Audited(modifiedColumnName = "room_id_mod")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
     var room: Room? = room

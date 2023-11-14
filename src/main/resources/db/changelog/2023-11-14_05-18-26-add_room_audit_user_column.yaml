@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1699906706755-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: created_by
+                  type: BIGINT
+              - column:
+                  name: updated_by
+                  type: BIGINT
+            tableName: room
+  - changeSet:
+      id: 1699906706755-2
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: created_by
+            baseTableName: room
+            constraintName: FK_ROOM_ON_CREATED_BY
+            referencedColumnNames: id
+            referencedTableName: user
+        - addForeignKeyConstraint:
+            baseColumnNames: updated_by
+            baseTableName: room
+            constraintName: FK_ROOM_ON_UPDATED_BY
+            referencedColumnNames: id
+            referencedTableName: user
+

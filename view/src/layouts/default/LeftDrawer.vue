@@ -38,7 +38,7 @@
 <script setup>
 import { ref } from "vue"
 import { useAuthStore } from "stores/auth.js"
-import { fasCommentDollar, fasTableColumns } from "@quasar/extras/fontawesome-v6"
+import { fasCommentDollar, fasPersonShelter, fasTableColumns } from "@quasar/extras/fontawesome-v6"
 
 defineExpose({
   toggleLeftDrawer,
@@ -50,6 +50,7 @@ const leftDrawerOpen = ref(false)
 
 const normalLinks = [
   { icon: fasTableColumns, text: "대시보드", to: "Home" },
+  { icon: fasPersonShelter, text: "객실", to: "Rooms" },
   { icon: fasCommentDollar, text: "예약 수단", to: "ReservationMethods" },
 ]
 const adminLinks = [

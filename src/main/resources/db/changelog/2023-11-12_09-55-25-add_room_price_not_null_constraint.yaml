@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1699793724844-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: INT
+            columnName: peek_price
+            tableName: room
+            validate: true
+        - addNotNullConstraint:
+            columnDataType: INT
+            columnName: off_peek_price
+            tableName: room
+            validate: true
+

@@ -2,7 +2,6 @@ package net.bellsoft.rms.service.reservation
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.ints.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.shouldBe
 import net.bellsoft.rms.domain.reservation.method.ReservationMethodRepository
 import net.bellsoft.rms.exception.DataNotFoundException
@@ -10,6 +9,7 @@ import net.bellsoft.rms.exception.DuplicateDataException
 import net.bellsoft.rms.fixture.baseFixture
 import net.bellsoft.rms.service.reservation.dto.ReservationMethodCreateDto
 import net.bellsoft.rms.service.reservation.dto.ReservationMethodUpdateDto
+import net.bellsoft.rms.util.TestDatabaseSupport
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -19,6 +19,7 @@ import org.springframework.test.context.ActiveProfiles
 @SpringBootTest
 @ActiveProfiles("test")
 internal class ReservationMethodServiceTest(
+    private val testDatabaseSupport: TestDatabaseSupport,
     private val reservationMethodService: ReservationMethodService,
     private val reservationMethodRepository: ReservationMethodRepository,
 ) : BehaviorSpec(
@@ -97,7 +98,7 @@ internal class ReservationMethodServiceTest(
                 )
 
                 Then("모든 예약 수단이 정상적으로 조회된다") {
-                    reservationMethods.page.size shouldBeGreaterThanOrEqual 1
+                    reservationMethods.page.size shouldBe 1
                     reservationMethods.values.first().run {
                         name shouldBe reservationMethod.name
                         commissionRate shouldBe reservationMethod.commissionRate
@@ -141,6 +142,10 @@ internal class ReservationMethodServiceTest(
                     reservationMethodRepository.findByIdOrNull(reservationMethod.id) shouldBe null
                 }
             }
+        }
+
+        afterSpec {
+            testDatabaseSupport.clear()
         }
     },
 )

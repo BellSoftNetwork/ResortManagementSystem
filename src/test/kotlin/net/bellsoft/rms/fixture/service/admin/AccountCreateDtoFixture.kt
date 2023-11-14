@@ -1,4 +1,4 @@
-package net.bellsoft.rms.fixture.controller.v1.admin
+package net.bellsoft.rms.fixture.service.admin
 
 import net.bellsoft.rms.domain.user.UserRole
 import net.bellsoft.rms.fixture.FixtureFeature

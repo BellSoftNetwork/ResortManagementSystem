@@ -46,6 +46,7 @@ dependencies {
 
     // NOTE: Database
     implementation(libs.springBootStarterDataJpa)
+    implementation(libs.springDataEnvers)
     implementation(libs.liquibase)
     testRuntimeOnly(libs.h2database)
     runtimeOnly(libs.mysqlConnector)
@@ -72,6 +73,7 @@ dependencies {
 
     // NOTE: Logging
     implementation(libs.kotlinLogging)
+    implementation(libs.p6spy)
 
     // NOTE: Monitoring
     implementation(libs.springBootStarterActuator)

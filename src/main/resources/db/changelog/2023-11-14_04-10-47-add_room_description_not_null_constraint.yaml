@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1699902647070-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: VARCHAR(200)
+            columnName: description
+            tableName: room
+            validate: true
+

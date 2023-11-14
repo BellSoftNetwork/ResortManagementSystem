@@ -16,6 +16,35 @@ const routes = [
     ],
   },
   {
+    path: "/rooms",
+    component: DefaultLayout,
+    meta: {
+      isAuthenticated: true,
+    },
+    children: [
+      {
+        path: "",
+        name: "Rooms",
+        component: () => import("pages/room/RoomList.vue"),
+      },
+      {
+        path: ":id",
+        name: "Room",
+        component: () => import("pages/room/RoomDetail.vue"),
+      },
+      {
+        path: ":id/edit",
+        name: "EditRoom",
+        component: () => import("pages/room/RoomEdit.vue"),
+      },
+      {
+        path: "create",
+        name: "CreateRoom",
+        component: () => import("pages/room/RoomCreate.vue"),
+      },
+    ],
+  },
+  {
     path: "/reservation-methods",
     component: DefaultLayout,
     meta: {
@@ -70,16 +99,22 @@ const routes = [
       },
     ],
   },
+
   {
     path: "/error/403",
     component: DefaultLayout,
     children: [
       {
         path: "",
-        name: "forbidden",
+        name: "ErrorForbidden",
         component: () => import("pages/error/ErrorForbidden.vue"),
       },
     ],
+  },
+  {
+    path: "/error/404",
+    name: "ErrorNotFound",
+    component: () => import("pages/error/ErrorNotFound.vue"),
   },
 
   {
