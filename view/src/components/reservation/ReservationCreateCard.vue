@@ -265,7 +265,7 @@ const formModel = ref({
     },
     name: "",
     phone: "",
-    peopleCount: 0,
+    peopleCount: 4,
     stayDate: { from: "", to: "" },
     price: 0,
     paymentAmount: 0,

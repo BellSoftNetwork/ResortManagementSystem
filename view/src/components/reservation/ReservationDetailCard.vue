@@ -155,7 +155,7 @@ const entity = ref({
   },
   name: "",
   phone: "",
-  peopleCount: 0,
+  peopleCount: 4,
   stayStartAt: "",
   stayEndAt: "",
   checkInAt: "",

@@ -15,12 +15,13 @@
           />
         </div>
 
-        <div class="col-12 col-md q-pa-sm">
+        <div class="col-12 col-md q-pa-md-sm">
           <q-tab-panels v-model="date">
             <q-tab-panel
               v-for="(reservations, stayStartAt) in reservationsOfDay"
               :key="stayStartAt"
               :name="stayStartAt"
+              class="q-px-none"
             >
               <q-table
                 :columns="columns"
@@ -59,6 +60,16 @@
                       flat
                     >{{ props.row.name }}
                     </q-btn>
+                  </q-td>
+                </template>
+
+                <template #body-cell-missPrice="props">
+                  <q-td
+                    :props="props"
+                    key="missPrice"
+                    :class="props.row.missPrice > 0 ? 'bg-warning' : ''"
+                  >
+                    {{ formatPrice(props.row.missPrice) }}
                   </q-td>
                 </template>
               </q-table>
@@ -105,21 +116,11 @@ const columns = [
     sortable: true,
   },
   {
-    name: "price",
-    field: "price",
-    label: "총 금액",
+    name: "missPrice",
+    field: "missPrice",
+    label: "미수금",
     align: "left",
     required: true,
-    sortable: true,
-    format: (value) => formatPrice(value),
-  },
-  {
-    name: "paymentAmount",
-    field: "paymentAmount",
-    label: "지불 금액",
-    align: "left",
-    required: true,
-    format: (value) => formatPrice(value),
   },
   {
     name: "room",
@@ -164,6 +165,7 @@ const reservationsOfDay = computed(() => {
     if (!Object.keys(reservationMap).includes(reservation.stayStartAt))
       reservationMap[reservation.stayStartAt] = []
 
+    reservation.missPrice = reservation.price - reservation.paymentAmount
     reservationMap[reservation.stayStartAt].push(reservation)
   })
 
