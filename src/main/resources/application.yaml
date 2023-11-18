@@ -11,6 +11,7 @@ server:
     encoding:
       charset: utf-8
       force: true
+  shutdown: graceful
 
 # Swagger
 springdoc:
@@ -59,6 +60,17 @@ spring:
       host: ${REDIS_HOST:127.0.0.1}
       password: ${REDIS_PASSWORD:}
       port: ${REDIS_PORT:6379}
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
 
 logging:
   level:

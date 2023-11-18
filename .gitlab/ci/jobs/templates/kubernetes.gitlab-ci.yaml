@@ -32,7 +32,7 @@
     <<: *kubernetes_deploy_variables
     KUBERNETES_RESOURCE_PATH: ${CI_PROJECT_DIR}/src/main/kubernetes/production
     APPLICATION_IMAGE_URL: ${CI_REGISTRY_IMAGE}/${CI_COMMIT_REF_SLUG}:${CI_COMMIT_SHA}
-    APPLICATION_REPLICAS: 1
+    APPLICATION_REPLICAS: 2
   before_script:
     - *setup_kubectl_context_script
     - *convert_kubernetes_resource_script

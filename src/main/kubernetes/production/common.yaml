@@ -46,6 +46,8 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "production"
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Duser.timezone=Asia/Seoul"
             - name: DEPLOY_ENVIRONMENT
               value: "${DEPLOY_ENVIRONMENT}"
             - name: DEPLOY_COMMIT_SHA
@@ -108,3 +110,21 @@ spec:
                   optional: true
           ports:
             - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1.5Gi
+            limits:
+              memory: 3Gi
