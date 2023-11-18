@@ -3,7 +3,7 @@ package net.bellsoft.rms.controller.v1.admin.dto
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Size
 import net.bellsoft.rms.domain.user.UserRole
-import net.bellsoft.rms.service.admin.dto.AccountPatchDto
+import net.bellsoft.rms.service.auth.dto.AccountPatchDto
 
 @Schema(description = "계정 수정 요청 정보")
 data class AccountPatchRequest(

@@ -16,6 +16,20 @@ const routes = [
     ],
   },
   {
+    path: "/my",
+    component: DefaultLayout,
+    meta: {
+      isAuthenticated: true,
+    },
+    children: [
+      {
+        path: "",
+        name: "MyDetail",
+        component: () => import("pages/my/MyDetail.vue"),
+      },
+    ],
+  },
+  {
     path: "/rooms",
     component: DefaultLayout,
     meta: {

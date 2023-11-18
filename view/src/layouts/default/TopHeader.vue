@@ -24,6 +24,10 @@
           </q-avatar>
           <q-menu auto-close>
             <q-list>
+              <q-item clickable :to="{ name: 'MyDetail' }">
+                <q-item-section>내 정보</q-item-section>
+              </q-item>
+              <q-separator />
               <q-item clickable @click="openDialog">
                 <q-item-section>로그아웃</q-item-section>
               </q-item>
