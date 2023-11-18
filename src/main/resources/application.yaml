@@ -50,6 +50,15 @@ spring:
     change-log: classpath:/db/changelog-master.yaml
     database-change-log-table: database_changelog
     database-change-log-lock-table: database_changelog_lock
+  session:
+    redis:
+      namespace: ${REDIS_NAMESPACE:local.v1}
+    timeout: 24h
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      password: ${REDIS_PASSWORD:}
+      port: ${REDIS_PORT:6379}
 
 logging:
   level:
