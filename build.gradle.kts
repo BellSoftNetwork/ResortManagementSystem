@@ -46,6 +46,8 @@ dependencies {
 
     // NOTE: Database
     implementation(libs.springBootStarterDataJpa)
+    implementation(libs.springBootStarterRedis)
+    implementation(libs.springSessionDataRedis)
     implementation(libs.springDataEnvers)
     implementation(libs.liquibase)
     testRuntimeOnly(libs.h2database)

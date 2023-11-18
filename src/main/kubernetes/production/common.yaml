@@ -83,5 +83,28 @@ spec:
                 secretKeyRef:
                   name: ${APPLICATION_NAME}-connection
                   key: DATABASE_MYSQL_PASSWORD
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: ${APPLICATION_NAME}-connection
+                  key: REDIS_HOST
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ${APPLICATION_NAME}-connection
+                  key: REDIS_PASSWORD
+                  optional: true
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: ${APPLICATION_NAME}-connection
+                  key: REDIS_PORT
+                  optional: true
+            - name: REDIS_NAMESPACE
+              valueFrom:
+                secretKeyRef:
+                  name: ${APPLICATION_NAME}-connection
+                  key: REDIS_NAMESPACE
+                  optional: true
           ports:
             - containerPort: 8080
