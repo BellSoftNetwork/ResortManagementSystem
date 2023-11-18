@@ -1,4 +1,4 @@
-package net.bellsoft.rms.service.admin.dto
+package net.bellsoft.rms.service.auth.dto
 
 import net.bellsoft.rms.domain.user.User
 import net.bellsoft.rms.domain.user.UserRole

@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.Size
 import net.bellsoft.rms.domain.user.UserRole
-import net.bellsoft.rms.service.admin.dto.AccountCreateDto
+import net.bellsoft.rms.service.auth.dto.AccountCreateDto
 
 @Schema(description = "계정 생성 요청 정보")
 data class AccountCreateRequest(

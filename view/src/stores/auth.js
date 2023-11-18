@@ -27,7 +27,7 @@ export const useAuthStore = defineStore("auth", {
 
   actions: {
     loadAccountInfo() {
-      return api.post("/api/v1/whoami").then((response) => {
+      return api.post("/api/v1/my").then((response) => {
         const responseValue = response.data.value
 
         this.user.email = responseValue.email

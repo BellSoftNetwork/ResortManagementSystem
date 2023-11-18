@@ -9,7 +9,7 @@
     :filter="filter"
     style="height: 90vh;"
     row-key="id"
-    title="예약"
+    title="다가오는 예약"
     flat
     bordered
     binary-state-sort
@@ -36,7 +36,7 @@
             </div>
 
             <div class="row no-wrap q-pa-md">
-              <q-input v-model="filter.stayStartAt" mask="####-##-##" outlined>
+              <q-input v-model="filter.stayStartAt" mask="####-##-##" :readonly="true" outlined>
                 <template v-slot:append>
                   <q-icon name="event" class="cursor-pointer">
                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">
@@ -50,7 +50,7 @@
                 </template>
               </q-input>
               <span class="self-center q-mx-sm">~</span>
-              <q-input v-model="filter.stayEndAt" mask="####-##-##" outlined>
+              <q-input v-model="filter.stayEndAt" mask="####-##-##" :readonly="true" outlined>
                 <template v-slot:append>
                   <q-icon name="event" class="cursor-pointer">
                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">

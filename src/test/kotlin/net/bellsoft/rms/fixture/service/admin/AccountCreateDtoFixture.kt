@@ -3,7 +3,7 @@ package net.bellsoft.rms.fixture.service.admin
 import net.bellsoft.rms.domain.user.UserRole
 import net.bellsoft.rms.fixture.FixtureFeature
 import net.bellsoft.rms.fixture.util.fixtureConfig
-import net.bellsoft.rms.service.admin.dto.AccountCreateDto
+import net.bellsoft.rms.service.auth.dto.AccountCreateDto
 import net.datafaker.Faker
 import java.util.*
 
