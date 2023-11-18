@@ -2,3 +2,10 @@ decorator:
   datasource:
     p6spy:
       enable-logging: true
+
+logging:
+  level:
+    com:
+      zaxxer:
+        hikari.HikariConfig: DEBUG
+        hikari: TRACE
