@@ -2,6 +2,7 @@ package net.bellsoft.rms.domain.room
 
 import com.querydsl.core.types.Order
 import com.querydsl.core.types.OrderSpecifier
+import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.core.types.dsl.Expressions
 import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
@@ -42,19 +43,26 @@ class RoomCustomRepositoryImpl(
     private fun getFilteredRoomsBaseQuery(filter: RoomFilterDto) = jpaQueryFactory
         .from(QRoom.room)
         .where(
-            QRoom.room.id.notIn(reservedRooms(filter)),
+            reservedRooms(filter),
             eqStatus(filter.status),
         )
 
-    private fun reservedRooms(filter: RoomFilterDto) = JPAExpressions
-        .select(QReservation.reservation.room.id)
-        .from(QReservation.reservation)
-        .where(
-            beforeDateFilterExpressions(filter)
-                ?.or(afterDateFilterExpressions(filter))
-                ?.or(wrapDateFilterExpressions(filter)),
+    private fun reservedRooms(filter: RoomFilterDto): BooleanExpression? {
+        if (filter.stayStartAt == null || filter.stayEndAt == null)
+            return null
+
+        return QRoom.room.id.notIn(
+            JPAExpressions
+                .select(QReservation.reservation.room.id)
+                .from(QReservation.reservation)
+                .where(
+                    beforeDateFilterExpressions(filter)
+                        ?.or(afterDateFilterExpressions(filter))
+                        ?.or(wrapDateFilterExpressions(filter)),
+                )
+                .distinct(),
         )
-        .distinct()
+    }
 
     /**
      * 기존 예약 기간: ###=
