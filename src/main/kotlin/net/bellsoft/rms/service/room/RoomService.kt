@@ -11,6 +11,7 @@ import net.bellsoft.rms.exception.UserNotFoundException
 import net.bellsoft.rms.service.common.dto.EntityListDto
 import net.bellsoft.rms.service.room.dto.RoomCreateDto
 import net.bellsoft.rms.service.room.dto.RoomDto
+import net.bellsoft.rms.service.room.dto.RoomFilterDto
 import net.bellsoft.rms.service.room.dto.RoomUpdateDto
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Pageable
@@ -24,9 +25,9 @@ class RoomService(
     private val entityHistoryComponent: EntityHistoryComponent,
     private val securitySupport: SecuritySupport,
 ) {
-    fun findAll(pageable: Pageable) = EntityListDto
+    fun findAll(pageable: Pageable, filter: RoomFilterDto) = EntityListDto
         .of(
-            roomRepository.findAll(pageable),
+            roomRepository.getFilteredRooms(pageable, filter),
             RoomDto::of,
         )
 

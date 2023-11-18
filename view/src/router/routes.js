@@ -45,6 +45,35 @@ const routes = [
     ],
   },
   {
+    path: "/reservations",
+    component: DefaultLayout,
+    meta: {
+      isAuthenticated: true,
+    },
+    children: [
+      {
+        path: "",
+        name: "Reservations",
+        component: () => import("pages/reservation/ReservationList.vue"),
+      },
+      {
+        path: ":id",
+        name: "Reservation",
+        component: () => import("pages/reservation/ReservationDetail.vue"),
+      },
+      {
+        path: ":id/edit",
+        name: "EditReservation",
+        component: () => import("pages/reservation/ReservationEdit.vue"),
+      },
+      {
+        path: "create",
+        name: "CreateReservation",
+        component: () => import("pages/reservation/ReservationCreate.vue"),
+      },
+    ],
+  },
+  {
     path: "/reservation-methods",
     component: DefaultLayout,
     meta: {

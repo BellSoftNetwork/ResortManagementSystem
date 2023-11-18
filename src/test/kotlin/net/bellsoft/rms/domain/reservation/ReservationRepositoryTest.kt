@@ -3,30 +3,39 @@ package net.bellsoft.rms.domain.reservation
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.mockkStatic
-import net.bellsoft.rms.domain.JpaEntityTest
 import net.bellsoft.rms.domain.reservation.method.ReservationMethodRepository
-import net.bellsoft.rms.domain.user.UserRepository
+import net.bellsoft.rms.domain.user.User
 import net.bellsoft.rms.fixture.baseFixture
+import net.bellsoft.rms.util.SecurityTestSupport
+import net.bellsoft.rms.util.TestDatabaseSupport
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDateTime
 
-@JpaEntityTest
+@SpringBootTest
+@ActiveProfiles("test")
 internal class ReservationRepositoryTest(
-    private val userRepository: UserRepository,
+    private val testDatabaseSupport: TestDatabaseSupport,
+    private val securityTestSupport: SecurityTestSupport,
     private val reservationMethodRepository: ReservationMethodRepository,
     private val reservationRepository: ReservationRepository,
 ) : BehaviorSpec(
     {
         val fixture = baseFixture
+        val loginUser: User = fixture()
 
         mockkStatic(LocalDateTime::class)
 
+        beforeContainer {
+            if (it.descriptor.isRootTest())
+                securityTestSupport.login(loginUser)
+        }
+
         Given("예약 정보가 생성된 상황에서") {
-            val user = userRepository.save(fixture())
             val reservationMethod = reservationMethodRepository.save(fixture())
             val reservation = reservationRepository.save(
                 fixture {
-                    property(Reservation::user) { user }
                     property(Reservation::reservationMethod) { reservationMethod }
                     property(Reservation::room) { null }
                 },
@@ -56,6 +65,10 @@ internal class ReservationRepositoryTest(
                     reservationRepository.findByIdOrNull(reservationId) shouldBe null
                 }
             }
+        }
+
+        afterSpec {
+            testDatabaseSupport.clear()
         }
     },
 )

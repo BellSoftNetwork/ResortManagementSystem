@@ -8,6 +8,7 @@ import net.bellsoft.rms.fixture.domain.room.RoomFixture
 import net.bellsoft.rms.fixture.domain.room.event.RoomEventFixture
 import net.bellsoft.rms.fixture.domain.user.UserFixture
 import net.bellsoft.rms.fixture.service.admin.AccountCreateDtoFixture
+import net.bellsoft.rms.fixture.service.reservation.ReservationCreateDtoFixture
 import net.bellsoft.rms.fixture.service.room.RoomCreateDtoFixture
 
 // NOTE: 신규 도메인 추가 시 해당 도메인 Configuration 생성 후 아래에 등록 필요
@@ -26,6 +27,7 @@ private val domainConfigurations = listOf(
 private val dtoFixtureConfigurations = listOf(
     UserRegistrationRequestFixture.BASE_CONFIGURATION,
     AccountCreateDtoFixture.BASE_CONFIGURATION,
+    ReservationCreateDtoFixture.BASE_CONFIGURATION,
     RoomCreateDtoFixture.BASE_CONFIGURATION,
 )
 

@@ -3,17 +3,23 @@ package net.bellsoft.rms.service.room
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import net.bellsoft.rms.component.history.type.HistoryType
+import net.bellsoft.rms.domain.reservation.Reservation
+import net.bellsoft.rms.domain.reservation.ReservationRepository
+import net.bellsoft.rms.domain.reservation.method.ReservationMethodRepository
 import net.bellsoft.rms.domain.room.Room
 import net.bellsoft.rms.domain.room.RoomRepository
+import net.bellsoft.rms.domain.room.RoomStatus
 import net.bellsoft.rms.domain.user.User
 import net.bellsoft.rms.exception.DataNotFoundException
 import net.bellsoft.rms.exception.DuplicateDataException
 import net.bellsoft.rms.exception.UserNotFoundException
 import net.bellsoft.rms.fixture.baseFixture
 import net.bellsoft.rms.service.room.dto.RoomCreateDto
+import net.bellsoft.rms.service.room.dto.RoomFilterDto
 import net.bellsoft.rms.service.room.dto.RoomUpdateDto
 import net.bellsoft.rms.util.SecurityTestSupport
 import net.bellsoft.rms.util.TestDatabaseSupport
@@ -21,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.test.context.ActiveProfiles
+import java.time.LocalDate
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -29,6 +36,8 @@ internal class RoomServiceTest(
     private val securityTestSupport: SecurityTestSupport,
     private val roomService: RoomService,
     private val roomRepository: RoomRepository,
+    private val reservationRepository: ReservationRepository,
+    private val reservationMethodRepository: ReservationMethodRepository,
 ) : BehaviorSpec(
     {
         val fixture = baseFixture
@@ -41,7 +50,10 @@ internal class RoomServiceTest(
 
         Given("객실 정보가 없는 상황에서 로그인 후") {
             When("전체 객실 정보를 조회하면") {
-                val entityListDto = roomService.findAll(PageRequest.of(0, 10))
+                val entityListDto = roomService.findAll(
+                    PageRequest.of(0, 10),
+                    RoomFilterDto(),
+                )
 
                 Then("빈 객실 목록이 반환 된다") {
                     entityListDto.page.totalElements shouldBe 0
@@ -110,7 +122,10 @@ internal class RoomServiceTest(
             val rooms = roomRepository.saveAll(fixture<List<Room>> { repeatCount { 10 } })
 
             When("전체 객실 정보를 조회하면") {
-                val entityListDto = roomService.findAll(PageRequest.of(0, 10))
+                val entityListDto = roomService.findAll(
+                    PageRequest.of(0, 10),
+                    RoomFilterDto(),
+                )
 
                 Then("10개의 객실 정보가 반환 된다") {
                     entityListDto.page.totalElements shouldBe 10
@@ -150,7 +165,7 @@ internal class RoomServiceTest(
                 val room = rooms[0]
                 val result = roomService.update(
                     room.id,
-                    RoomUpdateDto("UPDATED"),
+                    RoomUpdateDto(number = "UPDATED"),
                 )
 
                 loginUser.id shouldNotBe newLoginUser.id
@@ -166,8 +181,9 @@ internal class RoomServiceTest(
                     entityListDto.values.toList().let {
                         it[0].historyType shouldBe HistoryType.CREATED
                         it[1].historyType shouldBe HistoryType.UPDATED
-                        it[1].updatedFields shouldBe setOf("number")
+                        it[1].updatedFields shouldBe setOf("updatedBy", "number")
                         it[1].entity.number shouldBe "UPDATED"
+                        it[1].entity.updatedBy shouldBe newLoginUser.email
                     }
                 }
 
@@ -217,6 +233,232 @@ internal class RoomServiceTest(
                 Then("객실 정보를 삭제할 수 없다") {
                     exception.message shouldBe "로그인 필요"
                     roomRepository.existsById(room.id) shouldBe true
+                }
+            }
+        }
+
+        Given("비활성 상태의 객실이 1개 등록된 상황에서") {
+            roomRepository.save(fixture { property(Room::status) { RoomStatus.INACTIVE } })
+
+            When("활성 상태의 예약 가능한 객실 정보를 조회하면") {
+                val entityListDto = roomService.findAll(
+                    PageRequest.of(0, 10),
+                    RoomFilterDto(
+                        status = RoomStatus.NORMAL,
+                    ),
+                )
+
+                Then("0개의 객실 정보가 반환된다") {
+                    entityListDto.page.totalElements shouldBe 0
+                }
+            }
+        }
+
+        Given("희망 기간 외 예약이 잡혀있어 예약이 가능한 객실이 4개있을 때") {
+            val customFixture = fixture.new {
+                property(Reservation::reservationMethod) { reservationMethodRepository.save(fixture()) }
+            }
+
+            val availableRooms = roomRepository.saveAll(
+                listOf(
+                    fixture {
+                        property(Room::note) {
+                            """[0]
+                                기존 예약 기간: ##=
+                                희망 예약 기간: =##
+                            """.trimIndent()
+                        }
+                    },
+                    fixture {
+                        property(Room::note) {
+                            """[1]
+                                기존 예약 기간: =##
+                                희망 예약 기간: ##=
+                            """.trimIndent()
+                        }
+                    },
+                    fixture {
+                        property(Room::note) {
+                            """[2]
+                                기존 예약 기간: ##@@
+                                희망 예약 기간: =##=
+                            """.trimIndent()
+                        }
+                    },
+                    fixture {
+                        property(Room::note) {
+                            """[3]
+                                기존 예약 기간: ====
+                                희망 예약 기간: =##=
+                            """.trimIndent()
+                        }
+                    },
+                ),
+            )
+
+            reservationRepository.saveAll(
+                listOf(
+                    customFixture {
+                        property(Reservation::room) { availableRooms[0] }
+                        property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 9) }
+                        property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 10) }
+                    },
+                    customFixture {
+                        property(Reservation::room) { availableRooms[1] }
+                        property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 11) }
+                        property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 12) }
+                    },
+                    customFixture {
+                        property(Reservation::room) { availableRooms[2] }
+                        property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 9) }
+                        property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 10) }
+                    },
+                    customFixture {
+                        property(Reservation::room) { availableRooms[2] }
+                        property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 11) }
+                        property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 12) }
+                    },
+                ),
+            )
+
+            When("기간 내 예약 가능한 객실 정보를 조회하면") {
+                val entityListDto = roomService.findAll(
+                    PageRequest.of(0, 10),
+                    RoomFilterDto(
+                        stayStartAt = LocalDate.of(2023, 11, 10),
+                        stayEndAt = LocalDate.of(2023, 11, 11),
+                    ),
+                )
+
+                Then("4개의 객실 정보가 반환 된다") {
+                    assertSoftly {
+                        entityListDto.page.totalElements shouldBe 4
+                        entityListDto.values.map { it.note } shouldContainExactly availableRooms.map { it.note }
+                    }
+                }
+            }
+        }
+
+        Given("희망 기간 내 연박 예약이 잡혀있어 예약이 불가능한 객실이 7개있을 때") {
+            val customFixture = fixture.new {
+                property(Reservation::reservationMethod) { reservationMethodRepository.save(fixture()) }
+            }
+
+            val reservedRooms = roomRepository.saveAll(
+                listOf(
+                    fixture {
+                        property(Room::note) {
+                            """[0]
+                                기존 예약 기간: ###=
+                                희망 예약 기간: =###
+                            """.trimIndent()
+                        }
+                    },
+                    fixture {
+                        property(Room::note) {
+                            """[1]
+                                기존 예약 기간: ###
+                                희망 예약 기간: ###
+                            """.trimIndent()
+                        }
+                    },
+                    fixture {
+                        property(Room::note) {
+                            """[2]
+                                기존 예약 기간: ##=
+                                희망 예약 기간: ###
+                            """.trimIndent()
+                        }
+                    },
+                    fixture {
+                        property(Room::note) {
+                            """[3]
+                                기존 예약 기간: =###=
+                                희망 예약 기간: #####
+                            """.trimIndent()
+                        }
+                    },
+                    fixture {
+                        property(Room::note) {
+                            """[4]
+                                기존 예약 기간: =##
+                                희망 예약 기간: ###
+                            """.trimIndent()
+                        }
+                    },
+                    fixture {
+                        property(Room::note) {
+                            """[5]
+                                기존 예약 기간: =###
+                                희망 예약 기간: ###=
+                            """.trimIndent()
+                        }
+                    },
+                    fixture {
+                        property(Room::note) {
+                            """[6]
+                                기존 예약 기간: #####
+                                희망 예약 기간: =###=
+                            """.trimIndent()
+                        }
+                    },
+                ),
+            )
+
+            reservationRepository.saveAll(
+                listOf(
+                    customFixture {
+                        property(Reservation::room) { reservedRooms[0] }
+                        property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 9) }
+                        property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 11) }
+                    },
+                    customFixture {
+                        property(Reservation::room) { reservedRooms[1] }
+                        property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 10) }
+                        property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 20) }
+                    },
+                    customFixture {
+                        property(Reservation::room) { reservedRooms[2] }
+                        property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 10) }
+                        property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 11) }
+                    },
+                    customFixture {
+                        property(Reservation::room) { reservedRooms[3] }
+                        property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 11) }
+                        property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 19) }
+                    },
+                    customFixture {
+                        property(Reservation::room) { reservedRooms[4] }
+                        property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 19) }
+                        property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 20) }
+                    },
+                    customFixture {
+                        property(Reservation::room) { reservedRooms[5] }
+                        property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 19) }
+                        property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 21) }
+                    },
+                    customFixture {
+                        property(Reservation::room) { reservedRooms[6] }
+                        property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 1) }
+                        property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 30) }
+                    },
+                ),
+            )
+
+            When("기간 내 예약 가능한 객실 정보를 조회하면") {
+                val entityListDto = roomService.findAll(
+                    PageRequest.of(0, 10),
+                    RoomFilterDto(
+                        stayStartAt = LocalDate.of(2023, 11, 10),
+                        stayEndAt = LocalDate.of(2023, 11, 20),
+                    ),
+                )
+
+                Then("0개의 객실 정보가 반환 된다") {
+                    assertSoftly {
+                        entityListDto.page.totalElements shouldBe 0
+                        entityListDto.values.map { it.note } shouldContainExactly emptyList()
+                    }
                 }
             }
         }
