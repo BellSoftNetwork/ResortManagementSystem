@@ -402,7 +402,7 @@ function changePrice() {
 function resetForm() {
   formModel.value.value.name = ""
   formModel.value.value.phone = ""
-  formModel.value.value.peopleCount = 0
+  formModel.value.value.peopleCount = 4
   formModel.value.value.stayDate.from = dayjs().format("YYYY-MM-DD")
   formModel.value.value.stayDate.to = dayjs().add(1, "d").format("YYYY-MM-DD")
   formModel.value.value.price = 0
