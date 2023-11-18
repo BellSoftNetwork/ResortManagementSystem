@@ -1,13 +1,9 @@
 <template>
   <q-page padding>
-    <div class="row items-start q-gutter-md">
-      <ApiTestCard />
-      <UserInfoCard />
-    </div>
+    <ReservationSummary />
   </q-page>
 </template>
 
 <script setup>
-import ApiTestCard from "components/test/ApiTestCard.vue"
-import UserInfoCard from "components/auth/UserInfoCard.vue"
+import ReservationSummary from "components/dashboard/ReservationSummary.vue"
 </script>

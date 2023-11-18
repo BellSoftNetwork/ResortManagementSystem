@@ -117,6 +117,21 @@ const routes = [
     ],
   },
   {
+    path: "/debug",
+    component: DefaultLayout,
+    meta: {
+      roles: ["SUPER_ADMIN"],
+      isAuthenticated: true,
+    },
+    children: [
+      {
+        path: "",
+        name: "DevDebug",
+        component: () => import("pages/DevDebug.vue"),
+      },
+    ],
+  },
+  {
     path: "/login",
     meta: {
       isAuthenticated: false,
