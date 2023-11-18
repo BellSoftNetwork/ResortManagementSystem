@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1699996950794-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: created_by
+                  type: BIGINT
+              - column:
+                  name: updated_by
+                  type: BIGINT
+            tableName: reservation
+        - addNotNullConstraint:
+            columnDataType: BIGINT
+            columnName: created_by
+            tableName: reservation
+        - addForeignKeyConstraint:
+            baseColumnNames: created_by
+            baseTableName: reservation
+            constraintName: FK_RESERVATION_ON_CREATED_BY
+            referencedColumnNames: id
+            referencedTableName: user
+  - changeSet:
+      id: 1699996950794-2
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: created_by
+                  type: BIGINT
+              - column:
+                  name: updated_by
+                  type: BIGINT
+            tableName: reservation_history
+        - addNotNullConstraint:
+            columnDataType: BIGINT
+            columnName: updated_by
+            tableName: reservation
+        - addForeignKeyConstraint:
+            baseColumnNames: updated_by
+            baseTableName: reservation
+            constraintName: FK_RESERVATION_ON_UPDATED_BY
+            referencedColumnNames: id
+            referencedTableName: user
+  - changeSet:
+      id: 1699996950794-3
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: reservation
+            constraintName: FK_RESERVATION_ON_USER
+        - dropColumn:
+            columnName: user_id
+            tableName: reservation
+

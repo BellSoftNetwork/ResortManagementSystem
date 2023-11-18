@@ -26,7 +26,6 @@ class ReservationFixture {
         private val FAKER = Faker(Locale.KOREA)
 
         val BASE_CONFIGURATION = fixtureConfig {
-            property(Reservation::user) { baseFixture() }
             property(Reservation::reservationMethod) { baseFixture() }
             property(Reservation::room) { baseFixture() }
             property(Reservation::name) { "name-${FAKER.random().hex(10)}" }

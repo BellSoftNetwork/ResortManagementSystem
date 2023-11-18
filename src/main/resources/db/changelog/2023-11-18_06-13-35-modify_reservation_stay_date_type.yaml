@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1700255615189-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - modifyDataType:
+            columnName: stay_start_at
+            newDataType: DATE
+            tableName: reservation
+        - modifyDataType:
+            columnName: stay_end_at
+            newDataType: DATE
+            tableName: reservation
+        - modifyDataType:
+            columnName: stay_start_at
+            newDataType: DATE
+            tableName: reservation_history
+        - modifyDataType:
+            columnName: stay_end_at
+            newDataType: DATE
+            tableName: reservation_history
+

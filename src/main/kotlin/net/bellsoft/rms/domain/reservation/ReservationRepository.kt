@@ -5,4 +5,7 @@ import org.springframework.data.repository.history.RevisionRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface ReservationRepository : JpaRepository<Reservation, Long>, RevisionRepository<Reservation, Long, Long>
+interface ReservationRepository :
+    JpaRepository<Reservation, Long>,
+    RevisionRepository<Reservation, Long, Long>,
+    ReservationCustomRepository

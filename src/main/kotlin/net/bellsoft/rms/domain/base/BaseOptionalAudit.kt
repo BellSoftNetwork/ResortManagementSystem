@@ -16,14 +16,22 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 @EntityListeners(AuditingEntityListener::class)
 abstract class BaseOptionalAudit : BaseTime() {
     @CreatedBy
-    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+    @Audited(
+        withModifiedFlag = true,
+        modifiedColumnName = "created_by_mod",
+        targetAuditMode = RelationTargetAuditMode.NOT_AUDITED,
+    )
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by", nullable = false, updatable = false)
     var createdBy: User? = null
         private set
 
     @LastModifiedBy
-    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+    @Audited(
+        withModifiedFlag = true,
+        modifiedColumnName = "updated_by_mod",
+        targetAuditMode = RelationTargetAuditMode.NOT_AUDITED,
+    )
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "updated_by", nullable = false)
     var updatedBy: User? = null
