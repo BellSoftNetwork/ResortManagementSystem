@@ -14,6 +14,7 @@ import net.bellsoft.rms.domain.room.Room
 import net.bellsoft.rms.domain.user.User
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
+import java.io.Serializable
 
 @Entity
 @Table(name = "room_event")
@@ -26,7 +27,7 @@ class RoomEvent(
 
     @Column(name = "type", nullable = false, columnDefinition = "TINYINT")
     var type: RoomEventType,
-) : BaseTime() {
+) : Serializable, BaseTime() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)

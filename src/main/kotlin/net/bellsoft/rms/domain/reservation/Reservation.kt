@@ -18,6 +18,7 @@ import org.hibernate.annotations.Where
 import org.hibernate.envers.AuditTable
 import org.hibernate.envers.Audited
 import org.hibernate.envers.RelationTargetAuditMode
+import java.io.Serializable
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -90,7 +91,7 @@ class Reservation(
 
     @Column(name = "status", nullable = false, columnDefinition = "TINYINT")
     var status: ReservationStatus = ReservationStatus.PENDING,
-) : BaseMustAudit() {
+) : Serializable, BaseMustAudit() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)

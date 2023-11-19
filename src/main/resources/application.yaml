@@ -53,7 +53,7 @@ spring:
     database-change-log-lock-table: database_changelog_lock
   session:
     redis:
-      namespace: ${REDIS_NAMESPACE:local.v1}
+      namespace: ${REDIS_NAMESPACE:production.v1}
     timeout: 24h
   data:
     redis:

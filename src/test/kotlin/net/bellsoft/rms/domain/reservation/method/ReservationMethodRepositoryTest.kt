@@ -29,10 +29,10 @@ internal class ReservationMethodRepositoryTest(
             }
 
             When("등록되지 않은 id로 조회하면") {
-                val reservationMethod = reservationMethodRepository.findByIdOrNull(-1)
+                val findReservationMethod = reservationMethodRepository.findByIdOrNull(-1)
 
                 Then("빈 값이 조회된다") {
-                    reservationMethod shouldBe null
+                    findReservationMethod shouldBe null
                 }
             }
 
