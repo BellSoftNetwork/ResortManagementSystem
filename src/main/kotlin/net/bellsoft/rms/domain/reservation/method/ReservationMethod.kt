@@ -10,6 +10,7 @@ import jakarta.persistence.UniqueConstraint
 import net.bellsoft.rms.domain.base.BaseTime
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
+import java.io.Serializable
 
 @Entity
 @Table(
@@ -33,7 +34,7 @@ class ReservationMethod(
         columnDefinition = "TINYINT",
     )
     var status: ReservationMethodStatus = ReservationMethodStatus.INACTIVE,
-) : BaseTime() {
+) : Serializable, BaseTime() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)

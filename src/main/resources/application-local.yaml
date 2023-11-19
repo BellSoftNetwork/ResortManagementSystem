@@ -6,6 +6,9 @@ spring:
     properties:
       mail:
         debug: true
+  session:
+    redis:
+      namespace: ${REDIS_NAMESPACE:local.v1}
 ---
 application:
   deploy:

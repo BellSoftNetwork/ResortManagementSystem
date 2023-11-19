@@ -228,7 +228,7 @@ internal class ReservationServiceTest(
         }
 
         Given("각각 입실일이 다른 예약이 4개 등록된 상황에서") {
-            val reservations = reservationRepository.saveAll(
+            reservationRepository.saveAll(
                 listOf(
                     fixture { property(Reservation::stayStartAt) { LocalDate.of(2023, 10, 31) } },
                     fixture { property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 1) } },

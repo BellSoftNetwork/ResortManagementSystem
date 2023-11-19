@@ -13,6 +13,7 @@ import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
 import org.hibernate.envers.AuditTable
 import org.hibernate.envers.Audited
+import java.io.Serializable
 
 @Entity
 @Audited(withModifiedFlag = true)
@@ -47,7 +48,7 @@ class Room(
         columnDefinition = "TINYINT",
     )
     var status: RoomStatus = RoomStatus.INACTIVE,
-) : BaseMustAudit() {
+) : Serializable, BaseMustAudit() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)

@@ -7,25 +7,24 @@ import org.hibernate.envers.Audited
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import java.io.Serializable
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
+@Audited
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
-abstract class BaseTime {
+open class BaseTime : Serializable {
     @CreatedDate
-    @Audited
     @Column(name = "created_at", nullable = false, updatable = false)
     var createdAt: LocalDateTime = LocalDateTime.MIN
         private set
 
     @LastModifiedDate
-    @Audited
     @Column(name = "updated_at", nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.MIN
         private set
 
-    @Audited
     @Column(name = "deleted_at", nullable = false)
     var deletedAt: LocalDateTime = ACTIVE_DATA_DELETED_AT_TIME
         private set

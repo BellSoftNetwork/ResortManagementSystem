@@ -14,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.password.PasswordEncoder
+import java.io.Serializable
 
 @Entity
 @Table(name = "user")
@@ -34,7 +35,7 @@ class User(
 
     @Column(name = "role", nullable = false, columnDefinition = "TINYINT")
     var role: UserRole = UserRole.NORMAL,
-) : BaseTime(), UserDetails {
+) : Serializable, BaseTime(), UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)

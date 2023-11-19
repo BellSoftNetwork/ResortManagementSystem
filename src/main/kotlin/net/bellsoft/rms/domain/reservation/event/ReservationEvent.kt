@@ -14,6 +14,7 @@ import net.bellsoft.rms.domain.reservation.Reservation
 import net.bellsoft.rms.domain.user.User
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
+import java.io.Serializable
 
 @Entity
 @Table(name = "reservation_event")
@@ -26,7 +27,7 @@ class ReservationEvent(
 
     @Column(name = "type", nullable = false, columnDefinition = "TINYINT")
     var type: ReservationEventType,
-) : BaseTime() {
+) : Serializable, BaseTime() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)

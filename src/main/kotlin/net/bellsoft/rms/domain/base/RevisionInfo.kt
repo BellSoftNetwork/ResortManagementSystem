@@ -9,12 +9,13 @@ import jakarta.persistence.Table
 import org.hibernate.envers.RevisionEntity
 import org.hibernate.envers.RevisionNumber
 import org.hibernate.envers.RevisionTimestamp
+import java.io.Serializable
 import java.time.LocalDateTime
 
 @Entity
 @RevisionEntity
 @Table(name = "revision_info")
-class RevisionInfo {
+class RevisionInfo : Serializable {
     @Id
     @RevisionNumber
     @GeneratedValue(strategy = GenerationType.IDENTITY)
