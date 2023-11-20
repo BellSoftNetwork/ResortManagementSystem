@@ -1,6 +1,6 @@
-package net.bellsoft.rms.domain.base.dto
+package net.bellsoft.rms.domain.revision.dto
 
-import net.bellsoft.rms.domain.base.RevisionInfo
+import net.bellsoft.rms.domain.revision.RevisionInfo
 import org.hibernate.envers.RevisionType
 
 data class RevisionDetails<T>(

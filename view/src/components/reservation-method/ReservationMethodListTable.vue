@@ -82,6 +82,26 @@
       </q-td>
     </template>
 
+    <template #body-cell-requireUnpaidAmountCheck="props">
+      <q-td key="requireUnpaidAmountCheck" :props="props">
+        {{ props.row.requireUnpaidAmountCheck ? "활성" : "비활성" }}
+        <q-popup-edit
+          v-slot="scope"
+          :model-value="props.row.requireUnpaidAmountCheck"
+          :persistent="status.isPatching"
+        >
+          <q-checkbox
+            v-model="scope.value"
+            @update:model-value="updateScope(props.row, scope, 'requireUnpaidAmountCheck')"
+            :loading="status.isPatching"
+            :disable="status.isPatching"
+            label="미수금 금액 알림"
+          >
+          </q-checkbox>
+        </q-popup-edit>
+      </q-td>
+    </template>
+
     <template #body-cell-actions="props">
       <q-td key="actions" :props="props">
         <q-btn dense round flat color="grey" icon="delete" @click="deleteItem(props.row)"></q-btn>
@@ -134,7 +154,17 @@ const columns = [
     headerStyle: "width: 10%",
     required: true,
     sortable: true,
-    format: val => commissionRateFormatter(val),
+    format: value => commissionRateFormatter(value),
+  },
+  {
+    name: "requireUnpaidAmountCheck",
+    field: "requireUnpaidAmountCheck",
+    label: "미수금 금액 알림",
+    align: "left",
+    headerStyle: "width: 10%",
+    required: true,
+    sortable: true,
+    format: value => value ? "활성" : "비활성",
   },
   {
     name: "createdAt",
@@ -144,7 +174,7 @@ const columns = [
     headerStyle: "width: 15%",
     required: true,
     sortable: true,
-    format: val => dayjs(val).format("YYYY-MM-DD HH:mm:ss"),
+    format: value => dayjs(value).format("YYYY-MM-DD HH:mm:ss"),
   },
   {
     name: "updatedAt",
@@ -154,7 +184,7 @@ const columns = [
     headerStyle: "width: 15%",
     required: true,
     sortable: true,
-    format: val => dayjs(val).format("YYYY-MM-DD HH:mm:ss"),
+    format: value => dayjs(value).format("YYYY-MM-DD HH:mm:ss"),
   },
   {
     name: "actions",
@@ -209,7 +239,7 @@ function reloadData() {
 }
 
 function updateScope(row, scope, key, formatter) {
-  if (!inputRef.value.validate() || row[key] === scope.value)
+  if ((inputRef.value && !inputRef.value.validate()) || row[key] === scope.value)
     return
 
   const patchData = {}

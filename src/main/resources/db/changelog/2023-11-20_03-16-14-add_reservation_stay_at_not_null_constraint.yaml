@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1700417773475-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: DATE
+            columnName: stay_start_at
+            tableName: reservation
+            validate: true
+        - addNotNullConstraint:
+            columnDataType: DATE
+            columnName: stay_end_at
+            tableName: reservation
+            validate: true
+

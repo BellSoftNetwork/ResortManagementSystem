@@ -7,6 +7,7 @@ data class ReservationMethodDto(
     val id: Long,
     val name: String,
     val commissionRate: Double,
+    val requireUnpaidAmountCheck: Boolean,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 ) {
@@ -15,6 +16,7 @@ data class ReservationMethodDto(
             id = reservationMethod.id,
             name = reservationMethod.name,
             commissionRate = reservationMethod.commissionRate,
+            requireUnpaidAmountCheck = reservationMethod.requireUnpaidAmountCheck,
             createdAt = reservationMethod.createdAt,
             updatedAt = reservationMethod.updatedAt,
         )

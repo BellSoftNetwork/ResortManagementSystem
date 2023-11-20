@@ -14,9 +14,13 @@ data class ReservationMethodUpdateRequest(
     @Schema(description = "수수료율", example = "0.2")
     @field:Range(min = 0, max = 1)
     val commissionRate: Double? = null,
+
+    @Schema(description = "미수금 금액 알림", example = "false")
+    val requireUnpaidAmountCheck: Boolean? = null,
 ) {
     fun toDto() = ReservationMethodUpdateDto(
         name = name,
         commissionRate = commissionRate,
+        requireUnpaidAmountCheck = requireUnpaidAmountCheck,
     )
 }

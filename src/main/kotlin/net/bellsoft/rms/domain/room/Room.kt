@@ -2,17 +2,15 @@ package net.bellsoft.rms.domain.room
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
-import net.bellsoft.rms.domain.base.BaseMustAudit
-import net.bellsoft.rms.domain.base.BaseTime
+import net.bellsoft.rms.domain.base.BaseMustAuditEntity
+import net.bellsoft.rms.domain.base.BaseTimeEntity
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
 import org.hibernate.envers.AuditTable
 import org.hibernate.envers.Audited
+import java.io.Serial
 import java.io.Serializable
 
 @Entity
@@ -25,7 +23,7 @@ import java.io.Serializable
     ],
 )
 @SQLDelete(sql = "UPDATE room SET deleted_at = NOW() WHERE id = ?")
-@Where(clause = BaseTime.SOFT_DELETE_CONDITION)
+@Where(clause = BaseTimeEntity.SOFT_DELETE_CONDITION)
 class Room(
     @Column(name = "number", nullable = false, length = 10)
     var number: String,
@@ -48,10 +46,9 @@ class Room(
         columnDefinition = "TINYINT",
     )
     var status: RoomStatus = RoomStatus.INACTIVE,
-) : Serializable, BaseMustAudit() {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true, updatable = false)
-    var id: Long = 0
-        private set
+) : Serializable, BaseMustAuditEntity() {
+    companion object {
+        @Serial
+        private const val serialVersionUID: Long = -4336707694159308855L
+    }
 }

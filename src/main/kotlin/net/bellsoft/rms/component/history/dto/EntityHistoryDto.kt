@@ -2,7 +2,7 @@ package net.bellsoft.rms.component.history.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import net.bellsoft.rms.component.history.type.HistoryType
-import net.bellsoft.rms.domain.base.dto.RevisionDetails
+import net.bellsoft.rms.domain.revision.dto.RevisionDetails
 import java.time.LocalDateTime
 
 @Schema(description = "엔티티 데이터 이력 정보")

@@ -22,84 +22,65 @@
         </div>
 
         <div class="col-12 col-md-4 q-px-sm">
-          <q-input
-            v-model="entity.room.number"
-            :readonly="true"
-            label="객실 번호"
-          />
+          <div class="q-py-sm">
+            <div class="text-caption">객실 번호</div>
+            <div class="text-body1">
+              <q-btn
+                :to="{ name: 'Room', params: { id: entity.room.id } }"
+                color="primary"
+                flat
+                dense
+              >
+                {{ entity.room.number }}
+              </q-btn>
+            </div>
+          </div>
 
-          <q-input
-            v-model="entity.price"
-            :readonly="true"
-            label="판매 금액"
-            type="number"
-          ></q-input>
+          <div class="q-py-sm">
+            <div class="text-caption">누적 결제 금액</div>
+            <div class="text-body1">{{ entity.paymentAmount }}</div>
+          </div>
 
-          <q-input
-            v-model="entity.reservationFee"
-            :readonly="true"
-            label="예약 선입금액"
-          ></q-input>
+          <div class="q-py-sm">
+            <div class="text-caption">예약 수단</div>
+            <div class="text-body1">{{ entity.reservationMethod.name }}</div>
+          </div>
 
-          <q-input
-            v-model="entity.paymentAmount"
-            :readonly="true"
-            label="누적 결제 금액"
-            type="number"
-          ></q-input>
-
-          <q-select
-            v-model="entity.reservationMethod.name"
-            :readonly="true"
-            label="예약 수단"
-          ></q-select>
-
-          <q-input
-            v-model="entity.brokerFee"
-            :readonly="true"
-            label="예약 수단 수수료"
-            type="number"
-          ></q-input>
+          <div class="q-py-sm">
+            <div class="text-caption">예약 수단 수수료</div>
+            <div class="text-body1">{{ entity.brokerFee }}</div>
+          </div>
         </div>
 
         <div class="col-12 col-md-4 q-px-sm">
-          <q-input
-            v-model="entity.name"
-            :readonly="true"
-            label="예약자명"
-          ></q-input>
+          <div class="q-py-sm">
+            <div class="text-caption">예약자명</div>
+            <div class="text-body1">{{ entity.name }}</div>
+          </div>
 
-          <q-input
-            v-model="entity.phone"
-            :readonly="true"
-            label="예약자 연락처"
-          ></q-input>
+          <div class="q-py-sm">
+            <div class="text-caption">예약자 연락처</div>
+            <div class="text-body1"><a :href="'tel:' + entity.phone">{{ entity.phone }}</a></div>
+          </div>
 
-          <q-input
-            v-model="entity.peopleCount"
-            :readonly="true"
-            label="예약인원"
-          ></q-input>
+          <div class="q-py-sm">
+            <div class="text-caption">예약인원</div>
+            <div class="text-body1">{{ entity.peopleCount }}</div>
+          </div>
 
-          <q-select
-            v-model="entity.status"
-            :readonly="true"
-            :options="options.status"
-            label="예약 상태"
-            emit-value
-            map-options
-          ></q-select>
+          <div class="q-py-sm">
+            <div class="text-caption">예약 상태</div>
+            <div class="text-body1">{{ statusMap[entity.status] }}</div>
+          </div>
         </div>
       </div>
-
+      <br />
       <div class="row">
         <div class="col">
-          <q-input
-            v-model="entity.note"
-            :readonly="true"
-            type="textarea"
-            label="메모"
-          ></q-input>
+          <div class="q-py-sm">
+            <div class="text-caption">메모</div>
+            <div class="text-body1">{{ entity.note }}</div>
+          </div>
         </div>
       </div>
     </q-card-section>
@@ -163,7 +144,6 @@ const entity = ref({
   price: "",
   paymentAmount: "",
   refundAmount: "",
-  reservationFee: "",
   brokerFee: "",
   note: "",
   canceledAt: "",
@@ -173,50 +153,13 @@ const entity = ref({
   updatedAt: "",
   updatedBy: "",
 })
-const rules = {
-  name: [value => (value.length >= 2 && value.length <= 30) || "2~30 글자가 필요합니다"],
-  phone: [value => (value.length >= 2 && value.length <= 20) || "2~20 글자가 필요합니다"],
-  peopleCount: [value => (value >= 0 && value <= 1000) || "1000 명 이하만 입실 가능합니다"],
-  stayStartAt: [value => (/^-?[\d]+-[0-1]\d-[0-3]\d$/.test(value)) || "####-##-## 형태의 날짜만 입력 가능합니다."],
-  stayEndAt: [value => (/^-?[\d]+-[0-1]\d-[0-3]\d$/.test(value)) || "####-##-## 형태의 날짜만 입력 가능합니다."],
-  price: [value => (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다"],
-  paymentAmount: [
-    value => (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다",
-    value => (value <= entity.value.price) || "판매 금액보다 클 수 없습니다",
-    value => (value >= entity.value.reservationFee) || "선입금액보다 작을 수 없습니다",
-  ],
-  reservationFee: [
-    value => (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다",
-    value => (value <= entity.value.price) || "판매 금액보다 클 수 없습니다",
-  ],
-  brokerFee: [value => (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다"],
-  note: [value => (value.length >= 0 && value.length <= 200) || "200 글자까지 입력 가능합니다"],
-}
-const options = {
-  status: [
-    { label: "예약 대기", value: "PENDING" },
-    { label: "예약 확정", value: "NORMAL" },
-    { label: "예약 취소", value: "CANCEL" },
-    { label: "환불 완료", value: "REFUND" },
-  ],
+const statusMap = {
+  "PENDING": "예약 대기",
+  "NORMAL": "예약 확정",
+  "CANCEL": "예약 취소",
+  "REFUND": "환불 완료",
 }
 const stayDateDiff = computed(() => dayjs(entity.value.stayEndAt).diff(dayjs(entity.value.stayStartAt), "day"))
-const reservationMethods = ref({
-  status: {
-    isLoading: false,
-    isLoaded: false,
-  },
-  values: [
-    {
-      id: -1,
-      name: "네이버",
-      commissionRate: 0.1,
-      createdAt: "2021-01-01T00:00:00.000Z",
-      updatedAt: "2021-01-01T00:00:00.000Z",
-    },
-  ],
-})
-
 
 function fetchData() {
   status.value.isProgress = true

@@ -131,7 +131,6 @@ const columnMap = {
   price: { name: "판매 금액", format: (value) => formatPrice(value) },
   paymentAmount: { name: "누적 결제 금액", format: (value) => formatPrice(value) },
   refundAmount: { name: "환불 금액", format: (value) => formatPrice(value) },
-  reservationFee: { name: "예약 선입금액", format: (value) => formatPrice(value) },
   brokerFee: { name: "예약 수단 수수료", format: (value) => formatPrice(value) },
   note: { name: "메모" },
   status: { name: "상태", format: (value) => formatStatus(value) },

@@ -22,7 +22,6 @@ data class ReservationUpdateDto(
     val price: Int? = null,
     val paymentAmount: Int? = null,
     val refundAmount: Int? = null,
-    val reservationFee: Int? = null,
     val brokerFee: Int? = null,
     val note: String? = null,
     val canceledAt: LocalDateTime? = null,
@@ -56,7 +55,6 @@ data class ReservationUpdateDto(
         price?.let { entity.price = it }
         paymentAmount?.let { entity.paymentAmount = it }
         refundAmount?.let { entity.refundAmount = it }
-        reservationFee?.let { entity.reservationFee = it }
         brokerFee?.let { entity.brokerFee = it }
         note?.let { entity.note = it }
         canceledAt?.let { entity.canceledAt = it }

@@ -83,18 +83,6 @@
         ></q-input>
 
         <q-input
-          v-model="formModel.value.reservationFee"
-          :rules="rules.reservationFee"
-          @update:model-value="(value) => {if (value > formModel.value.paymentAmount) {formModel.value.paymentAmount = value;}}"
-          label="예약 선입금액"
-          placeholder="50000"
-          type="number"
-          min="0"
-          max="10000000"
-          required
-        ></q-input>
-
-        <q-input
           v-model="formModel.value.paymentAmount"
           :rules="rules.paymentAmount"
           label="누적 결제 금액"
@@ -276,7 +264,6 @@ const entity = ref({
   price: "",
   paymentAmount: "",
   refundAmount: "",
-  reservationFee: "",
   brokerFee: "",
   note: "",
   canceledAt: "",
@@ -306,7 +293,6 @@ const formModel = ref({
     stayDate: { from: "", to: "" },
     price: 0,
     paymentAmount: 0,
-    reservationFee: 0,
     brokerFee: 0,
     note: "",
     status: "PENDING",
@@ -324,11 +310,6 @@ const rules = {
   stayEndAt: [value => (/^-?[\d]+-[0-1]\d-[0-3]\d$/.test(value)) || "####-##-## 형태의 날짜만 입력 가능합니다."],
   price: [value => (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다"],
   paymentAmount: [
-    value => (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다",
-    value => (value <= formModel.value.value.price) || "판매 금액보다 클 수 없습니다",
-    value => (value >= formModel.value.value.reservationFee) || "선입금액보다 작을 수 없습니다",
-  ],
-  reservationFee: [
     value => (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다",
     value => (value <= formModel.value.value.price) || "판매 금액보다 클 수 없습니다",
   ],
@@ -441,8 +422,6 @@ function patchedData() {
     patchData.price = formModel.value.value.price
   if (entity.value.paymentAmount !== formModel.value.value.paymentAmount)
     patchData.paymentAmount = formModel.value.value.paymentAmount
-  if (entity.value.reservationFee !== formModel.value.value.reservationFee)
-    patchData.reservationFee = formModel.value.value.reservationFee
   if (entity.value.brokerFee !== formModel.value.value.brokerFee)
     patchData.brokerFee = formModel.value.value.brokerFee
   if (entity.value.note !== formModel.value.value.note)
@@ -476,7 +455,6 @@ function resetForm() {
   formModel.value.value.stayDate.to = dayjs(entity.value.stayEndAt).format("YYYY-MM-DD")
   formModel.value.value.price = entity.value.price
   formModel.value.value.paymentAmount = entity.value.paymentAmount
-  formModel.value.value.reservationFee = entity.value.reservationFee
   formModel.value.value.brokerFee = entity.value.brokerFee
   formModel.value.value.note = entity.value.note
   formModel.value.value.status = entity.value.status

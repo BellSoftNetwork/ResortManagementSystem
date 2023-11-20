@@ -14,7 +14,7 @@ import java.time.ZoneOffset
 @Audited
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
-open class BaseTime : Serializable {
+abstract class BaseTimeEntity : Serializable, BaseEntity() {
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     var createdAt: LocalDateTime = LocalDateTime.MIN

@@ -52,10 +52,6 @@ data class ReservationCreateRequest(
     @field:Range(min = 0, max = 100000000)
     val refundAmount: Int = 0,
 
-    @Schema(description = "예약 선금", example = "500000")
-    @field:Range(min = 0, max = 100000000)
-    val reservationFee: Int = 0,
-
     @Schema(description = "플랫폼 수수료", example = "5000")
     @field:Range(min = 0, max = 100000000)
     val brokerFee: Int = 0,
@@ -83,7 +79,6 @@ data class ReservationCreateRequest(
         price = price,
         paymentAmount = paymentAmount,
         refundAmount = refundAmount,
-        reservationFee = reservationFee,
         brokerFee = brokerFee,
         note = note,
         canceledAt = canceledAt,
