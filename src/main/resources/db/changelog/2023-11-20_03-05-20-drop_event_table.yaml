@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1700417120888-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: reservation_event
+            constraintName: FK_RESERVATION_EVENT_ON_RESERVATION
+        - dropForeignKeyConstraint:
+            baseTableName: reservation_event
+            constraintName: FK_RESERVATION_EVENT_ON_USER
+        - dropTable:
+            cascadeConstraints: true
+            tableName: reservation_event
+  - changeSet:
+      id: 1700417120888-2
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: room_event
+            constraintName: FK_ROOM_EVENT_ON_ROOM
+        - dropForeignKeyConstraint:
+            baseTableName: room_event
+            constraintName: FK_ROOM_EVENT_ON_USER
+        - dropTable:
+            cascadeConstraints: true
+            tableName: room_event
+

@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1700453099858-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropColumn:
+            columnName: reservation_fee
+            tableName: reservation
+

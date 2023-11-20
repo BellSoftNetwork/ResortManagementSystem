@@ -67,7 +67,7 @@
                   <q-td
                     :props="props"
                     key="missPrice"
-                    :class="props.row.missPrice > 0 ? 'bg-warning' : ''"
+                    :class="missPriceBackgroundColor(props.row)"
                   >
                     {{ formatPrice(props.row.missPrice) }}
                   </q-td>
@@ -108,14 +108,6 @@ const columns = [
     sortable: true,
   },
   {
-    name: "phone",
-    field: "phone",
-    label: "예약자 전화번호",
-    align: "left",
-    required: true,
-    sortable: true,
-  },
-  {
     name: "missPrice",
     field: "missPrice",
     label: "미수금",
@@ -123,25 +115,17 @@ const columns = [
     required: true,
   },
   {
-    name: "room",
-    field: "room",
-    label: "객실",
-    align: "left",
-    required: true,
-    sortable: true,
-  },
-  {
-    name: "peopleCount",
-    field: "peopleCount",
-    label: "숙박 인원",
-    align: "left",
-    required: true,
-    sortable: true,
-  },
-  {
     name: "reservationMethod",
     field: "reservationMethod",
     label: "예약 수단",
+    align: "left",
+    required: true,
+    sortable: true,
+  },
+  {
+    name: "room",
+    field: "room",
+    label: "객실",
     align: "left",
     required: true,
     sortable: true,
@@ -243,6 +227,16 @@ function formatStatus(value) {
     default:
       return value
   }
+}
+
+function missPriceBackgroundColor(value) {
+  if (value.reservationMethod.requireUnpaidAmountCheck === false)
+    return ""
+
+  if (value.missPrice > 0)
+    return "bg-warning"
+
+  return ""
 }
 
 function resetData() {

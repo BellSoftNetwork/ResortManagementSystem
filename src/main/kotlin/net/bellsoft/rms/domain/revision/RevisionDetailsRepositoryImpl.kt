@@ -1,7 +1,7 @@
-package net.bellsoft.rms.domain.base
+package net.bellsoft.rms.domain.revision
 
 import jakarta.persistence.EntityManager
-import net.bellsoft.rms.domain.base.dto.RevisionDetails
+import net.bellsoft.rms.domain.revision.dto.RevisionDetails
 import org.hibernate.envers.AuditReaderFactory
 import org.hibernate.envers.query.AuditEntity
 import org.hibernate.envers.query.AuditQuery

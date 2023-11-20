@@ -15,7 +15,7 @@ import java.io.Serializable
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
-abstract class BaseOptionalAudit : Serializable, BaseTime() {
+abstract class BaseMustAuditEntity : Serializable, BaseTimeEntity() {
     @CreatedBy
     @Audited(
         withModifiedFlag = true,
@@ -24,7 +24,7 @@ abstract class BaseOptionalAudit : Serializable, BaseTime() {
     )
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by", nullable = false, updatable = false)
-    var createdBy: User? = null
+    lateinit var createdBy: User
         private set
 
     @LastModifiedBy
@@ -35,5 +35,5 @@ abstract class BaseOptionalAudit : Serializable, BaseTime() {
     )
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "updated_by", nullable = false)
-    var updatedBy: User? = null
+    lateinit var updatedBy: User
 }

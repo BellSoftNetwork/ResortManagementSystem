@@ -1,4 +1,4 @@
-package net.bellsoft.rms.domain.base
+package net.bellsoft.rms.domain.revision
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -9,6 +9,7 @@ import jakarta.persistence.Table
 import org.hibernate.envers.RevisionEntity
 import org.hibernate.envers.RevisionNumber
 import org.hibernate.envers.RevisionTimestamp
+import java.io.Serial
 import java.io.Serializable
 import java.time.LocalDateTime
 
@@ -27,4 +28,9 @@ class RevisionInfo : Serializable {
     @Column(name = "created_at")
     var createdAt: LocalDateTime = LocalDateTime.MIN
         private set
+
+    companion object {
+        @Serial
+        private const val serialVersionUID: Long = 2472706047115136983L
+    }
 }

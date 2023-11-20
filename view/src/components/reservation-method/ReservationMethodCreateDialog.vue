@@ -37,6 +37,11 @@
               <q-icon name="percent" />
             </template>
           </q-input>
+
+          <q-checkbox
+            v-model="formData.requireUnpaidAmountCheck"
+            label="미수금 금액 알림"
+          ></q-checkbox>
         </q-card-section>
 
         <q-card-actions align="right">
@@ -81,6 +86,7 @@ const status = ref({
 const formData = ref({
   name: "",
   commissionRatePercent: 0,
+  requireUnpaidAmountCheck: false,
 })
 const rules = {
   name: [value => (value.length >= 2 && value.length <= 20) || "2~20 글자가 필요합니다"],
@@ -93,6 +99,7 @@ function create() {
   const data = {
     name: formData.value.name,
     commissionRate: formData.value.commissionRatePercent / 100,
+    requireUnpaidAmountCheck: formData.value.requireUnpaidAmountCheck,
   }
 
   api.post("/api/v1/reservation-methods", data)
@@ -122,5 +129,6 @@ function resetForm() {
   formData.value.name = ""
   formData.value.commissionRate = 0
   formData.value.commissionRatePercent = 0
+  formData.value.requireUnpaidAmountCheck = false
 }
 </script>

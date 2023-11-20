@@ -3,14 +3,11 @@ package net.bellsoft.rms.domain.reservation
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
-import net.bellsoft.rms.domain.base.BaseMustAudit
-import net.bellsoft.rms.domain.base.BaseTime
+import net.bellsoft.rms.domain.base.BaseMustAuditEntity
+import net.bellsoft.rms.domain.base.BaseTimeEntity
 import net.bellsoft.rms.domain.reservation.method.ReservationMethod
 import net.bellsoft.rms.domain.room.Room
 import org.hibernate.annotations.SQLDelete
@@ -18,6 +15,7 @@ import org.hibernate.annotations.Where
 import org.hibernate.envers.AuditTable
 import org.hibernate.envers.Audited
 import org.hibernate.envers.RelationTargetAuditMode
+import java.io.Serial
 import java.io.Serializable
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -27,7 +25,7 @@ import java.time.LocalDateTime
 @AuditTable("reservation_history")
 @Table(name = "reservation")
 @SQLDelete(sql = "UPDATE reservation SET deleted_at = NOW() WHERE id = ?")
-@Where(clause = BaseTime.SOFT_DELETE_CONDITION)
+@Where(clause = BaseTimeEntity.SOFT_DELETE_CONDITION)
 class Reservation(
     @Audited(
         withModifiedFlag = true,
@@ -77,9 +75,6 @@ class Reservation(
     @Column(name = "refund_amount", nullable = false)
     var refundAmount: Int = 0,
 
-    @Column(name = "reservation_fee", nullable = false)
-    var reservationFee: Int = 0,
-
     @Column(name = "broker_fee", nullable = false)
     var brokerFee: Int = 0,
 
@@ -91,10 +86,9 @@ class Reservation(
 
     @Column(name = "status", nullable = false, columnDefinition = "TINYINT")
     var status: ReservationStatus = ReservationStatus.PENDING,
-) : Serializable, BaseMustAudit() {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true, updatable = false)
-    var id: Long = 0
-        private set
+) : Serializable, BaseMustAuditEntity() {
+    companion object {
+        @Serial
+        private const val serialVersionUID: Long = 737436737363715200L
+    }
 }

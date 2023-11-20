@@ -2,24 +2,22 @@ package net.bellsoft.rms.domain.user
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
 import jakarta.persistence.Table
 import net.bellsoft.rms.annotation.ExcludeFromJacocoGeneratedReport
-import net.bellsoft.rms.domain.base.BaseTime
+import net.bellsoft.rms.domain.base.BaseTimeEntity
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.password.PasswordEncoder
+import java.io.Serial
 import java.io.Serializable
 
 @Entity
 @Table(name = "user")
 @SQLDelete(sql = "UPDATE user SET deleted_at = NOW() WHERE id = ?")
-@Where(clause = BaseTime.SOFT_DELETE_CONDITION)
+@Where(clause = BaseTimeEntity.SOFT_DELETE_CONDITION)
 class User(
     @Column(name = "email", nullable = false, unique = true, length = 100)
     var email: String,
@@ -35,13 +33,7 @@ class User(
 
     @Column(name = "role", nullable = false, columnDefinition = "TINYINT")
     var role: UserRole = UserRole.NORMAL,
-) : Serializable, BaseTime(), UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true, updatable = false)
-    var id: Long = 0
-        private set
-
+) : Serializable, BaseTimeEntity(), UserDetails {
     @ExcludeFromJacocoGeneratedReport
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return mutableListOf<GrantedAuthority>(SimpleGrantedAuthority(this.role.name))
@@ -82,5 +74,10 @@ class User(
     override fun toString(): String {
         return "User(id=$id, email='$email', password='$password', name='$name', role='$role', status='$status', " +
             "createdAt='$createdAt', updatedAt='$updatedAt', deletedAt=$deletedAt)"
+    }
+
+    companion object {
+        @Serial
+        private const val serialVersionUID: Long = -8921744413467798119L
     }
 }

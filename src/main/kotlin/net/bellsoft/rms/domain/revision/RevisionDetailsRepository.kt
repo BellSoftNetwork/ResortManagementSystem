@@ -1,6 +1,6 @@
-package net.bellsoft.rms.domain.base
+package net.bellsoft.rms.domain.revision
 
-import net.bellsoft.rms.domain.base.dto.RevisionDetails
+import net.bellsoft.rms.domain.revision.dto.RevisionDetails
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository

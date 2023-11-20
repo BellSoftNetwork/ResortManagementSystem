@@ -1,7 +1,7 @@
 package net.bellsoft.rms.component.history
 
 import net.bellsoft.rms.component.history.dto.EntityHistoryDto
-import net.bellsoft.rms.domain.base.RevisionDetailsRepository
+import net.bellsoft.rms.domain.revision.RevisionDetailsRepository
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
