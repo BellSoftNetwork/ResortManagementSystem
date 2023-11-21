@@ -36,7 +36,7 @@
       :name="2"
       :done="formModel.status.step > 2"
       title="객실 배정"
-      :caption="selectedRoom.length > 0 ? selectedRoom[0].number : '추후 배정'"
+      :caption="selectedRoom[0] && Object.keys(selectedRoom[0]).includes('number') ? selectedRoom[0].number : '추후 배정'"
       icon="create_new_folder"
     >
       <RoomSelectTable
@@ -288,7 +288,14 @@ const options = {
     { label: "환불 완료", value: "REFUND" },
   ],
 }
-const stayDateDiff = computed(() => dayjs(formModel.value.value.stayDate.to).diff(dayjs(formModel.value.value.stayDate.from), "day"))
+const stayDateDiff = computed(() => {
+    try {
+      return dayjs(formModel.value.value.stayDate.to).diff(dayjs(formModel.value.value.stayDate.from), "day")
+    } catch (e) {
+      return 0
+    }
+  },
+)
 const reservationMethods = ref({
   status: {
     isLoading: false,
@@ -351,7 +358,7 @@ function create() {
 function formData() {
   return {
     reservationMethodId: formModel.value.value.reservationMethod.id,
-    roomId: selectedRoom.value.length > 0 ? selectedRoom.value[0].id : null,
+    roomId: (selectedRoom.value[0] && Object.keys(selectedRoom.value[0]).includes("id")) ? selectedRoom.value[0].id : null,
     name: formModel.value.value.name,
     phone: formModel.value.value.phone,
     peopleCount: formModel.value.value.peopleCount,
