@@ -16,6 +16,7 @@ import net.bellsoft.rms.domain.user.User
 import net.bellsoft.rms.service.reservation.ReservationService
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -67,6 +68,7 @@ class ReservationController(
             ApiResponse(responseCode = "201"),
         ],
     )
+    @Secured("ADMIN", "SUPER_ADMIN")
     @PostMapping
     fun createReservation(
         @AuthenticationPrincipal user: User,
@@ -82,6 +84,7 @@ class ReservationController(
             ApiResponse(responseCode = "200"),
         ],
     )
+    @Secured("ADMIN", "SUPER_ADMIN")
     @PatchMapping("/{id}")
     fun updateReservation(
         @AuthenticationPrincipal user: User,
@@ -99,6 +102,7 @@ class ReservationController(
             ApiResponse(responseCode = "204"),
         ],
     )
+    @Secured("ADMIN", "SUPER_ADMIN")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteReservation(
@@ -114,6 +118,7 @@ class ReservationController(
             ApiResponse(responseCode = "200"),
         ],
     )
+    @Secured("ADMIN", "SUPER_ADMIN")
     @GetMapping("/{id}/histories")
     fun getReservationHistory(
         @PathVariable("id") id: Long,

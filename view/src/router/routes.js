@@ -34,6 +34,7 @@ const routes = [
     component: DefaultLayout,
     meta: {
       isAuthenticated: true,
+      roles: ["ADMIN", "SUPER_ADMIN"],
     },
     children: [
       {
@@ -63,6 +64,7 @@ const routes = [
     component: DefaultLayout,
     meta: {
       isAuthenticated: true,
+      roles: ["ADMIN", "SUPER_ADMIN"],
     },
     children: [
       {
@@ -92,6 +94,7 @@ const routes = [
     component: DefaultLayout,
     meta: {
       isAuthenticated: true,
+      roles: ["ADMIN", "SUPER_ADMIN"],
     },
     children: [
       {
@@ -105,8 +108,8 @@ const routes = [
     path: "/admin",
     component: DefaultLayout,
     meta: {
-      roles: ["ADMIN", "SUPER_ADMIN"],
       isAuthenticated: true,
+      roles: ["ADMIN", "SUPER_ADMIN"],
     },
     children: [
       {
@@ -120,8 +123,8 @@ const routes = [
     path: "/debug",
     component: DefaultLayout,
     meta: {
-      roles: ["SUPER_ADMIN"],
       isAuthenticated: true,
+      roles: ["SUPER_ADMIN"],
     },
     children: [
       {

@@ -15,6 +15,7 @@ import net.bellsoft.rms.service.reservation.dto.ReservationMethodDto
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.annotation.Secured
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -64,6 +65,7 @@ class ReservationMethodController(
             ApiResponse(responseCode = "201"),
         ],
     )
+    @Secured("ADMIN", "SUPER_ADMIN")
     @PostMapping
     fun createReservation(
         @RequestBody @Valid
@@ -78,6 +80,7 @@ class ReservationMethodController(
             ApiResponse(responseCode = "201"),
         ],
     )
+    @Secured("ADMIN", "SUPER_ADMIN")
     @PatchMapping("/{id}")
     fun updateReservation(
         @PathVariable("id") id: Long,
@@ -93,6 +96,7 @@ class ReservationMethodController(
             ApiResponse(responseCode = "204"),
         ],
     )
+    @Secured("ADMIN", "SUPER_ADMIN")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteReservation(@PathVariable("id") id: Long) {

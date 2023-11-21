@@ -38,15 +38,20 @@
                 <template #body-cell-room="props">
                   <q-td key="room" :props="props">
                     <div v-if="props.row.room">
-                      <q-btn
-                        :to="{ name: 'Room', params: { id: props.row.room.id } }"
-                        class="full-width"
-                        align="left"
-                        color="primary"
-                        dense
-                        flat
-                      >{{ props.row.room.number }}
-                      </q-btn>
+                      <div v-if="authStore.isAdminRole">
+                        <q-btn
+                          :to="{ name: 'Room', params: { id: props.row.room.id } }"
+                          class="full-width"
+                          align="left"
+                          color="primary"
+                          dense
+                          flat
+                        >{{ props.row.room.number }}
+                        </q-btn>
+                      </div>
+                      <div v-else>
+                        {{ props.row.room.number }}
+                      </div>
                     </div>
                     <div v-else class="text-grey">미배정</div>
                   </q-td>
@@ -54,15 +59,20 @@
 
                 <template #body-cell-name="props">
                   <q-td key="name" :props="props">
-                    <q-btn
-                      :to="{ name: 'Reservation', params: { id: props.row.id } }"
-                      class="full-width"
-                      align="left"
-                      color="primary"
-                      dense
-                      flat
-                    >{{ props.row.name }}
-                    </q-btn>
+                    <div v-if="authStore.isAdminRole">
+                      <q-btn
+                        :to="{ name: 'Reservation', params: { id: props.row.id } }"
+                        class="full-width"
+                        align="left"
+                        color="primary"
+                        dense
+                        flat
+                      >{{ props.row.name }}
+                      </q-btn>
+                    </div>
+                    <div v-else>
+                      {{ props.row.name }}
+                    </div>
                   </q-td>
                 </template>
 
@@ -104,8 +114,10 @@ import { computed, onBeforeMount, onMounted, ref } from "vue"
 import dayjs from "dayjs"
 import { useQuasar } from "quasar"
 import { api } from "boot/axios"
+import { useAuthStore } from "stores/auth"
 
 const $q = useQuasar()
+const authStore = useAuthStore()
 const status = ref({
   isLoading: false,
   isLoaded: false,
