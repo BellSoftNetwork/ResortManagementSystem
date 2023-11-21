@@ -84,15 +84,18 @@
 
     <template #body-cell-room="props">
       <q-td key="room" :props="props">
-        <q-btn
-          :to="{ name: 'Room', params: { id: props.row.room.id } }"
-          class="full-width"
-          align="left"
-          color="primary"
-          dense
-          flat
-        >{{ props.row.room.number }}
-        </q-btn>
+        <div v-if="props.row.room">
+          <q-btn
+            :to="{ name: 'Room', params: { id: props.row.room.id } }"
+            class="full-width"
+            align="left"
+            color="primary"
+            dense
+            flat
+          >{{ props.row.room.number }}
+          </q-btn>
+        </div>
+        <div v-else class="text-grey">미배정</div>
       </q-td>
     </template>
 

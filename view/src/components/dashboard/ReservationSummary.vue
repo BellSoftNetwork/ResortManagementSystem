@@ -37,15 +37,18 @@
 
                 <template #body-cell-room="props">
                   <q-td key="room" :props="props">
-                    <q-btn
-                      :to="{ name: 'Room', params: { id: props.row.room.id } }"
-                      class="full-width"
-                      align="left"
-                      color="primary"
-                      dense
-                      flat
-                    >{{ props.row.room.number }}
-                    </q-btn>
+                    <div v-if="props.row.room">
+                      <q-btn
+                        :to="{ name: 'Room', params: { id: props.row.room.id } }"
+                        class="full-width"
+                        align="left"
+                        color="primary"
+                        dense
+                        flat
+                      >{{ props.row.room.number }}
+                      </q-btn>
+                    </div>
+                    <div v-else class="text-grey">미배정</div>
                   </q-td>
                 </template>
 
@@ -70,6 +73,21 @@
                     :class="missPriceBackgroundColor(props.row)"
                   >
                     {{ formatPrice(props.row.missPrice) }}
+                  </q-td>
+                </template>
+
+                <template #body-cell-note="props">
+                  <q-td
+                    :props="props"
+                    key="note"
+                  >
+                    <q-btn
+                      v-if="props.row.note"
+                      @click="$q.dialog({ title: `${props.row.name}님 예약 메모`, message: props.row.note })"
+                      color="primary"
+                    >
+                      메모 확인
+                    </q-btn>
                   </q-td>
                 </template>
               </q-table>
@@ -131,14 +149,11 @@ const columns = [
     sortable: true,
   },
   {
-    name: "status",
-    field: "status",
-    label: "상태",
+    name: "note",
+    field: "note",
+    label: "메모",
     align: "left",
     headerStyle: "width: 10%",
-    required: true,
-    sortable: true,
-    format: (value) => formatStatus(value),
   },
 ]
 const date = ref(dayjs().format("YYYY-MM-DD"))
@@ -212,21 +227,6 @@ function formatPrice(value) {
     style: "currency",
     currency: "KRW",
   }).format(value)
-}
-
-function formatStatus(value) {
-  switch (value) {
-    case "NORMAL":
-      return "예약 확정"
-    case "PENDING":
-      return "예약 대기"
-    case "CANCEL":
-      return "취소 요청"
-    case "REFUND":
-      return "환불 완료"
-    default:
-      return value
-  }
 }
 
 function missPriceBackgroundColor(value) {
