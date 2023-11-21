@@ -413,7 +413,7 @@ function patchedData() {
   if (entity.value.reservationMethod.id !== formModel.value.value.reservationMethod.id)
     patchData.reservationMethodId = formModel.value.value.reservationMethod.id
   const roomId = (selectedRoom.value[0] && Object.keys(selectedRoom.value[0]).includes("id")) ? selectedRoom.value[0].id : null
-  if (entity.value.room && entity.value.room.id !== roomId)
+  if ((entity.value.room && entity.value.room.id !== roomId) || roomId)
     patchData.roomId = roomId
   if (entity.value.name !== formModel.value.value.name)
     patchData.name = formModel.value.value.name
