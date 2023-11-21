@@ -43,8 +43,8 @@ class RoomCustomRepositoryImpl(
     private fun getFilteredRoomsBaseQuery(filter: RoomFilterDto) = jpaQueryFactory
         .from(QRoom.room)
         .where(
-            reservedRooms(filter),
             eqStatus(filter.status),
+            reservedRooms(filter),
         )
 
     private fun reservedRooms(filter: RoomFilterDto): BooleanExpression? {
@@ -56,6 +56,7 @@ class RoomCustomRepositoryImpl(
                 .select(QReservation.reservation.room.id)
                 .from(QReservation.reservation)
                 .where(
+                    QReservation.reservation.room.isNotNull,
                     beforeDateFilterExpressions(filter)
                         ?.or(afterDateFilterExpressions(filter))
                         ?.or(wrapDateFilterExpressions(filter)),
