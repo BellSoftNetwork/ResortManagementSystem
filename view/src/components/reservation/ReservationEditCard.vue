@@ -470,7 +470,8 @@ function resetForm() {
 onBeforeMount(() => {
   fetchData().then(() => {
     resetForm()
-    selectedRoom.value = [entity.value.room]
+    if (entity.value.room)
+      selectedRoom.value = [entity.value.room]
     loadReservationMethods().then(() => {
       formModel.value.value.reservationMethod = reservationMethods.value.values.find(item => item.id === entity.value.reservationMethod.id)
     })
