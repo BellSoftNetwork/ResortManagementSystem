@@ -130,6 +130,14 @@ const filter = ref({
 })
 const columns = [
   {
+    name: "type",
+    field: "type",
+    label: "구분",
+    align: "left",
+    required: true,
+    sortable: true,
+  },
+  {
     name: "name",
     field: "name",
     label: "예약자명",
@@ -169,19 +177,7 @@ const columns = [
   },
 ]
 const date = ref(dayjs().format("YYYY-MM-DD"))
-const reservationsOfDay = computed(() => {
-  const reservationMap = {}
-
-  responseData.value.values.forEach((reservation) => {
-    if (!Object.keys(reservationMap).includes(reservation.stayStartAt))
-      reservationMap[reservation.stayStartAt] = []
-
-    reservation.missPrice = reservation.price - reservation.paymentAmount
-    reservationMap[reservation.stayStartAt].push(reservation)
-  })
-
-  return reservationMap
-})
+const reservationsOfDay = ref({})
 const events = computed(() => Object.keys(reservationsOfDay.value).map((date) => dayjs(date).format("YYYY/MM/DD")))
 const responseData = ref({
   page: {
@@ -216,12 +212,52 @@ function fetchData() {
 
   api.get(`/api/v1/reservations?${queryString.join("&")}`)
     .then(response => {
-      responseData.value = response.data
+      reservationsOfDay.value = setReservations(response.data)
 
       status.value.isLoaded = true
     }).finally(() => {
     status.value.isLoading = false
   })
+}
+
+function setReservations(responseData) {
+  responseData.value = responseData
+
+  const reservationMap = {}
+
+  responseData.value.values.forEach((reservation) => {
+    reservation.missPrice = reservation.price - reservation.paymentAmount
+
+    for (let [index, date] of getDateArray(reservation.stayStartAt, reservation.stayEndAt).entries()) {
+      if (!Object.keys(reservationMap).includes(date))
+        reservationMap[date] = []
+
+      const reservationCopy = { ...reservation, type: "N/A" }
+
+      if (index === 0)
+        reservationCopy.type = "입실"
+      else if (date === reservation.stayEndAt)
+        reservationCopy.type = "퇴실"
+      else
+        reservationCopy.type = "연박"
+
+      reservationMap[date].push(reservationCopy)
+    }
+  })
+
+  return reservationMap
+}
+
+function getDateArray(startDate, endDate) {
+  const stayStartDate = dayjs(startDate).format("YYYY-MM-DD")
+  const stayEndAt = dayjs(endDate).format("YYYY-MM-DD")
+  const dateArray = []
+
+  for (let date = stayStartDate; date <= stayEndAt; date = dayjs(date).add(1, "day").format("YYYY-MM-DD")) {
+    dateArray.push(date)
+  }
+
+  return dateArray
 }
 
 function changeView(view) {
