@@ -158,7 +158,7 @@ function deleteItem() {
   }).onOk(() => {
     api.delete(`/api/v1/rooms/${itemId}`)
       .then(() => {
-        router.push({ name: "RoomList" })
+        router.push({ name: "Rooms" })
       })
       .catch((error) => {
         $q.notify({
