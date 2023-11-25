@@ -4,28 +4,66 @@ include:
 .deploy:
   extends:
     - .setup_kubectl
-  stage: deploy
+    - .setup_kubernetes_application_resource_yaml
+    - .kubernetes_apply
+    - .save_kubernetes_resources_to_artifacts
   needs:
-    - deploy_staging
+    - build_boot_image
   interruptible: false
+  variables:
+    CERT_MANAGER_CLUSTER_ISSUER: "letsencrypt-prod"
   rules:
-    - if: "$TEST_DISABLED || $BUILD_DISABLED || $DEPLOY_DISABLED"
+    - if: "$TEST_DISABLED || $BUILD_DISABLED"
       when: never
+
+deploy_development:
+  extends:
+    - .deploy
+  stage: review
+  variables:
+    APPLICATION_URL: development.${KUBE_INGRESS_BASE_DOMAIN}
+    APPLICATION_NAMESPACE: ${KUBE_NAMESPACE}
+    DEPLOY_ENVIRONMENT: "development"
+  environment:
+    name: development
+    url: https://${APPLICATION_URL}/
+  rules:
+    - if: "$REVIEW_DISABLED"
+      when: never
+    - if: $CI_MERGE_REQUEST_ID
+      when: manual
+      allow_failure: true
+
+deploy_staging:
+  extends:
+    - .deploy
+  stage: staging
+  variables:
+    APPLICATION_URL: staging.${KUBE_INGRESS_BASE_DOMAIN}
+    APPLICATION_NAMESPACE: ${KUBE_STAGING_NAMESPACE}
+    DEPLOY_ENVIRONMENT: "staging"
+  environment:
+    name: staging
+    url: https://${APPLICATION_URL}/
+  rules:
+    - if: "$DEPLOY_DISABLED"
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 deploy_production:
   extends:
     - .deploy
-    - .setup_kubernetes_application_resource_yaml
-    - .kubernetes_apply
-    - .save_kubernetes_resources_to_artifacts
+  stage: deploy
+  needs:
+    - deploy_staging
   variables:
     APPLICATION_URL: ${KUBE_INGRESS_BASE_DOMAIN}
     APPLICATION_NAMESPACE: ${KUBE_PRODUCTION_NAMESPACE}
-    CERT_MANAGER_CLUSTER_ISSUER: "letsencrypt-prod"
     DEPLOY_ENVIRONMENT: "production"
   environment:
     name: production
     url: https://${APPLICATION_URL}/
   rules:
+    - if: "$DEPLOY_DISABLED"
+      when: never
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      when: manual
