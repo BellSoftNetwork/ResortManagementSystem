@@ -201,7 +201,7 @@ function deleteItem() {
   }).onOk(() => {
     api.delete(`/api/v1/reservations/${itemId}`)
       .then(() => {
-        router.push({ name: "ReservationList" })
+        router.push({ name: "Reservations" })
       })
       .catch((error) => {
         $q.notify({
