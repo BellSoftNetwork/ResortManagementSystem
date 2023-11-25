@@ -37,7 +37,5 @@ include:
   - local: /.gitlab/ci/jobs/templates/default.gitlab-ci.yaml # 공통 구성요소 템플릿
   - local: /.gitlab/ci/jobs/test.gitlab-ci.yaml
   - local: /.gitlab/ci/jobs/build.gitlab-ci.yaml
-  - local: /.gitlab/ci/jobs/development.gitlab-ci.yaml
-  - local: /.gitlab/ci/jobs/staging.gitlab-ci.yaml
   - local: /.gitlab/ci/jobs/deploy.gitlab-ci.yaml
   - template: Workflows/MergeRequest-Pipelines.gitlab-ci.yml # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Workflows/MergeRequest-Pipelines.gitlab-ci.yml
