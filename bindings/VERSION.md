@@ -3,11 +3,13 @@
 - `build.gradle.kts` 파일에서 빌더 버전 업데이트 시 사용하는 버전에 맞게 아래 항목을 오브젝트 스토리지에 캐시용 파일 업로드 필요
 
 ## 현재 버전
-- base-builder: [0.3.44](https://github.com/paketo-buildpacks/base-builder/blob/v0.3.44/builder.toml)
-  - java: [6.36.0](https://github.com/paketo-buildpacks/java/blob/v6.36.0/buildpack.toml)
-    - bellsoft-liberica: [9.5.0](https://github.com/paketo-buildpacks/bellsoft-liberica/blob/v9.5.0/buildpack.toml)
-      - jre:17.0.4 (`04d5a8540a5ed57af493137be85ce996ebb3afc86390f685c0f922a9c6fa1d62`)
-    - spring-boot: [5.16.0](https://github.com/paketo-buildpacks/spring-boot/blob/v5.16.0/buildpack.toml)
-      - spring-cloud-bindings:1.10.0 (`1f5b781f8bd0d6b85ab2462e4b98d36782a2227fef5b168db174b3959a0ebebe`)
-    - syft: [1.17.0](https://github.com/paketo-buildpacks/syft/blob/v1.17.0/buildpack.toml)
-      - syft:0.54.0 (`00794a0eafe3e86cf10e096fffd8f983551fc8585937deb4fc44203635f0b2ca`)
+
+- builder: [0.4.254](https://github.com/paketo-buildpacks/builder-jammy-base/blob/v0.4.254/builder.toml)
+    - java: [10.3.3](https://github.com/paketo-buildpacks/java/blob/v10.3.3/buildpack.toml)
+        -
+        bellsoft-liberica: [10.4.2](https://github.com/paketo-buildpacks/bellsoft-liberica/blob/v10.4.2/buildpack.toml)
+            - jre:17.0.9 (`8129150fa39f1fdf6fdef6b05cf74ff570dae35bf540d2bdd9bf915532e12d55`)
+        - spring-boot: [5.27.5](https://github.com/paketo-buildpacks/spring-boot/blob/v5.27.5/buildpack.toml)
+            - spring-cloud-bindings:2.0.2 (`dab47967bffb29c5b4c41653e9741b6ca15cde483926d7f9d0a04956247fb680`)
+        - syft: [1.39.0](https://github.com/paketo-buildpacks/syft/blob/v1.39.0/buildpack.toml)
+            - syft:0.94.0 (`a18f10ba6add219b2680687450869db3c6a8b71e68ca6ae3925f9e53964cacbd`)
