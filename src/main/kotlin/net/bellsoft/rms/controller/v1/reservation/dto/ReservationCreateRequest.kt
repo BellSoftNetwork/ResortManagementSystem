@@ -20,7 +20,7 @@ data class ReservationCreateRequest(
     val name: String,
 
     @Schema(description = "예약자 전화번호", example = "010-0000-0000")
-    @field:Size(min = 2, max = 20)
+    @field:Size(max = 20)
     val phone: String = "",
 
     @Schema(description = "예약 인원", example = "4")
