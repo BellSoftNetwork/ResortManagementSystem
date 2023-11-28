@@ -9,15 +9,17 @@ import net.bellsoft.rms.component.history.type.HistoryType
 import net.bellsoft.rms.domain.reservation.Reservation
 import net.bellsoft.rms.domain.reservation.ReservationRepository
 import net.bellsoft.rms.domain.reservation.method.ReservationMethodRepository
+import net.bellsoft.rms.domain.room.RoomRepository
 import net.bellsoft.rms.domain.user.User
 import net.bellsoft.rms.exception.DataNotFoundException
 import net.bellsoft.rms.exception.UserNotFoundException
 import net.bellsoft.rms.fixture.baseFixture
 import net.bellsoft.rms.service.reservation.dto.ReservationCreateDto
 import net.bellsoft.rms.service.reservation.dto.ReservationFilterDto
-import net.bellsoft.rms.service.reservation.dto.ReservationUpdateDto
+import net.bellsoft.rms.service.reservation.dto.ReservationPatchDto
 import net.bellsoft.rms.util.SecurityTestSupport
 import net.bellsoft.rms.util.TestDatabaseSupport
+import org.openapitools.jackson.nullable.JsonNullable
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
@@ -32,6 +34,7 @@ internal class ReservationServiceTest(
     private val reservationService: ReservationService,
     private val reservationRepository: ReservationRepository,
     private val reservationMethodRepository: ReservationMethodRepository,
+    private val roomRepository: RoomRepository,
 ) : BehaviorSpec(
     {
         val reservationMethod = reservationMethodRepository.save(baseFixture())
@@ -52,7 +55,7 @@ internal class ReservationServiceTest(
             When("전체 예약 정보를 조회하면") {
                 val entityListDto = reservationService.findAll(
                     PageRequest.of(0, 10),
-                    ReservationFilterDto(),
+                    ReservationFilterDto(stayStartAt = null, stayEndAt = null, searchText = null),
                 )
 
                 Then("빈 예약 목록이 반환 된다") {
@@ -118,13 +121,77 @@ internal class ReservationServiceTest(
             }
         }
 
+        Given("객실이 배정된 예약이 등록된 상황에서") {
+            val room = roomRepository.save(fixture())
+            val reservation = reservationRepository.save(
+                fixture { property(Reservation::room) { room } },
+            )
+
+            When("객실 배정을 해제를 요청하면") {
+                val result = reservationService.update(
+                    reservation.id,
+                    ReservationPatchDto(
+                        roomId = JsonNullable.of(null),
+                        reservationMethodId = JsonNullable.undefined(),
+                        name = JsonNullable.undefined(),
+                        phone = JsonNullable.undefined(),
+                        peopleCount = JsonNullable.undefined(),
+                        stayStartAt = JsonNullable.undefined(),
+                        stayEndAt = JsonNullable.undefined(),
+                        checkInAt = JsonNullable.undefined(),
+                        checkOutAt = JsonNullable.undefined(),
+                        price = JsonNullable.undefined(),
+                        paymentAmount = JsonNullable.undefined(),
+                        refundAmount = JsonNullable.undefined(),
+                        brokerFee = JsonNullable.undefined(),
+                        note = JsonNullable.undefined(),
+                        canceledAt = JsonNullable.undefined(),
+                        status = JsonNullable.undefined(),
+                    ),
+                )
+
+                Then("정상적으로 객실 배정이 해제된다") {
+                    result.room shouldBe null
+                }
+            }
+
+            When("객실 배정을 해제를 요청하지 않으면") {
+                val result = reservationService.update(
+                    reservation.id,
+                    ReservationPatchDto(
+                        roomId = JsonNullable.undefined(),
+                        reservationMethodId = JsonNullable.undefined(),
+                        name = JsonNullable.undefined(),
+                        phone = JsonNullable.undefined(),
+                        peopleCount = JsonNullable.undefined(),
+                        stayStartAt = JsonNullable.undefined(),
+                        stayEndAt = JsonNullable.undefined(),
+                        checkInAt = JsonNullable.undefined(),
+                        checkOutAt = JsonNullable.undefined(),
+                        price = JsonNullable.undefined(),
+                        paymentAmount = JsonNullable.undefined(),
+                        refundAmount = JsonNullable.undefined(),
+                        brokerFee = JsonNullable.undefined(),
+                        note = JsonNullable.undefined(),
+                        canceledAt = JsonNullable.undefined(),
+                        status = JsonNullable.undefined(),
+                    ),
+                )
+
+                Then("정상적으로 객실 배정이 해제된다") {
+                    result.room shouldNotBe null
+                    result.room!!.id shouldBe room.id
+                }
+            }
+        }
+
         Given("예약이 10개 등록된 상황에서") {
             val reservations = reservationRepository.saveAll(fixture<List<Reservation>> { repeatCount { 10 } })
 
             When("전체 예약 정보를 조회하면") {
                 val entityListDto = reservationService.findAll(
                     PageRequest.of(0, 10),
-                    ReservationFilterDto(),
+                    ReservationFilterDto(stayStartAt = null, stayEndAt = null, searchText = null),
                 )
 
                 Then("10개의 예약 정보가 반환 된다") {
@@ -151,17 +218,37 @@ internal class ReservationServiceTest(
             }
 
             When("다른 계정으로 로그인 후 존재하는 예약 정보 수정을 시도하면") {
+                val newRoom = roomRepository.save(fixture())
                 val newLoginUser = securityTestSupport.login()
                 val reservation = reservations[0]
                 val result = reservationService.update(
                     reservation.id,
-                    ReservationUpdateDto(name = "UPDATED"),
+                    ReservationPatchDto(
+                        roomId = JsonNullable.of(newRoom.id),
+                        name = JsonNullable.of("UPDATED"),
+                        reservationMethodId = JsonNullable.undefined(),
+                        phone = JsonNullable.undefined(),
+                        peopleCount = JsonNullable.undefined(),
+                        stayStartAt = JsonNullable.undefined(),
+                        stayEndAt = JsonNullable.undefined(),
+                        checkInAt = JsonNullable.undefined(),
+                        checkOutAt = JsonNullable.undefined(),
+                        price = JsonNullable.undefined(),
+                        paymentAmount = JsonNullable.undefined(),
+                        refundAmount = JsonNullable.undefined(),
+                        brokerFee = JsonNullable.undefined(),
+                        note = JsonNullable.undefined(),
+                        canceledAt = JsonNullable.undefined(),
+                        status = JsonNullable.undefined(),
+                    ),
                 )
 
                 loginUser.id shouldNotBe newLoginUser.id
 
                 Then("예약 정보가 정상적으로 수정된다") {
                     result.name shouldBe "UPDATED"
+                    result.room shouldNotBe null
+                    result.room!!.id shouldBe newRoom.id
                 }
 
                 Then("수정 이력이 등록된다") {
@@ -171,8 +258,9 @@ internal class ReservationServiceTest(
                     entityListDto.values.toList().let {
                         it[0].historyType shouldBe HistoryType.CREATED
                         it[1].historyType shouldBe HistoryType.UPDATED
-                        it[1].updatedFields shouldBe setOf("updatedBy", "name")
+                        it[1].updatedFields shouldBe setOf("updatedBy", "room", "name")
                         it[1].entity.name shouldBe "UPDATED"
+                        it[1].entity.room!!.id shouldBe newRoom.id
                         it[1].entity.updatedBy shouldBe newLoginUser.email
                     }
                 }
@@ -243,6 +331,7 @@ internal class ReservationServiceTest(
                     ReservationFilterDto(
                         stayStartAt = LocalDate.of(2023, 11, 1),
                         stayEndAt = LocalDate.of(2023, 11, 30),
+                        searchText = null,
                     ),
                 )
 

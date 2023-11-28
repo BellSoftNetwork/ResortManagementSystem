@@ -236,7 +236,7 @@ const columns = [
   {
     name: "price",
     field: "price",
-    label: "총 금액",
+    label: "판매 금액",
     align: "left",
     headerStyle: "width: 10%",
     required: true,
@@ -246,7 +246,7 @@ const columns = [
   {
     name: "paymentAmount",
     field: "paymentAmount",
-    label: "지불 금액",
+    label: "결제 금액",
     align: "left",
     headerStyle: "width: 10%",
     required: true,

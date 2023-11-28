@@ -91,7 +91,7 @@ const columns = [
   },
   {
     name: "updatedAt",
-    field: "updatedAt",
+    field: "historyCreatedAt",
     label: "변경 시각",
     align: "left",
     headerStyle: "width: 15%",

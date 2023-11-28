@@ -3,28 +3,21 @@ package net.bellsoft.rms.controller.v1.admin.dto
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Size
 import net.bellsoft.rms.domain.user.UserRole
-import net.bellsoft.rms.service.auth.dto.AccountPatchDto
+import org.openapitools.jackson.nullable.JsonNullable
 
 @Schema(description = "계정 수정 요청 정보")
-data class AccountPatchRequest(
+data class AdminUserPatchRequest(
     @Schema(description = "비밀번호", example = "password!@#")
     @field:Size(min = 8, max = 20)
-    val password: String? = null,
+    val password: JsonNullable<String> = JsonNullable.undefined(),
 
     @Schema(description = "이름", example = "방울")
     @field:Size(min = 2, max = 20)
-    val name: String? = null,
+    val name: JsonNullable<String> = JsonNullable.undefined(),
 
     @Schema(description = "계정 잠금 상태", example = "false")
-    val isLock: Boolean? = null,
+    val isLock: JsonNullable<Boolean> = JsonNullable.undefined(),
 
     @Schema(description = "계정 권한", example = "NORMAL")
-    val role: UserRole? = null,
-) {
-    fun toDto() = AccountPatchDto(
-        password = password,
-        name = name,
-        isLock = isLock,
-        role = role,
-    )
-}
+    val role: JsonNullable<UserRole> = JsonNullable.undefined(),
+)

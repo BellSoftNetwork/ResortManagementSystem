@@ -54,6 +54,7 @@ dependencies {
     runtimeOnly(libs.mysqlConnector)
     implementation(variantOf(libs.queryDslJpa) { classifier("jakarta") })
     kapt(variantOf(libs.queryDslApt) { classifier("jakarta") })
+    kaptTest(variantOf(libs.queryDslApt) { classifier("jakarta") })
 
     // NOTE: Security
     implementation(libs.springBootStarterSecurity)
@@ -64,6 +65,10 @@ dependencies {
 
     // NOTE: Data Process
     implementation(libs.jacksonKotlin)
+    implementation(libs.jacksonDatabindNullable)
+    implementation(libs.mapstruct)
+    kapt(libs.mapstructProcessor)
+    kaptTest(libs.mapstructProcessor)
 
     // NOTE: Data Support
     implementation(libs.dataFaker)

@@ -3,7 +3,6 @@ package net.bellsoft.rms.controller.v1.reservation.dto
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Size
 import net.bellsoft.rms.domain.reservation.ReservationStatus
-import net.bellsoft.rms.service.reservation.dto.ReservationCreateDto
 import org.hibernate.validator.constraints.Range
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -65,23 +64,4 @@ data class ReservationCreateRequest(
 
     @Schema(description = "예약 상태", example = "NORMAL")
     val status: ReservationStatus = ReservationStatus.PENDING,
-) {
-    fun toDto() = ReservationCreateDto(
-        reservationMethodId = reservationMethodId,
-        roomId = roomId,
-        name = name,
-        phone = phone,
-        peopleCount = peopleCount,
-        stayStartAt = stayStartAt,
-        stayEndAt = stayEndAt,
-        checkInAt = checkInAt,
-        checkOutAt = checkOutAt,
-        price = price,
-        paymentAmount = paymentAmount,
-        refundAmount = refundAmount,
-        brokerFee = brokerFee,
-        note = note,
-        canceledAt = canceledAt,
-        status = status,
-    )
-}
+)

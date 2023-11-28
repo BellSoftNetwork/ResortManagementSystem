@@ -2,7 +2,6 @@ package net.bellsoft.rms.controller.v1.reservation.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Size
-import net.bellsoft.rms.service.reservation.dto.ReservationMethodCreateDto
 import org.hibernate.validator.constraints.Range
 
 @Schema(description = "예약 수단 생성 요청 정보")
@@ -17,10 +16,4 @@ data class ReservationMethodCreateRequest(
 
     @Schema(description = "미수금 금액 알림", example = "false")
     val requireUnpaidAmountCheck: Boolean = false,
-) {
-    fun toDto() = ReservationMethodCreateDto(
-        name = name,
-        commissionRate = commissionRate,
-        requireUnpaidAmountCheck = requireUnpaidAmountCheck,
-    )
-}
+)

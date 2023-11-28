@@ -4,16 +4,16 @@ import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import net.bellsoft.rms.controller.v1.auth.dto.UserRegistrationRequest
 import net.bellsoft.rms.domain.user.User
 import net.bellsoft.rms.domain.user.UserRepository
 import net.bellsoft.rms.exception.DataNotFoundException
 import net.bellsoft.rms.fixture.baseFixture
 import net.bellsoft.rms.fixture.domain.user.UserFixture
 import net.bellsoft.rms.fixture.util.feature
-import net.bellsoft.rms.service.auth.dto.AccountCreateDto
-import net.bellsoft.rms.service.auth.dto.AccountPatchDto
+import net.bellsoft.rms.service.auth.dto.UserCreateDto
+import net.bellsoft.rms.service.auth.dto.UserPatchDto
 import net.bellsoft.rms.util.TestDatabaseSupport
+import org.openapitools.jackson.nullable.JsonNullable
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.PageRequest
@@ -30,18 +30,18 @@ internal class AuthServiceTest(
 ) : BehaviorSpec(
     {
         val fixture = baseFixture.new {
-            property(UserRegistrationRequest::password) { "password" }
+            property(UserCreateDto::password) { "password" }
         }
 
         Given("가입한 사용자가 없는 상황에서") {
             When("신규 회원 가입 시도 시") {
-                val userRegistrationRequest: UserRegistrationRequest = fixture {
-                    property(UserRegistrationRequest::email) { "userId@mail.com" }
+                val userCreateDto: UserCreateDto = fixture {
+                    property(UserCreateDto::email) { "userId@mail.com" }
                 }
-                val user = authService.register(userRegistrationRequest)
+                val user = authService.register(userCreateDto)
 
                 Then("정상적으로 가입된다") {
-                    user.email shouldBe userRegistrationRequest.email
+                    user.email shouldBe userCreateDto.email
                 }
             }
 
@@ -64,13 +64,13 @@ internal class AuthServiceTest(
             }
 
             When("신규 계정 등록 시") {
-                val accountCreateDto = fixture<AccountCreateDto>()
-                val result = authService.createAccount(accountCreateDto)
+                val userCreateDto = fixture<UserCreateDto>()
+                val result = authService.register(userCreateDto)
 
                 Then("정상적으로 등록된다") {
-                    result.email shouldBe accountCreateDto.email
-                    result.name shouldBe accountCreateDto.name
-                    result.role shouldBe accountCreateDto.role
+                    result.email shouldBe userCreateDto.email
+                    result.name shouldBe userCreateDto.name
+                    result.role shouldBe userCreateDto.role
                 }
             }
 
@@ -86,30 +86,30 @@ internal class AuthServiceTest(
         }
 
         Given("기존에 가입한 사용자가 있는 상황에서") {
-            val userRegistrationRequest: UserRegistrationRequest = fixture()
-            authService.register(userRegistrationRequest)
+            val userCreateDto: UserCreateDto = fixture()
+            authService.register(userCreateDto)
 
             When("기존 사용자 ID 와 동일한 ID 로 가입 요청 시") {
                 Then("가입이 거부된다") {
                     shouldThrow<DataIntegrityViolationException> {
-                        authService.register(userRegistrationRequest)
+                        authService.register(userCreateDto)
                     }
                 }
             }
 
             When("기존 사용자 ID 와 다른 ID 로 가입 요청 시") {
-                val newUserRegistrationRequest: UserRegistrationRequest = fixture {
-                    property(UserRegistrationRequest::email) { "new@mail.com" }
+                val userCreateDto: UserCreateDto = fixture {
+                    property(UserCreateDto::email) { "new@mail.com" }
                 }
-                val newUser = authService.register(newUserRegistrationRequest)
+                val newUser = authService.register(userCreateDto)
 
                 Then("정상적으로 가입된다") {
-                    newUser.email shouldBe newUserRegistrationRequest.email
+                    newUser.email shouldBe userCreateDto.email
                 }
             }
 
             When("유효한 계정 아이디로 유저 로드 시도 시") {
-                val email = userRegistrationRequest.email
+                val email = userCreateDto.email
 
                 Then("유저 엔티티가 정상적으로 로드된다") {
                     authService.loadUserByUsername(email).username shouldBe email
@@ -143,23 +143,28 @@ internal class AuthServiceTest(
             }
 
             When("신규 계정 등록 시") {
-                val accountCreateDto = fixture<AccountCreateDto>()
-                val result = authService.createAccount(accountCreateDto)
+                val userCreateDto = fixture<UserCreateDto>()
+                val result = authService.register(userCreateDto)
 
                 Then("정상적으로 등록된다") {
-                    result.email shouldBe accountCreateDto.email
-                    result.name shouldBe accountCreateDto.name
-                    result.role shouldBe accountCreateDto.role
+                    result.email shouldBe userCreateDto.email
+                    result.name shouldBe userCreateDto.name
+                    result.role shouldBe userCreateDto.role
                 }
             }
 
             When("기존 계정 수정 시도 시") {
                 val account = accounts.first()
-                val accountPatchDto = AccountPatchDto(name = "변경된 이름")
-                val result = authService.updateAccount(account.id, accountPatchDto)
+                val userPatchDto = UserPatchDto(
+                    name = JsonNullable.of("변경된 이름"),
+                    password = JsonNullable.undefined(),
+                    isLock = JsonNullable.undefined(),
+                    role = JsonNullable.undefined(),
+                )
+                val result = authService.updateAccount(account.id, userPatchDto)
 
                 Then("정상적으로 수정된다") {
-                    result.name shouldBe accountPatchDto.name
+                    result.name shouldBe "변경된 이름"
                 }
             }
         }

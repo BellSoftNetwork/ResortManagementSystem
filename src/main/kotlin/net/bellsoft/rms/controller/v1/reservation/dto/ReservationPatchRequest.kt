@@ -3,85 +3,66 @@ package net.bellsoft.rms.controller.v1.reservation.dto
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Size
 import net.bellsoft.rms.domain.reservation.ReservationStatus
-import net.bellsoft.rms.service.reservation.dto.ReservationUpdateDto
 import org.hibernate.validator.constraints.Range
+import org.openapitools.jackson.nullable.JsonNullable
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Schema(description = "예약 수정 요청 정보")
-data class ReservationUpdateRequest(
+data class ReservationPatchRequest(
     @Schema(description = "예약 수단 ID", example = "1")
-    val reservationMethodId: Long? = null,
+    val reservationMethodId: JsonNullable<Long> = JsonNullable.undefined(),
 
     @Schema(description = "객실 ID", example = "1")
-    val roomId: Long? = null,
+    val roomId: JsonNullable<Long?> = JsonNullable.undefined(),
 
     @Schema(description = "예약자명", example = "홍길동")
     @field:Size(min = 2, max = 30)
-    val name: String? = null,
+    val name: JsonNullable<String> = JsonNullable.undefined(),
 
     @Schema(description = "예약자 전화번호", example = "010-0000-0000")
     @field:Size(min = 2, max = 20)
-    val phone: String? = null,
+    val phone: JsonNullable<String> = JsonNullable.undefined(),
 
     @Schema(description = "예약 인원", example = "4")
     @field:Range(min = 0, max = 1000)
-    val peopleCount: Int? = null,
+    val peopleCount: JsonNullable<Int> = JsonNullable.undefined(),
 
     @Schema(description = "입실일", example = "2023-11-15")
-    val stayStartAt: LocalDate? = null,
+    val stayStartAt: JsonNullable<LocalDate> = JsonNullable.undefined(),
 
     @Schema(description = "퇴실일", example = "2023-11-16")
-    val stayEndAt: LocalDate? = null,
+    val stayEndAt: JsonNullable<LocalDate> = JsonNullable.undefined(),
 
     @Schema(description = "체크인 시각", example = "2023-11-15 17:00:00")
-    val checkInAt: LocalDateTime? = null,
+    val checkInAt: JsonNullable<LocalDateTime?> = JsonNullable.undefined(),
 
     @Schema(description = "체크아웃 시각", example = "2023-11-16 10:00:00")
-    val checkOutAt: LocalDateTime? = null,
+    val checkOutAt: JsonNullable<LocalDateTime?> = JsonNullable.undefined(),
 
     @Schema(description = "예약 가격", example = "100000")
     @field:Range(min = 0, max = 100000000)
-    val price: Int? = null,
+    val price: JsonNullable<Int> = JsonNullable.undefined(),
 
     @Schema(description = "현재 총 지불 금액", example = "80000")
     @field:Range(min = 0, max = 100000000)
-    val paymentAmount: Int? = null,
+    val paymentAmount: JsonNullable<Int> = JsonNullable.undefined(),
 
     @Schema(description = "환불 금액", example = "0")
     @field:Range(min = 0, max = 100000000)
-    val refundAmount: Int? = null,
+    val refundAmount: JsonNullable<Int> = JsonNullable.undefined(),
 
     @Schema(description = "플랫폼 수수료", example = "5000")
     @field:Range(min = 0, max = 100000000)
-    val brokerFee: Int? = null,
+    val brokerFee: JsonNullable<Int> = JsonNullable.undefined(),
 
     @Schema(description = "메모", example = "밤 늦게 입실 예정")
     @field:Size(min = 0, max = 200)
-    val note: String? = null,
+    val note: JsonNullable<String> = JsonNullable.undefined(),
 
     @Schema(description = "예약 취소 시각", example = "2023-11-15 20:00:00")
-    val canceledAt: LocalDateTime? = null,
+    val canceledAt: JsonNullable<LocalDateTime?> = JsonNullable.undefined(),
 
     @Schema(description = "예약 상태", example = "NORMAL")
-    val status: ReservationStatus? = null,
-) {
-    fun toDto() = ReservationUpdateDto(
-        reservationMethodId = reservationMethodId,
-        roomId = roomId,
-        name = name,
-        phone = phone,
-        peopleCount = peopleCount,
-        stayStartAt = stayStartAt,
-        stayEndAt = stayEndAt,
-        checkInAt = checkInAt,
-        checkOutAt = checkOutAt,
-        price = price,
-        paymentAmount = paymentAmount,
-        refundAmount = refundAmount,
-        brokerFee = brokerFee,
-        note = note,
-        canceledAt = canceledAt,
-        status = status,
-    )
-}
+    val status: JsonNullable<ReservationStatus> = JsonNullable.undefined(),
+)

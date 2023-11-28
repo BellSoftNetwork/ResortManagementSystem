@@ -15,6 +15,8 @@ h2database = "2.1.214"
 queryDsl = "5.0.0"
 jjwt = "0.11.5"
 jacksonKotlin = "2.14.1"
+jacksonDatabindNullable = "0.2.6"
+mapstruct = "1.5.5.Final"
 dataFaker = "1.7.0"
 ulidCreator = "5.1.0"
 findbugsJsr305 = "3.0.2"
@@ -81,6 +83,9 @@ springBootStarterValidation = { module = "org.springframework.boot:spring-boot-s
 springBootStarterBatch = { module = "org.springframework.boot:spring-boot-starter-batch", version.ref = "springBoot" }
 springBatchTest = { module = "org.springframework.batch:spring-batch-test", version.ref = "springBatch" }
 jacksonKotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jacksonKotlin" }
+jacksonDatabindNullable = { module = "org.openapitools:jackson-databind-nullable", version.ref = "jacksonDatabindNullable" }
+mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
+mapstructProcessor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
 
 # NOTE: Data Support
 dataFaker = { module = "net.datafaker:datafaker", version.ref = "dataFaker" }

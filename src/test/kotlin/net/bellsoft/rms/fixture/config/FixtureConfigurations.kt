@@ -5,7 +5,7 @@ import net.bellsoft.rms.fixture.domain.reservation.ReservationFixture
 import net.bellsoft.rms.fixture.domain.reservation.method.ReservationMethodFixture
 import net.bellsoft.rms.fixture.domain.room.RoomFixture
 import net.bellsoft.rms.fixture.domain.user.UserFixture
-import net.bellsoft.rms.fixture.service.admin.AccountCreateDtoFixture
+import net.bellsoft.rms.fixture.service.admin.UserCreateDtoFixture
 import net.bellsoft.rms.fixture.service.reservation.ReservationCreateDtoFixture
 import net.bellsoft.rms.fixture.service.room.RoomCreateDtoFixture
 
@@ -22,7 +22,7 @@ private val domainConfigurations = listOf(
 // @Suppress("ktlint:experimental:property-naming")
 private val dtoFixtureConfigurations = listOf(
     UserRegistrationRequestFixture.BASE_CONFIGURATION,
-    AccountCreateDtoFixture.BASE_CONFIGURATION,
+    UserCreateDtoFixture.BASE_CONFIGURATION,
     ReservationCreateDtoFixture.BASE_CONFIGURATION,
     RoomCreateDtoFixture.BASE_CONFIGURATION,
 )
