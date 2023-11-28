@@ -122,7 +122,7 @@ const columnMap = {
   name: { name: "예약자명" },
   reservationMethod: { name: "예약 수단", format: (value) => value.name },
   room: { name: "객실", format: (value) => value ? value.number : "미배정" },
-  phone: { name: "예약자 연락처" },
+  phone: { name: "예약자 연락처", format: (value) => value || "-" },
   peopleCount: { name: "예약인원" },
   stayStartAt: { name: "입실일", format: (value) => dayjs(value).format("YYYY-MM-DD") },
   stayEndAt: { name: "퇴실일", format: (value) => dayjs(value).format("YYYY-MM-DD") },

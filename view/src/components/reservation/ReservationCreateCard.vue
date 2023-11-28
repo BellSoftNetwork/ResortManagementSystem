@@ -154,7 +154,6 @@
           :rules="rules.phone"
           label="예약자 연락처"
           placeholder="010-0000-0000"
-          required
         ></q-input>
 
         <q-input
@@ -268,7 +267,7 @@ const status = ref({
 })
 const rules = {
   name: [value => (value.length >= 2 && value.length <= 30) || "2~30 글자가 필요합니다"],
-  phone: [value => (value.length >= 2 && value.length <= 20) || "2~20 글자가 필요합니다"],
+  phone: [value => (value.length <= 20) || "20 글자 이내로 입력 가능합니다"],
   peopleCount: [value => (value >= 0 && value <= 1000) || "1000 명 이하만 입실 가능합니다"],
   stayStartAt: [value => (/^-?[\d]+-[0-1]\d-[0-3]\d$/.test(value)) || "####-##-## 형태의 날짜만 입력 가능합니다."],
   stayEndAt: [value => (/^-?[\d]+-[0-1]\d-[0-3]\d$/.test(value)) || "####-##-## 형태의 날짜만 입력 가능합니다."],
