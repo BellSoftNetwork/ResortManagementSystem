@@ -119,20 +119,49 @@ fun BootRun.setupEnvironment() {
 
 // https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/htmlsingle/#build-image
 tasks.named<BootBuildImage>("bootBuildImage") {
-    setupEnvironment(this)
+    setupDocker(this)
     setupBuildProperty(this)
     setupImageProperty(this)
-    setupDocker(this)
+    setupEnvironment(this)
 }
 
-fun setupEnvironment(bootBuildImage: BootBuildImage) {
+fun setupDocker(bootBuildImage: BootBuildImage) {
     bootBuildImage.run {
-        environment.set(environment.get() + mapOf("SPRING_PROFILES_ACTIVE" to "production"))
+        val dockerHost: String by project
+        val isDockerTlsVerify: String by project
+        val dockerCertPath: String by project
+
+        val proxyRegistryUrl: String by project
+        val projectRegistryUrl: String by project
+        val registryUser: String by project
+        val registryPassword: String by project
+        val registryEmail: String by project
+
+        docker {
+            if (project.hasProperty("dockerHost")) host.set(dockerHost)
+            if (project.hasProperty("isDockerTlsVerify")) tlsVerify.set(isDockerTlsVerify.toBoolean())
+            if (project.hasProperty("dockerCertPath")) certPath.set(dockerCertPath)
+
+            builderRegistry {
+                if (project.hasProperty("proxyRegistryUrl")) url.set(proxyRegistryUrl)
+                if (project.hasProperty("registryUser")) username.set(registryUser)
+                if (project.hasProperty("registryPassword")) password.set(registryPassword)
+                if (project.hasProperty("registryEmail")) email.set(registryEmail)
+            }
+
+            publishRegistry {
+                if (project.hasProperty("projectRegistryUrl")) url.set(projectRegistryUrl)
+                if (project.hasProperty("registryUser")) username.set(registryUser)
+                if (project.hasProperty("registryPassword")) password.set(registryPassword)
+                if (project.hasProperty("registryEmail")) email.set(registryEmail)
+            }
+        }
     }
 }
 
 fun setupBuildProperty(bootBuildImage: BootBuildImage) {
     bootBuildImage.run {
+        val proxyRegistryUrl: String by project
         val bindingsDir: String by project
         val gradleDir: String by project
 
@@ -142,7 +171,14 @@ fun setupBuildProperty(bootBuildImage: BootBuildImage) {
         if (project.hasProperty("gradleDir")) bindingVolumes.add("$gradleDir:/home/cnb/.gradle:rw")
 
         bindings.set(bindingVolumes)
-        builder.set("paketobuildpacks/builder:${paketobuildpacks.versions.builder.get()}")
+
+        val buildPackBaseUrl = if (project.hasProperty("proxyRegistryUrl"))
+            "$proxyRegistryUrl/paketobuildpacks"
+        else
+            "paketobuildpacks"
+
+        runImage.set("$buildPackBaseUrl/run-jammy-base:latest")
+        builder.set("$buildPackBaseUrl/builder-jammy-base:${paketobuildpacks.versions.builder.get()}")
     }
 }
 
@@ -158,29 +194,9 @@ fun setupImageProperty(bootBuildImage: BootBuildImage) {
     }
 }
 
-fun setupDocker(bootBuildImage: BootBuildImage) {
+fun setupEnvironment(bootBuildImage: BootBuildImage) {
     bootBuildImage.run {
-        val dockerHost: String by project
-        val isDockerTlsVerify: String by project
-        val dockerCertPath: String by project
-
-        val projectRegistryUrl: String by project
-        val registryUser: String by project
-        val registryPassword: String by project
-        val registryEmail: String by project
-
-        docker {
-            if (project.hasProperty("dockerHost")) host.set(dockerHost)
-            if (project.hasProperty("isDockerTlsVerify")) tlsVerify.set(isDockerTlsVerify.toBoolean())
-            if (project.hasProperty("dockerCertPath")) certPath.set(dockerCertPath)
-
-            publishRegistry {
-                if (project.hasProperty("projectRegistryUrl")) url.set(projectRegistryUrl)
-                if (project.hasProperty("registryUser")) username.set(registryUser)
-                if (project.hasProperty("registryPassword")) password.set(registryPassword)
-                if (project.hasProperty("registryEmail")) email.set(registryEmail)
-            }
-        }
+        environment.set(environment.get() + mapOf("SPRING_PROFILES_ACTIVE" to "production"))
     }
 }
 
