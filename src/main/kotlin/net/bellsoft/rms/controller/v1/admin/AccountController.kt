@@ -9,13 +9,15 @@ import jakarta.validation.Valid
 import mu.KLogging
 import net.bellsoft.rms.controller.common.dto.ListResponse
 import net.bellsoft.rms.controller.common.dto.SingleResponse
-import net.bellsoft.rms.controller.v1.admin.dto.AccountCreateRequest
-import net.bellsoft.rms.controller.v1.admin.dto.AccountPatchRequest
+import net.bellsoft.rms.controller.v1.admin.dto.AdminUserCreateRequest
+import net.bellsoft.rms.controller.v1.admin.dto.AdminUserPatchRequest
 import net.bellsoft.rms.domain.user.User
 import net.bellsoft.rms.domain.user.UserRole
 import net.bellsoft.rms.exception.PermissionRequiredDataException
+import net.bellsoft.rms.mapper.model.PatchDtoMapper
+import net.bellsoft.rms.mapper.model.UserMapper
 import net.bellsoft.rms.service.auth.AuthService
-import net.bellsoft.rms.service.auth.dto.UserDto
+import net.bellsoft.rms.service.auth.dto.UserDetailDto
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -38,6 +40,8 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/admin/accounts")
 class AccountController(
     private val authService: AuthService,
+    private val userMapper: UserMapper,
+    private val patchDtoMapper: PatchDtoMapper,
 ) {
     @Operation(summary = "계정 리스트", description = "계정 리스트 조회")
     @ApiResponses(
@@ -60,13 +64,13 @@ class AccountController(
     fun createAccount(
         @AuthenticationPrincipal user: User,
         @RequestBody @Valid
-        request: AccountCreateRequest,
-    ): ResponseEntity<SingleResponse<UserDto>> {
+        request: AdminUserCreateRequest,
+    ): ResponseEntity<SingleResponse<UserDetailDto>> {
         if (request.role >= UserRole.ADMIN && user.role != UserRole.SUPER_ADMIN)
             throw PermissionRequiredDataException("관리자 이상 권한 설정 시 최고 관리자 권한 필요")
 
         return SingleResponse
-            .of(authService.createAccount(request.toDto()))
+            .of(authService.register(userMapper.toDto(request)))
             .toResponseEntity(HttpStatus.CREATED)
     }
 
@@ -81,9 +85,9 @@ class AccountController(
         @PathVariable("id") id: Long,
         @AuthenticationPrincipal user: User,
         @RequestBody @Valid
-        request: AccountPatchRequest,
-    ): ResponseEntity<SingleResponse<UserDto>> {
-        request.role?.let {
+        request: AdminUserPatchRequest,
+    ): ResponseEntity<SingleResponse<UserDetailDto>> {
+        request.role.orElse(null)?.let {
             if (it >= UserRole.ADMIN && user.role != UserRole.SUPER_ADMIN)
                 throw PermissionRequiredDataException("관리자 이상 권한 설정 시 최고 관리자 권한 필요")
         }
@@ -91,7 +95,7 @@ class AccountController(
             throw PermissionRequiredDataException("동일 또는 상위 권한 계정 정보 수정 불가")
 
         return SingleResponse
-            .of(authService.updateAccount(id, request.toDto()))
+            .of(authService.updateAccount(id, patchDtoMapper.toDto(request)))
             .toResponseEntity()
     }
 

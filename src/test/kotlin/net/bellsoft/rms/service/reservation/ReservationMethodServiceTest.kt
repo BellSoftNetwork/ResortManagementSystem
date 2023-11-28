@@ -8,8 +8,9 @@ import net.bellsoft.rms.exception.DataNotFoundException
 import net.bellsoft.rms.exception.DuplicateDataException
 import net.bellsoft.rms.fixture.baseFixture
 import net.bellsoft.rms.service.reservation.dto.ReservationMethodCreateDto
-import net.bellsoft.rms.service.reservation.dto.ReservationMethodUpdateDto
+import net.bellsoft.rms.service.reservation.dto.ReservationMethodPatchDto
 import net.bellsoft.rms.util.TestDatabaseSupport
+import org.openapitools.jackson.nullable.JsonNullable
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -55,7 +56,14 @@ internal class ReservationMethodServiceTest(
 
             When("존재하지 않는 예약 수단 정보 수정을 시도하면") {
                 val exception = shouldThrow<DataNotFoundException> {
-                    reservationMethodService.update(-1, ReservationMethodUpdateDto())
+                    reservationMethodService.update(
+                        -1,
+                        ReservationMethodPatchDto(
+                            name = JsonNullable.undefined(),
+                            commissionRate = JsonNullable.undefined(),
+                            requireUnpaidAmountCheck = JsonNullable.undefined(),
+                        ),
+                    )
                 }
 
                 Then("조회 불가 예외가 발생한다") {
@@ -120,9 +128,10 @@ internal class ReservationMethodServiceTest(
             When("등록한 예약 수단 정보 수정을 시도하면") {
                 val updateReservationMethod = reservationMethodService.update(
                     reservationMethod.id,
-                    ReservationMethodUpdateDto(
-                        name = "BSN",
-                        commissionRate = 0.2,
+                    ReservationMethodPatchDto(
+                        name = JsonNullable.of("BSN"),
+                        commissionRate = JsonNullable.of(0.2),
+                        requireUnpaidAmountCheck = JsonNullable.undefined(),
                     ),
                 )
 

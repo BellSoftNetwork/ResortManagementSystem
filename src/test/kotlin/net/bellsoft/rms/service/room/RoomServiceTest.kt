@@ -20,9 +20,10 @@ import net.bellsoft.rms.exception.UserNotFoundException
 import net.bellsoft.rms.fixture.baseFixture
 import net.bellsoft.rms.service.room.dto.RoomCreateDto
 import net.bellsoft.rms.service.room.dto.RoomFilterDto
-import net.bellsoft.rms.service.room.dto.RoomUpdateDto
+import net.bellsoft.rms.service.room.dto.RoomPatchDto
 import net.bellsoft.rms.util.SecurityTestSupport
 import net.bellsoft.rms.util.TestDatabaseSupport
+import org.openapitools.jackson.nullable.JsonNullable
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
@@ -52,7 +53,7 @@ internal class RoomServiceTest(
             When("전체 객실 정보를 조회하면") {
                 val entityListDto = roomService.findAll(
                     PageRequest.of(0, 10),
-                    RoomFilterDto(),
+                    RoomFilterDto(stayStartAt = null, stayEndAt = null, status = null),
                 )
 
                 Then("빈 객실 목록이 반환 된다") {
@@ -124,7 +125,7 @@ internal class RoomServiceTest(
             When("전체 객실 정보를 조회하면") {
                 val entityListDto = roomService.findAll(
                     PageRequest.of(0, 10),
-                    RoomFilterDto(),
+                    RoomFilterDto(stayStartAt = null, stayEndAt = null, status = null),
                 )
 
                 Then("10개의 객실 정보가 반환 된다") {
@@ -165,7 +166,14 @@ internal class RoomServiceTest(
                 val room = rooms[0]
                 val result = roomService.update(
                     room.id,
-                    RoomUpdateDto(number = "UPDATED"),
+                    RoomPatchDto(
+                        number = JsonNullable.of("UPDATED"),
+                        peekPrice = JsonNullable.undefined(),
+                        offPeekPrice = JsonNullable.undefined(),
+                        description = JsonNullable.undefined(),
+                        note = JsonNullable.undefined(),
+                        status = JsonNullable.undefined(),
+                    ),
                 )
 
                 loginUser.id shouldNotBe newLoginUser.id
@@ -243,9 +251,7 @@ internal class RoomServiceTest(
             When("활성 상태의 예약 가능한 객실 정보를 조회하면") {
                 val entityListDto = roomService.findAll(
                     PageRequest.of(0, 10),
-                    RoomFilterDto(
-                        status = RoomStatus.NORMAL,
-                    ),
+                    RoomFilterDto(status = RoomStatus.NORMAL, stayStartAt = null, stayEndAt = null),
                 )
 
                 Then("0개의 객실 정보가 반환된다") {
@@ -327,6 +333,7 @@ internal class RoomServiceTest(
                     RoomFilterDto(
                         stayStartAt = LocalDate.of(2023, 11, 10),
                         stayEndAt = LocalDate.of(2023, 11, 11),
+                        status = null,
                     ),
                 )
 
@@ -451,6 +458,7 @@ internal class RoomServiceTest(
                     RoomFilterDto(
                         stayStartAt = LocalDate.of(2023, 11, 10),
                         stayEndAt = LocalDate.of(2023, 11, 20),
+                        status = null,
                     ),
                 )
 
@@ -486,6 +494,7 @@ internal class RoomServiceTest(
                     RoomFilterDto(
                         stayStartAt = LocalDate.of(2023, 11, 10),
                         stayEndAt = LocalDate.of(2023, 11, 20),
+                        status = null,
                     ),
                 )
 

@@ -2,25 +2,19 @@ package net.bellsoft.rms.controller.v1.reservation.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Size
-import net.bellsoft.rms.service.reservation.dto.ReservationMethodUpdateDto
 import org.hibernate.validator.constraints.Range
+import org.openapitools.jackson.nullable.JsonNullable
 
 @Schema(description = "예약 수단 수정 요청 정보")
-data class ReservationMethodUpdateRequest(
+data class ReservationMethodPatchRequest(
     @Schema(description = "예약 수단명", example = "네이버")
     @field:Size(min = 2, max = 20)
-    val name: String? = null,
+    val name: JsonNullable<String> = JsonNullable.undefined(),
 
     @Schema(description = "수수료율", example = "0.2")
     @field:Range(min = 0, max = 1)
-    val commissionRate: Double? = null,
+    val commissionRate: JsonNullable<Double> = JsonNullable.undefined(),
 
     @Schema(description = "미수금 금액 알림", example = "false")
-    val requireUnpaidAmountCheck: Boolean? = null,
-) {
-    fun toDto() = ReservationMethodUpdateDto(
-        name = name,
-        commissionRate = commissionRate,
-        requireUnpaidAmountCheck = requireUnpaidAmountCheck,
-    )
-}
+    val requireUnpaidAmountCheck: JsonNullable<Boolean> = JsonNullable.undefined(),
+)

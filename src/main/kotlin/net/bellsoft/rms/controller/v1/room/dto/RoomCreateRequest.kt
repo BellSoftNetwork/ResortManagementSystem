@@ -3,7 +3,6 @@ package net.bellsoft.rms.controller.v1.room.dto
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Size
 import net.bellsoft.rms.domain.room.RoomStatus
-import net.bellsoft.rms.service.room.dto.RoomCreateDto
 import org.hibernate.validator.constraints.Range
 
 @Schema(description = "객실 생성 요청 정보")
@@ -30,13 +29,4 @@ data class RoomCreateRequest(
 
     @Schema(description = "객실 상태", example = "NORMAL")
     val status: RoomStatus,
-) {
-    fun toDto() = RoomCreateDto(
-        number = number,
-        peekPrice = peekPrice,
-        offPeekPrice = offPeekPrice,
-        description = description,
-        note = note,
-        status = status,
-    )
-}
+)

@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse
 import mu.KLogging
 import net.bellsoft.rms.component.auth.dto.AuthenticationSuccessResponse
 import net.bellsoft.rms.domain.user.User
+import net.bellsoft.rms.mapper.model.UserMapper
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.core.Authentication
@@ -13,7 +14,10 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component
 
 @Component
-class JsonAuthenticationSuccessHandler(private val objectMapper: ObjectMapper) : AuthenticationSuccessHandler {
+class JsonAuthenticationSuccessHandler(
+    private val objectMapper: ObjectMapper,
+    private val userMapper: UserMapper,
+) : AuthenticationSuccessHandler {
     override fun onAuthenticationSuccess(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -29,9 +33,9 @@ class JsonAuthenticationSuccessHandler(private val objectMapper: ObjectMapper) :
 
         objectMapper.writeValue(
             response.writer,
-            AuthenticationSuccessResponse.of(
-                user = user,
+            AuthenticationSuccessResponse(
                 message = "인증 성공",
+                value = userMapper.toDto(user),
             ),
         )
     }

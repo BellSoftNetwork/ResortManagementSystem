@@ -9,9 +9,11 @@ import jakarta.validation.Valid
 import net.bellsoft.rms.controller.common.dto.ListResponse
 import net.bellsoft.rms.controller.common.dto.SingleResponse
 import net.bellsoft.rms.controller.v1.reservation.dto.ReservationMethodCreateRequest
-import net.bellsoft.rms.controller.v1.reservation.dto.ReservationMethodUpdateRequest
+import net.bellsoft.rms.controller.v1.reservation.dto.ReservationMethodPatchRequest
+import net.bellsoft.rms.mapper.model.PatchDtoMapper
+import net.bellsoft.rms.mapper.model.ReservationMethodMapper
 import net.bellsoft.rms.service.reservation.ReservationMethodService
-import net.bellsoft.rms.service.reservation.dto.ReservationMethodDto
+import net.bellsoft.rms.service.reservation.dto.ReservationMethodDetailDto
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -34,6 +36,8 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/reservation-methods")
 class ReservationMethodController(
     private val reservationMethodService: ReservationMethodService,
+    private val reservationMethodMapper: ReservationMethodMapper,
+    private val patchDtoMapper: PatchDtoMapper,
 ) {
     @Operation(summary = "예약 수단 리스트", description = "예약 수단 리스트 조회")
     @ApiResponses(
@@ -53,7 +57,7 @@ class ReservationMethodController(
         ],
     )
     @GetMapping("/{id}")
-    fun getReservation(@PathVariable("id") id: Long): ResponseEntity<SingleResponse<ReservationMethodDto>> {
+    fun getReservation(@PathVariable("id") id: Long): ResponseEntity<SingleResponse<ReservationMethodDetailDto>> {
         return SingleResponse
             .of(reservationMethodService.find(id))
             .toResponseEntity(HttpStatus.OK)
@@ -71,7 +75,7 @@ class ReservationMethodController(
         @RequestBody @Valid
         request: ReservationMethodCreateRequest,
     ) = SingleResponse
-        .of(reservationMethodService.create(request.toDto()))
+        .of(reservationMethodService.create(reservationMethodMapper.toDto(request)))
         .toResponseEntity(HttpStatus.CREATED)
 
     @Operation(summary = "예약 수단 수정", description = "기존 예약 수단 정보 수정")
@@ -85,9 +89,9 @@ class ReservationMethodController(
     fun updateReservation(
         @PathVariable("id") id: Long,
         @RequestBody @Valid
-        request: ReservationMethodUpdateRequest,
+        request: ReservationMethodPatchRequest,
     ) = SingleResponse
-        .of(reservationMethodService.update(id, request.toDto()))
+        .of(reservationMethodService.update(id, patchDtoMapper.toDto(request)))
         .toResponseEntity(HttpStatus.OK)
 
     @Operation(summary = "예약 수단 삭제", description = "기존 예약 수단 삭제")

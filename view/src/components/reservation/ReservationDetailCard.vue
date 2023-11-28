@@ -40,8 +40,13 @@
           </div>
 
           <div class="q-py-sm">
-            <div class="text-caption">누적 결제 금액</div>
-            <div class="text-body1">{{ entity.paymentAmount }}</div>
+            <div class="text-caption">판매 금액</div>
+            <div class="text-body1">{{ formatPrice(entity.price) }}</div>
+          </div>
+
+          <div class="q-py-sm">
+            <div class="text-caption">결제 금액</div>
+            <div class="text-body1">{{ formatPrice(entity.paymentAmount) }}</div>
           </div>
 
           <div class="q-py-sm">
@@ -51,7 +56,7 @@
 
           <div class="q-py-sm">
             <div class="text-caption">예약 수단 수수료</div>
-            <div class="text-body1">{{ entity.brokerFee }}</div>
+            <div class="text-body1">{{ formatPrice(entity.brokerFee) }}</div>
           </div>
         </div>
 
@@ -219,6 +224,13 @@ function deleteItem() {
 
 function formatSubTitle(dateDiff) {
   return `${dateDiff}박 ${dateDiff + 1}일`
+}
+
+function formatPrice(value) {
+  return new Intl.NumberFormat("ko-KR", {
+    style: "currency",
+    currency: "KRW",
+  }).format(value)
 }
 
 onBeforeMount(() => {

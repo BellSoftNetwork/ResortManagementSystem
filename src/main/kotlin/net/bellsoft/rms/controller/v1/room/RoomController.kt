@@ -9,9 +9,11 @@ import jakarta.validation.Valid
 import net.bellsoft.rms.controller.common.dto.ListResponse
 import net.bellsoft.rms.controller.common.dto.SingleResponse
 import net.bellsoft.rms.controller.v1.room.dto.RoomCreateRequest
+import net.bellsoft.rms.controller.v1.room.dto.RoomPatchRequest
 import net.bellsoft.rms.controller.v1.room.dto.RoomRequestFilter
-import net.bellsoft.rms.controller.v1.room.dto.RoomUpdateRequest
 import net.bellsoft.rms.domain.user.User
+import net.bellsoft.rms.mapper.model.PatchDtoMapper
+import net.bellsoft.rms.mapper.model.RoomMapper
 import net.bellsoft.rms.service.room.RoomService
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
@@ -35,6 +37,8 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/rooms")
 class RoomController(
     private val roomService: RoomService,
+    private val roomMapper: RoomMapper,
+    private val patchDtoMapper: PatchDtoMapper,
 ) {
     @Operation(summary = "객실 리스트", description = "객실 리스트 조회")
     @ApiResponses(
@@ -44,7 +48,7 @@ class RoomController(
     )
     @GetMapping
     fun getRooms(pageable: Pageable, filter: RoomRequestFilter) = ListResponse
-        .of(roomService.findAll(pageable, filter.toDto()), filter)
+        .of(roomService.findAll(pageable, roomMapper.toDto(filter)), filter)
         .toResponseEntity()
 
     @Operation(summary = "객실 조회", description = "객실 단건 조회")
@@ -72,7 +76,7 @@ class RoomController(
         @RequestBody @Valid
         request: RoomCreateRequest,
     ) = SingleResponse
-        .of(roomService.create(request.toDto()))
+        .of(roomService.create(roomMapper.toDto(request)))
 
     @Operation(summary = "객실 수정", description = "기존 객실 정보 수정")
     @ApiResponses(
@@ -87,9 +91,9 @@ class RoomController(
         @PathVariable("id") id: Long,
 
         @RequestBody @Valid
-        request: RoomUpdateRequest,
+        request: RoomPatchRequest,
     ) = SingleResponse
-        .of(roomService.update(id, request.toDto()))
+        .of(roomService.update(id, patchDtoMapper.toDto(request)))
         .toResponseEntity()
 
     @Operation(summary = "객실 삭제", description = "기존 객실 삭제")
