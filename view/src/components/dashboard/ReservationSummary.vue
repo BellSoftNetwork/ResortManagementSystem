@@ -192,6 +192,7 @@ function fetchData() {
   fetchReservations({
     stayStartAt: filter.value.stayStartAt,
     stayEndAt: filter.value.stayEndAt,
+    status: "NORMAL",
   })
     .then((response) => {
       reservationsOfDay.value = formatReservations(response.values);

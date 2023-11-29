@@ -13,6 +13,7 @@ export type FetchReservationsRequestParams = Partial<
     stayStartAt: string;
     stayEndAt: string;
     searchText: string;
+    status: ReservationStatus;
   } & PageRequestParams &
     SortRequestParams
 >;

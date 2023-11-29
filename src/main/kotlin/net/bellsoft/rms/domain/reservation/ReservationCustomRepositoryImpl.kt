@@ -43,6 +43,7 @@ class ReservationCustomRepositoryImpl(
             goeStayStartAt(filter.stayStartAt),
             loeStayStartAt(filter.stayEndAt),
             likeSearchText(filter.searchText),
+            eqStatus(filter.status),
         )
 
     private fun goeStayStartAt(stayStartAt: LocalDate?) =
@@ -56,4 +57,7 @@ class ReservationCustomRepositoryImpl(
             QReservation.reservation.name.like("%$it%")
                 .or(QReservation.reservation.phone.like("%$it%"))
         }
+
+    private fun eqStatus(status: ReservationStatus?) =
+        status?.let { QReservation.reservation.status.eq(it) }
 }
