@@ -1,5 +1,7 @@
 package net.bellsoft.rms.service.auth.dto
 
+import net.bellsoft.rms.controller.v1.admin.dto.AdminUserCreateRequest
+import net.bellsoft.rms.controller.v1.auth.dto.UserRegistrationRequest
 import net.bellsoft.rms.domain.user.User
 import net.bellsoft.rms.domain.user.UserRole
 import net.bellsoft.rms.domain.user.UserStatus
@@ -19,6 +21,21 @@ data class UserCreateDto(
             password = passwordEncoder.encode(password),
             status = status,
             role = role,
+        )
+    }
+
+    companion object {
+        fun of(dto: AdminUserCreateRequest) = UserCreateDto(
+            name = dto.name,
+            email = dto.email,
+            password = dto.password,
+            role = dto.role,
+        )
+
+        fun of(dto: UserRegistrationRequest) = UserCreateDto(
+            name = dto.name,
+            email = dto.email,
+            password = dto.password,
         )
     }
 }

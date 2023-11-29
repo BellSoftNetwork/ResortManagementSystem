@@ -55,7 +55,7 @@ internal class ReservationServiceTest(
             When("전체 예약 정보를 조회하면") {
                 val entityListDto = reservationService.findAll(
                     PageRequest.of(0, 10),
-                    ReservationFilterDto(stayStartAt = null, stayEndAt = null, searchText = null),
+                    ReservationFilterDto(),
                 )
 
                 Then("빈 예약 목록이 반환 된다") {
@@ -132,21 +132,6 @@ internal class ReservationServiceTest(
                     reservation.id,
                     ReservationPatchDto(
                         roomId = JsonNullable.of(null),
-                        reservationMethodId = JsonNullable.undefined(),
-                        name = JsonNullable.undefined(),
-                        phone = JsonNullable.undefined(),
-                        peopleCount = JsonNullable.undefined(),
-                        stayStartAt = JsonNullable.undefined(),
-                        stayEndAt = JsonNullable.undefined(),
-                        checkInAt = JsonNullable.undefined(),
-                        checkOutAt = JsonNullable.undefined(),
-                        price = JsonNullable.undefined(),
-                        paymentAmount = JsonNullable.undefined(),
-                        refundAmount = JsonNullable.undefined(),
-                        brokerFee = JsonNullable.undefined(),
-                        note = JsonNullable.undefined(),
-                        canceledAt = JsonNullable.undefined(),
-                        status = JsonNullable.undefined(),
                     ),
                 )
 
@@ -158,24 +143,7 @@ internal class ReservationServiceTest(
             When("객실 배정을 해제를 요청하지 않으면") {
                 val result = reservationService.update(
                     reservation.id,
-                    ReservationPatchDto(
-                        roomId = JsonNullable.undefined(),
-                        reservationMethodId = JsonNullable.undefined(),
-                        name = JsonNullable.undefined(),
-                        phone = JsonNullable.undefined(),
-                        peopleCount = JsonNullable.undefined(),
-                        stayStartAt = JsonNullable.undefined(),
-                        stayEndAt = JsonNullable.undefined(),
-                        checkInAt = JsonNullable.undefined(),
-                        checkOutAt = JsonNullable.undefined(),
-                        price = JsonNullable.undefined(),
-                        paymentAmount = JsonNullable.undefined(),
-                        refundAmount = JsonNullable.undefined(),
-                        brokerFee = JsonNullable.undefined(),
-                        note = JsonNullable.undefined(),
-                        canceledAt = JsonNullable.undefined(),
-                        status = JsonNullable.undefined(),
-                    ),
+                    ReservationPatchDto(),
                 )
 
                 Then("정상적으로 객실 배정이 해제된다") {
@@ -191,7 +159,7 @@ internal class ReservationServiceTest(
             When("전체 예약 정보를 조회하면") {
                 val entityListDto = reservationService.findAll(
                     PageRequest.of(0, 10),
-                    ReservationFilterDto(stayStartAt = null, stayEndAt = null, searchText = null),
+                    ReservationFilterDto(),
                 )
 
                 Then("10개의 예약 정보가 반환 된다") {
@@ -226,20 +194,6 @@ internal class ReservationServiceTest(
                     ReservationPatchDto(
                         roomId = JsonNullable.of(newRoom.id),
                         name = JsonNullable.of("UPDATED"),
-                        reservationMethodId = JsonNullable.undefined(),
-                        phone = JsonNullable.undefined(),
-                        peopleCount = JsonNullable.undefined(),
-                        stayStartAt = JsonNullable.undefined(),
-                        stayEndAt = JsonNullable.undefined(),
-                        checkInAt = JsonNullable.undefined(),
-                        checkOutAt = JsonNullable.undefined(),
-                        price = JsonNullable.undefined(),
-                        paymentAmount = JsonNullable.undefined(),
-                        refundAmount = JsonNullable.undefined(),
-                        brokerFee = JsonNullable.undefined(),
-                        note = JsonNullable.undefined(),
-                        canceledAt = JsonNullable.undefined(),
-                        status = JsonNullable.undefined(),
                     ),
                 )
 
@@ -331,7 +285,6 @@ internal class ReservationServiceTest(
                     ReservationFilterDto(
                         stayStartAt = LocalDate.of(2023, 11, 1),
                         stayEndAt = LocalDate.of(2023, 11, 30),
-                        searchText = null,
                     ),
                 )
 

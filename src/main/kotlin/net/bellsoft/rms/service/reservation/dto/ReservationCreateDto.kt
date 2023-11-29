@@ -1,5 +1,6 @@
 package net.bellsoft.rms.service.reservation.dto
 
+import net.bellsoft.rms.controller.v1.reservation.dto.ReservationCreateRequest
 import net.bellsoft.rms.domain.reservation.ReservationStatus
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -21,4 +22,25 @@ data class ReservationCreateDto(
     val note: String = "",
     val canceledAt: LocalDateTime? = null,
     val status: ReservationStatus = ReservationStatus.PENDING,
-)
+) {
+    companion object {
+        fun of(dto: ReservationCreateRequest) = ReservationCreateDto(
+            reservationMethodId = dto.reservationMethodId,
+            roomId = dto.roomId,
+            name = dto.name,
+            phone = dto.phone,
+            peopleCount = dto.peopleCount,
+            stayStartAt = dto.stayStartAt,
+            stayEndAt = dto.stayEndAt,
+            checkInAt = dto.checkInAt,
+            checkOutAt = dto.checkOutAt,
+            price = dto.price,
+            paymentAmount = dto.paymentAmount,
+            refundAmount = dto.refundAmount,
+            brokerFee = dto.brokerFee,
+            note = dto.note,
+            canceledAt = dto.canceledAt,
+            status = dto.status,
+        )
+    }
+}

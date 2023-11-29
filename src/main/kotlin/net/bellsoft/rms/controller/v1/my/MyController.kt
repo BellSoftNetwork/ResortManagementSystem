@@ -8,9 +8,9 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import net.bellsoft.rms.controller.common.dto.SingleResponse
 import net.bellsoft.rms.controller.v1.my.dto.MyPatchRequest
 import net.bellsoft.rms.domain.user.User
-import net.bellsoft.rms.mapper.model.PatchDtoMapper
 import net.bellsoft.rms.mapper.model.UserMapper
 import net.bellsoft.rms.service.auth.AuthService
+import net.bellsoft.rms.service.auth.dto.UserPatchDto
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PatchMapping
@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController
 class MyController(
     private val authService: AuthService,
     private val userMapper: UserMapper,
-    private val patchDtoMapper: PatchDtoMapper,
 ) {
     @Operation(summary = "로그인 계정 정보", description = "로그인 계정 정보 조회")
     @ApiResponses(
@@ -48,6 +47,6 @@ class MyController(
     )
     @PatchMapping
     fun updateMySelf(@AuthenticationPrincipal user: User, @RequestBody request: MyPatchRequest) = SingleResponse
-        .of(authService.updateAccount(user.id, patchDtoMapper.toDto(request)))
+        .of(authService.updateAccount(user.id, UserPatchDto.of(request)))
         .toResponseEntity()
 }

@@ -8,8 +8,8 @@ import jakarta.validation.Valid
 import mu.KLogging
 import net.bellsoft.rms.controller.common.dto.SingleResponse
 import net.bellsoft.rms.controller.v1.auth.dto.UserRegistrationRequest
-import net.bellsoft.rms.mapper.model.UserMapper
 import net.bellsoft.rms.service.auth.AuthService
+import net.bellsoft.rms.service.auth.dto.UserCreateDto
 import org.springframework.http.HttpStatus
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/auth")
 class AuthController(
     private val authService: AuthService,
-    private val userMapper: UserMapper,
 ) {
     @Operation(summary = "회원가입", description = "회원가입 처리")
     @ApiResponses(
@@ -36,7 +35,7 @@ class AuthController(
         @RequestBody @Valid
         userRegistrationRequest: UserRegistrationRequest,
     ) = SingleResponse
-        .of((authService.register(userMapper.toDto(userRegistrationRequest))))
+        .of((authService.register(UserCreateDto.of(userRegistrationRequest))))
         .toResponseEntity(HttpStatus.CREATED)
 
     companion object : KLogging()

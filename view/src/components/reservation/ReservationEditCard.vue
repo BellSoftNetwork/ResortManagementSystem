@@ -212,39 +212,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeMount, ref } from "vue"
-import { useRouter } from "vue-router"
-import { useQuasar } from "quasar"
-import RoomSelectTable from "components/room/RoomSelectTable.vue"
-import {
-  formatDate,
-  formatDiffDays,
-  formatPrice,
-  formatStayCaption,
-  formatStayTitle,
-} from "src/util/format-util"
-import {
-  Reservation,
-  reservationDynamicRules,
-  reservationStaticRules,
-} from "src/schema/reservation"
-import {
-  fetchReservation,
-  patchReservation,
-  ReservationPatchParams,
-} from "src/api/v1/reservation"
-import { fetchReservationMethods } from "src/api/v1/reservation-method"
-import { formatSortParam } from "src/util/query-string-util"
-import { Room } from "src/schema/room"
-import { getPatchedFormData } from "src/util/data-util"
+import { computed, onBeforeMount, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useQuasar } from "quasar";
+import RoomSelectTable from "components/room/RoomSelectTable.vue";
+import { formatDate, formatDiffDays, formatPrice, formatStayCaption, formatStayTitle } from "src/util/format-util";
+import { Reservation, reservationDynamicRules, reservationStaticRules } from "src/schema/reservation";
+import { fetchReservation, patchReservation, ReservationPatchParams } from "src/api/v1/reservation";
+import { fetchReservationMethods } from "src/api/v1/reservation-method";
+import { formatSortParam } from "src/util/query-string-util";
+import { Room } from "src/schema/room";
+import { getPatchedFormData } from "src/util/data-util";
 
-const router = useRouter()
-const $q = useQuasar()
+const router = useRouter();
+const $q = useQuasar();
 
 const props = defineProps<{
   id: number;
 }>();
-const id = props.id
+const id = props.id;
 const entity = ref<
   {
     reservationMethodId: number;
@@ -274,7 +260,7 @@ const formModel = ref({
   note: "",
   status: "PENDING",
 });
-const selectedRoom = ref<Room[]>([])
+const selectedRoom = ref<Room[]>([]);
 const status = ref({
   isProgress: false,
 });
@@ -314,48 +300,48 @@ function setReservation(reservation: Reservation) {
 }
 
 function fetchData() {
-  status.value.isProgress = true
+  status.value.isProgress = true;
 
   return fetchReservation(id)
     .then((response) => {
-      setReservation(response.value)
+      setReservation(response.value);
     })
     .catch((error) => {
-      if (error.response.status === 404) router.push({ name: "ErrorNotFound" })
+      if (error.response.status === 404) router.push({ name: "ErrorNotFound" });
 
-      console.log(error)
+      console.log(error);
     })
     .finally(() => {
-      status.value.isProgress = false
+      status.value.isProgress = false;
     });
 }
 
 function loadReservationMethods() {
-  reservationMethods.value.status.isLoading = true
-  reservationMethods.value.status.isLoaded = false
-  reservationMethods.value.values = []
+  reservationMethods.value.status.isLoading = true;
+  reservationMethods.value.status.isLoaded = false;
+  reservationMethods.value.values = [];
 
   return fetchReservationMethods({
     sort: formatSortParam({ field: "name" }),
   })
     .then((response) => {
-      reservationMethods.value.values = response.values
+      reservationMethods.value.values = response.values;
 
-      reservationMethods.value.status.isLoaded = true
+      reservationMethods.value.status.isLoaded = true;
     })
     .finally(() => {
-      reservationMethods.value.status.isLoading = false
+      reservationMethods.value.status.isLoading = false;
     });
 }
 
 function update() {
-  status.value.isProgress = true
+  status.value.isProgress = true;
 
   patchReservation(id, patchedData())
     .then(() => {
-      router.push({ name: "Reservation", params: { id: id } })
+      router.push({ name: "Reservation", params: { id: id } });
 
-      resetForm()
+      resetForm();
     })
     .catch((error) => {
       $q.notify({
@@ -371,7 +357,7 @@ function update() {
       });
     })
     .finally(() => {
-      status.value.isProgress = false
+      status.value.isProgress = false;
     });
 }
 
@@ -387,15 +373,15 @@ function getFormData(): ReservationPatchParams {
     stayEndAt: formModel.value.stayDate?.to,
   };
 
-  delete formData.id
-  delete formData.reservationMethod
-  delete formData.stayDate
+  delete formData.id;
+  delete formData.reservationMethod;
+  delete formData.stayDate;
 
-  return formData
+  return formData;
 }
 
 function patchedData(): ReservationPatchParams {
-  return getPatchedFormData(entity.value, getFormData())
+  return getPatchedFormData(entity.value, getFormData());
 }
 
 function changePrice() {
@@ -404,17 +390,17 @@ function changePrice() {
 }
 
 function resetForm() {
-  Object.assign(formModel.value, entity.value)
-  formModel.value.stayDate.from = formatDate(entity.value?.stayStartAt)
-  formModel.value.stayDate.to = formatDate(entity.value?.stayEndAt)
+  Object.assign(formModel.value, entity.value);
+  formModel.value.stayDate.from = formatDate(entity.value?.stayStartAt);
+  formModel.value.stayDate.to = formatDate(entity.value?.stayEndAt);
 }
 
 onBeforeMount(() => {
   fetchData().then(() => {
-    if (entity.value === undefined) return
+    if (entity.value === undefined) return;
 
-    resetForm()
-    selectedRoom.value = [entity.value.room]
+    resetForm();
+    if (entity.value.room) selectedRoom.value = [entity.value.room];
     loadReservationMethods().then(() => {
       formModel.value.reservationMethod = reservationMethods.value.values.find(
         (item) => item.id === entity.value.reservationMethod.id,

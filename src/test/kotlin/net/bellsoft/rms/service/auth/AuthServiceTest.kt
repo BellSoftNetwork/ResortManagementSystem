@@ -98,13 +98,13 @@ internal class AuthServiceTest(
             }
 
             When("기존 사용자 ID 와 다른 ID 로 가입 요청 시") {
-                val userCreateDto: UserCreateDto = fixture {
+                val newUserCreateDto: UserCreateDto = fixture {
                     property(UserCreateDto::email) { "new@mail.com" }
                 }
-                val newUser = authService.register(userCreateDto)
+                val newUser = authService.register(newUserCreateDto)
 
                 Then("정상적으로 가입된다") {
-                    newUser.email shouldBe userCreateDto.email
+                    newUser.email shouldBe newUserCreateDto.email
                 }
             }
 
@@ -157,9 +157,6 @@ internal class AuthServiceTest(
                 val account = accounts.first()
                 val userPatchDto = UserPatchDto(
                     name = JsonNullable.of("변경된 이름"),
-                    password = JsonNullable.undefined(),
-                    isLock = JsonNullable.undefined(),
-                    role = JsonNullable.undefined(),
                 )
                 val result = authService.updateAccount(account.id, userPatchDto)
 

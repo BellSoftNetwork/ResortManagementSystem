@@ -53,7 +53,7 @@ internal class RoomServiceTest(
             When("전체 객실 정보를 조회하면") {
                 val entityListDto = roomService.findAll(
                     PageRequest.of(0, 10),
-                    RoomFilterDto(stayStartAt = null, stayEndAt = null, status = null),
+                    RoomFilterDto(),
                 )
 
                 Then("빈 객실 목록이 반환 된다") {
@@ -125,7 +125,7 @@ internal class RoomServiceTest(
             When("전체 객실 정보를 조회하면") {
                 val entityListDto = roomService.findAll(
                     PageRequest.of(0, 10),
-                    RoomFilterDto(stayStartAt = null, stayEndAt = null, status = null),
+                    RoomFilterDto(),
                 )
 
                 Then("10개의 객실 정보가 반환 된다") {
@@ -168,11 +168,6 @@ internal class RoomServiceTest(
                     room.id,
                     RoomPatchDto(
                         number = JsonNullable.of("UPDATED"),
-                        peekPrice = JsonNullable.undefined(),
-                        offPeekPrice = JsonNullable.undefined(),
-                        description = JsonNullable.undefined(),
-                        note = JsonNullable.undefined(),
-                        status = JsonNullable.undefined(),
                     ),
                 )
 
@@ -251,7 +246,7 @@ internal class RoomServiceTest(
             When("활성 상태의 예약 가능한 객실 정보를 조회하면") {
                 val entityListDto = roomService.findAll(
                     PageRequest.of(0, 10),
-                    RoomFilterDto(status = RoomStatus.NORMAL, stayStartAt = null, stayEndAt = null),
+                    RoomFilterDto(status = RoomStatus.NORMAL),
                 )
 
                 Then("0개의 객실 정보가 반환된다") {
@@ -333,7 +328,6 @@ internal class RoomServiceTest(
                     RoomFilterDto(
                         stayStartAt = LocalDate.of(2023, 11, 10),
                         stayEndAt = LocalDate.of(2023, 11, 11),
-                        status = null,
                     ),
                 )
 
@@ -458,7 +452,6 @@ internal class RoomServiceTest(
                     RoomFilterDto(
                         stayStartAt = LocalDate.of(2023, 11, 10),
                         stayEndAt = LocalDate.of(2023, 11, 20),
-                        status = null,
                     ),
                 )
 
@@ -494,7 +487,6 @@ internal class RoomServiceTest(
                     RoomFilterDto(
                         stayStartAt = LocalDate.of(2023, 11, 10),
                         stayEndAt = LocalDate.of(2023, 11, 20),
-                        status = null,
                     ),
                 )
 

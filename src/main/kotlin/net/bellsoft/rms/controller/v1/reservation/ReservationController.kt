@@ -13,9 +13,10 @@ import net.bellsoft.rms.controller.v1.reservation.dto.ReservationCreateRequest
 import net.bellsoft.rms.controller.v1.reservation.dto.ReservationPatchRequest
 import net.bellsoft.rms.controller.v1.reservation.dto.ReservationRequestFilter
 import net.bellsoft.rms.domain.user.User
-import net.bellsoft.rms.mapper.model.PatchDtoMapper
-import net.bellsoft.rms.mapper.model.ReservationMapper
 import net.bellsoft.rms.service.reservation.ReservationService
+import net.bellsoft.rms.service.reservation.dto.ReservationCreateDto
+import net.bellsoft.rms.service.reservation.dto.ReservationFilterDto
+import net.bellsoft.rms.service.reservation.dto.ReservationPatchDto
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.annotation.Secured
@@ -38,8 +39,6 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/reservations")
 class ReservationController(
     private val reservationService: ReservationService,
-    private val reservationMapper: ReservationMapper,
-    private val patchDtoMapper: PatchDtoMapper,
 ) {
     @Operation(summary = "예약 리스트", description = "예약 리스트 조회")
     @ApiResponses(
@@ -52,7 +51,7 @@ class ReservationController(
         pageable: Pageable,
         filter: ReservationRequestFilter,
     ) = ListResponse
-        .of(reservationService.findAll(pageable, reservationMapper.toDto(filter)), filter)
+        .of(reservationService.findAll(pageable, ReservationFilterDto.of(filter)), filter)
         .toResponseEntity()
 
     @Operation(summary = "예약 조회", description = "예약 단건 조회")
@@ -80,7 +79,7 @@ class ReservationController(
         @RequestBody @Valid
         request: ReservationCreateRequest,
     ) = SingleResponse
-        .of(reservationService.create(reservationMapper.toDto(request)))
+        .of(reservationService.create(ReservationCreateDto.of(request)))
 
     @Operation(summary = "예약 수정", description = "기존 예약 정보 수정")
     @ApiResponses(
@@ -97,7 +96,7 @@ class ReservationController(
         @RequestBody @Valid
         request: ReservationPatchRequest,
     ) = SingleResponse
-        .of(reservationService.update(id, patchDtoMapper.toDto(request)))
+        .of(reservationService.update(id, ReservationPatchDto.of(request)))
         .toResponseEntity()
 
     @Operation(summary = "예약 삭제", description = "기존 예약 삭제")
