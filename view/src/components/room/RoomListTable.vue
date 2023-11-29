@@ -5,9 +5,9 @@
     v-model:pagination="pagination"
     :loading="status.isLoading"
     :columns="columns"
-    :rows="responseData.values"
+    :rows="rooms"
     :filter="filter"
-    style="height: 90vh;"
+    style="height: 90vh"
     row-key="id"
     title="객실"
     flat
@@ -43,26 +43,41 @@
 
     <template #body-cell-actions="props">
       <q-td key="actions" :props="props">
-        <q-btn dense round flat color="grey" icon="edit"
-               :to="{ name: 'EditRoom', params: { id: props.row.id } }"></q-btn>
-        <q-btn dense round flat color="grey" icon="delete" @click="deleteItem(props.row)"></q-btn>
+        <q-btn
+          dense
+          round
+          flat
+          color="grey"
+          icon="edit"
+          :to="{ name: 'EditRoom', params: { id: props.row.id } }"
+        ></q-btn>
+        <q-btn
+          dense
+          round
+          flat
+          color="grey"
+          icon="delete"
+          @click="deleteItem(props.row)"
+        ></q-btn>
       </q-td>
     </template>
   </q-table>
 </template>
 
-<script setup>
-import { onBeforeMount, onMounted, ref } from "vue"
-import dayjs from "dayjs"
+<script setup lang="ts">
+import { onMounted, ref } from "vue"
 import { useQuasar } from "quasar"
-import { api } from "boot/axios"
+import { getRoomFieldDetail, Room } from "src/schema/room"
+import { convertTableColumnDef } from "src/util/table-util"
+import { deleteRoom, fetchRooms } from "src/api/v1/room"
+import { formatSortParam } from "src/util/query-string-util"
 
 const $q = useQuasar()
 const status = ref({
   isLoading: false,
   isLoaded: false,
   isPatching: false,
-})
+});
 const tableRef = ref()
 const filter = ref("")
 const pagination = ref({
@@ -71,65 +86,48 @@ const pagination = ref({
   page: 1,
   rowsPerPage: 15,
   rowsNumber: 10,
-})
+});
 const columns = [
   {
-    name: "number",
-    field: "number",
-    label: "객실 번호",
+    ...getColumnDef("number"),
     align: "left",
     required: true,
     sortable: true,
   },
   {
-    name: "peekPrice",
-    field: "peekPrice",
-    label: "성수기 예약금",
+    ...getColumnDef("peekPrice"),
     align: "left",
     headerStyle: "width: 10%",
     required: true,
     sortable: true,
-    format: (value) => formatPrice(value),
   },
   {
-    name: "offPeekPrice",
-    field: "offPeekPrice",
-    label: "비성수기 예약금",
+    ...getColumnDef("offPeekPrice"),
     align: "left",
     headerStyle: "width: 10%",
     required: true,
     sortable: true,
-    format: (value) => formatPrice(value),
   },
   {
-    name: "status",
-    field: "status",
-    label: "상태",
+    ...getColumnDef("status"),
     align: "left",
     headerStyle: "width: 10%",
     required: true,
     sortable: true,
-    format: (value) => formatStatus(value),
   },
   {
-    name: "createdAt",
-    field: "createdAt",
-    label: "생성 시각",
+    ...getColumnDef("createdAt"),
     align: "left",
     headerStyle: "width: 15%",
     required: true,
     sortable: true,
-    format: val => dayjs(val).format("YYYY-MM-DD HH:mm:ss"),
   },
   {
-    name: "updatedAt",
-    field: "updatedAt",
-    label: "수정 시각",
+    ...getColumnDef("updatedAt"),
     align: "left",
     headerStyle: "width: 15%",
     required: true,
     sortable: true,
-    format: val => dayjs(val).format("YYYY-MM-DD HH:mm:ss"),
   },
   {
     name: "actions",
@@ -137,26 +135,12 @@ const columns = [
     align: "center",
     headerStyle: "width: 5%",
   },
-]
-const responseData = ref({
-  page: {
-    index: 0,
-    size: 0,
-    totalPages: 0,
-    totalElements: 0,
-  },
-  values: [
-    {
-      id: 1,
-      number: "101",
-      peekPrice: 100000,
-      offPeekPrice: 80000,
-      status: "ACTIVE",
-      createdAt: "2021-01-01T00:00:00.000Z",
-      updatedAt: "2021-01-01T00:00:00.000Z",
-    },
-  ],
-})
+];
+const rooms = ref<Room[]>()
+
+function getColumnDef(field: string) {
+  return convertTableColumnDef(getRoomFieldDetail(field))
+}
 
 function onRequest(props) {
   const { page, rowsPerPage, sortBy, descending } = props.pagination
@@ -164,10 +148,15 @@ function onRequest(props) {
   status.value.isLoading = true
   status.value.isLoaded = false
 
-  api.get(`/api/v1/rooms?size=${rowsPerPage}&page=${page - 1}&sort=${sortBy},${descending ? "desc" : "asc"}`)
-    .then(response => {
-      responseData.value = response.data
-      const page = responseData.value.page
+  fetchRooms({
+    page: page - 1,
+    size: rowsPerPage,
+    sort: formatSortParam({ field: sortBy, isDescending: descending }),
+  })
+    .then((response) => {
+      rooms.value = response.values
+
+      const page = response.page
 
       pagination.value.rowsNumber = page.totalElements
       pagination.value.page = page.index + 1
@@ -176,16 +165,17 @@ function onRequest(props) {
       pagination.value.descending = descending
 
       status.value.isLoaded = true
-    }).finally(() => {
-    status.value.isLoading = false
-  })
+    })
+    .finally(() => {
+      status.value.isLoading = false
+    });
 }
 
 function reloadData() {
   tableRef.value.requestServerInteraction()
 }
 
-function deleteItem(row) {
+function deleteItem(row: Room) {
   const itemId = row.id
   const itemName = row.number
 
@@ -203,7 +193,7 @@ function deleteItem(row) {
     },
     focus: "cancel",
   }).onOk(() => {
-    api.delete(`/api/v1/rooms/${itemId}`)
+    deleteRoom(itemId)
       .then(() => {
         reloadData()
       })
@@ -213,45 +203,17 @@ function deleteItem(row) {
           type: "negative",
           actions: [
             {
-              icon: "close", color: "white", round: true,
+              icon: "close",
+              color: "white",
+              round: true,
             },
           ],
-        })
-      })
-  })
+        });
+      });
+  });
 }
-
-function formatPrice(value) {
-  return new Intl.NumberFormat("ko-KR", {
-    style: "currency",
-    currency: "KRW",
-  }).format(value)
-}
-
-function formatStatus(value) {
-  switch (value) {
-    case "NORMAL":
-      return "정상"
-    case "INACTIVE":
-      return "이용불가"
-    case "DAMAGED":
-      return "파손"
-    case "CONSTRUCTION":
-      return "공사 중"
-    default:
-      return value
-  }
-}
-
-function resetData() {
-  responseData.value.values = []
-}
-
-onBeforeMount(() => {
-  resetData()
-})
 
 onMounted(() => {
   reloadData()
-})
+});
 </script>

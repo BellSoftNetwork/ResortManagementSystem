@@ -10,7 +10,7 @@
   </q-layout>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue"
 import TopHeader from "./TopHeader.vue"
 import LeftDrawer from "./LeftDrawer.vue"

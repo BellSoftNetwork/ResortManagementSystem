@@ -1,6 +1,7 @@
 import DefaultLayout from "layouts/default/DefaultLayout.vue"
+import { RouteRecordRaw } from "vue-router"
 
-const routes = [
+const routes: RouteRecordRaw[] = [
   {
     path: "/",
     component: DefaultLayout,
@@ -100,7 +101,8 @@ const routes = [
       {
         path: "",
         name: "ReservationMethods",
-        component: () => import("pages/reservation-method/ReservationMethodList.vue"),
+        component: () =>
+          import("pages/reservation-method/ReservationMethodList.vue"),
       },
     ],
   },
@@ -182,6 +184,6 @@ const routes = [
     path: "/:catchAll(.*)*",
     component: () => import("pages/error/ErrorNotFound.vue"),
   },
-]
+];
 
 export default routes

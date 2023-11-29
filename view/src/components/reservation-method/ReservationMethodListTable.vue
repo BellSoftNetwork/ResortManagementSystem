@@ -5,9 +5,9 @@
     v-model:pagination="pagination"
     :loading="status.isLoading"
     :columns="columns"
-    :rows="responseData.values"
+    :rows="reservationMethods"
     :filter="filter"
-    style="height: 90vh;"
+    style="height: 90vh"
     row-key="id"
     title="예약 수단"
     flat
@@ -17,7 +17,7 @@
     <template v-slot:top-right>
       <div class="row q-gutter-sm">
         <ReservationMethodCreateDialog
-          v-slot="{dialog}"
+          v-slot="{ dialog }"
           @complete="reloadData"
         >
           <q-btn
@@ -45,7 +45,7 @@
             @keyup.enter="updateScope(props.row, scope, 'name')"
             :loading="status.isPatching"
             :disable="status.isPatching"
-            :rules="rules.name"
+            :rules="reservationMethodStaticRules.name"
             ref="inputRef"
             dense
             autofocus
@@ -57,18 +57,25 @@
 
     <template #body-cell-commissionRate="props">
       <q-td key="commissionRate" :props="props">
-        {{ commissionRateFormatter(props.row.commissionRate) }}
+        {{ formatCommissionRate(props.row.commissionRate) }}
         <q-popup-edit
           v-slot="scope"
           :model-value="props.row.commissionRate * 100"
           :persistent="status.isPatching"
         >
           <q-input
-            v-model="scope.value"
-            @keyup.enter="updateScope(props.row, scope, 'commissionRate', (value) => value / 100)"
+            v-model.number="scope.value"
+            @keyup.enter="
+              updateScope(
+                props.row,
+                scope,
+                'commissionRate',
+                (value) => value / 100,
+              )
+            "
             :loading="status.isPatching"
             :disable="status.isPatching"
-            :rules="rules.commissionRatePercent"
+            :rules="reservationMethodStaticRules.commissionRatePercent"
             ref="inputRef"
             type="number"
             dense
@@ -92,7 +99,9 @@
         >
           <q-checkbox
             v-model="scope.value"
-            @update:model-value="updateScope(props.row, scope, 'requireUnpaidAmountCheck')"
+            @update:model-value="
+              updateScope(props.row, scope, 'requireUnpaidAmountCheck')
+            "
             :loading="status.isPatching"
             :disable="status.isPatching"
             label="미수금 금액 알림"
@@ -104,25 +113,43 @@
 
     <template #body-cell-actions="props">
       <q-td key="actions" :props="props">
-        <q-btn dense round flat color="grey" icon="delete" @click="deleteItem(props.row)"></q-btn>
+        <q-btn
+          dense
+          round
+          flat
+          color="grey"
+          icon="delete"
+          @click="deleteItem(props.row)"
+        ></q-btn>
       </q-td>
     </template>
   </q-table>
 </template>
 
-<script setup>
-import { onBeforeMount, onMounted, ref } from "vue"
-import dayjs from "dayjs"
+<script setup lang="ts">
+import { onMounted, ref } from "vue"
 import { useQuasar } from "quasar"
 import ReservationMethodCreateDialog from "components/reservation-method/ReservationMethodCreateDialog.vue"
-import { api } from "boot/axios"
+import {
+  getReservationMethodFieldDetail,
+  ReservationMethod,
+  reservationMethodStaticRules,
+} from "src/schema/reservation-method";
+import { convertTableColumnDef } from "src/util/table-util"
+import { formatCommissionRate } from "src/util/format-util"
+import {
+  deleteReservationMethod,
+  fetchReservationMethods,
+  patchReservationMethod,
+} from "src/api/v1/reservation-method";
+import { formatSortParam } from "src/util/query-string-util"
 
 const $q = useQuasar()
 const status = ref({
   isLoading: false,
   isLoaded: false,
   isPatching: false,
-})
+});
 const tableRef = ref()
 const inputRef = ref(null)
 const filter = ref("")
@@ -132,59 +159,41 @@ const pagination = ref({
   page: 1,
   rowsPerPage: 15,
   rowsNumber: 10,
-})
-const rules = {
-  name: [value => (value.length >= 2 && value.length <= 20) || "2~20 글자가 필요합니다"],
-  commissionRatePercent: [value => (value >= 0 && value <= 100) || "수수료율이 유효하지 않습니다."],
-}
+});
 const columns = [
   {
-    name: "name",
-    field: "name",
-    label: "이름",
+    ...getColumnDef("name"),
     align: "left",
     required: true,
     sortable: true,
   },
   {
-    name: "commissionRate",
-    field: "commissionRate",
-    label: "수수료율",
+    ...getColumnDef("commissionRate"),
     align: "left",
     headerStyle: "width: 10%",
     required: true,
     sortable: true,
-    format: value => commissionRateFormatter(value),
   },
   {
-    name: "requireUnpaidAmountCheck",
-    field: "requireUnpaidAmountCheck",
-    label: "미수금 금액 알림",
+    ...getColumnDef("requireUnpaidAmountCheck"),
     align: "left",
     headerStyle: "width: 10%",
     required: true,
     sortable: true,
-    format: value => value ? "활성" : "비활성",
   },
   {
-    name: "createdAt",
-    field: "createdAt",
-    label: "생성 시각",
+    ...getColumnDef("createdAt"),
     align: "left",
     headerStyle: "width: 15%",
     required: true,
     sortable: true,
-    format: value => dayjs(value).format("YYYY-MM-DD HH:mm:ss"),
   },
   {
-    name: "updatedAt",
-    field: "updatedAt",
-    label: "수정 시각",
+    ...getColumnDef("updatedAt"),
     align: "left",
     headerStyle: "width: 15%",
     required: true,
     sortable: true,
-    format: value => dayjs(value).format("YYYY-MM-DD HH:mm:ss"),
   },
   {
     name: "actions",
@@ -192,24 +201,12 @@ const columns = [
     align: "center",
     headerStyle: "width: 5%",
   },
-]
-const responseData = ref({
-  page: {
-    index: 0,
-    size: 0,
-    totalPages: 0,
-    totalElements: 0,
-  },
-  values: [
-    {
-      id: 1,
-      name: "네이버",
-      commissionRate: 0.1,
-      createdAt: "2021-01-01T00:00:00.000Z",
-      updatedAt: "2021-01-01T00:00:00.000Z",
-    },
-  ],
-})
+];
+const reservationMethods = ref<ReservationMethod[]>()
+
+function getColumnDef(field: string) {
+  return convertTableColumnDef(getReservationMethodFieldDetail(field))
+}
 
 function onRequest(props) {
   const { page, rowsPerPage, sortBy, descending } = props.pagination
@@ -217,10 +214,14 @@ function onRequest(props) {
   status.value.isLoading = true
   status.value.isLoaded = false
 
-  api.get(`/api/v1/reservation-methods?size=${rowsPerPage}&page=${page - 1}&sort=${sortBy},${descending ? "desc" : "asc"}`)
-    .then(response => {
-      responseData.value = response.data
-      const page = responseData.value.page
+  fetchReservationMethods({
+    page: page - 1,
+    size: rowsPerPage,
+    sort: formatSortParam({ field: sortBy, isDescending: descending }),
+  })
+    .then((response) => {
+      reservationMethods.value = response.values
+      const page = response.page
 
       pagination.value.rowsNumber = page.totalElements
       pagination.value.page = page.index + 1
@@ -229,9 +230,10 @@ function onRequest(props) {
       pagination.value.descending = descending
 
       status.value.isLoaded = true
-    }).finally(() => {
-    status.value.isLoading = false
-  })
+    })
+    .finally(() => {
+      status.value.isLoading = false
+    });
 }
 
 function reloadData() {
@@ -239,32 +241,40 @@ function reloadData() {
 }
 
 function updateScope(row, scope, key, formatter) {
-  if ((inputRef.value && !inputRef.value.validate()) || row[key] === scope.value)
+  if (
+    (inputRef.value && !inputRef.value.validate()) ||
+    row[key] === scope.value
+  )
     return
 
   const patchData = {}
   patchData[key] = formatter ? formatter(scope.value) : scope.value
 
   status.value.isPatching = true
-  api.patch(`/api/v1/reservation-methods/${row.id}`, patchData).then((response) => {
-    scope.set()
-    row[key] = response.data.value[key]
-  }).catch((error) => {
-    $q.notify({
-      message: error.response.data.message,
-      type: "negative",
-      actions: [
-        {
-          icon: "close", color: "white", round: true,
-        },
-      ],
+  patchReservationMethod(row.id, patchData)
+    .then((response) => {
+      scope.set()
+      row[key] = response.value[key]
     })
-  }).finally(() => {
-    status.value.isPatching = false
-  })
+    .catch((error) => {
+      $q.notify({
+        message: error.response.data.message,
+        type: "negative",
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+          },
+        ],
+      });
+    })
+    .finally(() => {
+      status.value.isPatching = false
+    });
 }
 
-function deleteItem(row) {
+function deleteItem(row: ReservationMethod) {
   const itemId = row.id
   const itemName = row.name
 
@@ -282,7 +292,7 @@ function deleteItem(row) {
     },
     focus: "cancel",
   }).onOk(() => {
-    api.delete(`/api/v1/reservation-methods/${itemId}`)
+    deleteReservationMethod(itemId)
       .then(() => {
         reloadData()
       })
@@ -292,27 +302,17 @@ function deleteItem(row) {
           type: "negative",
           actions: [
             {
-              icon: "close", color: "white", round: true,
+              icon: "close",
+              color: "white",
+              round: true,
             },
           ],
-        })
-      })
-  })
+        });
+      });
+  });
 }
-
-function commissionRateFormatter(value) {
-  return value * 100 + "%"
-}
-
-function resetData() {
-  responseData.value.values = []
-}
-
-onBeforeMount(() => {
-  resetData()
-})
 
 onMounted(() => {
   reloadData()
-})
+});
 </script>

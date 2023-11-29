@@ -5,7 +5,7 @@
     v-model:pagination="pagination"
     :loading="status.isLoading"
     :columns="columns"
-    :rows="responseData.values"
+    :rows="reservationHistories"
     :filter="filter"
     row-key="id"
     title="변경 이력"
@@ -16,11 +16,11 @@
     <template #body-cell-historyType="props">
       <q-td key="historyType" :props="props">
         <q-chip
-          :icon="historyTypeMap[props.row.historyType].icon"
-          :color="historyTypeMap[props.row.historyType].color"
+          :icon="REVISION_TYPE_MAP[props.row.historyType].icon"
+          :color="REVISION_TYPE_MAP[props.row.historyType].color"
           outline
         >
-          {{ historyTypeMap[props.row.historyType].name }}
+          {{ REVISION_TYPE_MAP[props.row.historyType].name }}
         </q-chip>
       </q-td>
     </template>
@@ -35,11 +35,11 @@
           >
             <q-card-section horizontal>
               <q-card-section class="bg-blue-3 q-pa-xs">
-                {{ columnMap[field] ? columnMap[field].name : field }}
+                {{ formatReservationFieldToLabel(field) }}
               </q-card-section>
 
               <q-card-section class="bg-grey-4 q-pa-xs">
-                {{ columnMap[field] ? formatValue(field, props.row.entity[field]) : props.row.entity[field] }}
+                {{ formatReservationValue(field, props.row.entity[field]) }}
               </q-card-section>
             </q-card-section>
           </q-card>
@@ -49,21 +49,26 @@
   </q-table>
 </template>
 
-<script setup>
-import { onBeforeMount, onMounted, ref } from "vue"
-import dayjs from "dayjs"
-import { useQuasar } from "quasar"
-import { api } from "boot/axios"
+<script setup lang="ts">
+import { onMounted, ref } from "vue"
+import { formatDateTime } from "src/util/format-util"
+import {
+  formatReservationFieldToLabel,
+  formatReservationValue,
+  Reservation,
+} from "src/schema/reservation"
+import { Revision, REVISION_TYPE_MAP } from "src/schema/revision"
+import { formatSortParam } from "src/util/query-string-util"
+import { fetchReservationHistories } from "src/api/v1/reservation"
 
-const $q = useQuasar()
-const props = defineProps({
-  id: Number,
-})
+const props = defineProps<{
+  id: number;
+}>();
 const status = ref({
   isLoading: false,
   isLoaded: false,
   isPatching: false,
-})
+});
 const tableRef = ref()
 const filter = ref("")
 const pagination = ref({
@@ -72,7 +77,7 @@ const pagination = ref({
   page: 1,
   rowsPerPage: 15,
   rowsNumber: 10,
-})
+});
 const columns = [
   {
     name: "historyType",
@@ -97,52 +102,10 @@ const columns = [
     headerStyle: "width: 15%",
     required: true,
     sortable: true,
-    format: val => dayjs(val).format("YYYY-MM-DD HH:mm:ss"),
+    format: formatDateTime,
   },
-]
-const responseData = ref({
-  page: {
-    index: 0,
-    size: 0,
-    totalPages: 0,
-    totalElements: 0,
-  },
-  values: [
-    {
-      entity: {
-        name: "101",
-      },
-      historyCreatedAt: "2021-01-01T00:00:00.000Z",
-      historyType: "CREATED",
-      updatedFields: ["number"],
-    },
-  ],
-})
-const columnMap = {
-  name: { name: "예약자명" },
-  reservationMethod: { name: "예약 수단", format: (value) => value.name },
-  room: { name: "객실", format: (value) => value ? value.number : "미배정" },
-  phone: { name: "예약자 연락처", format: (value) => value || "-" },
-  peopleCount: { name: "예약인원" },
-  stayStartAt: { name: "입실일", format: (value) => dayjs(value).format("YYYY-MM-DD") },
-  stayEndAt: { name: "퇴실일", format: (value) => dayjs(value).format("YYYY-MM-DD") },
-  checkInAt: { name: "체크인 시각", format: (value) => dayjs(value).format("YYYY-MM-DD HH:mm:ss") },
-  checkOutAt: { name: "체크아웃 시각", format: (value) => dayjs(value).format("YYYY-MM-DD HH:mm:ss") },
-  price: { name: "판매 금액", format: (value) => formatPrice(value) },
-  paymentAmount: { name: "누적 결제 금액", format: (value) => formatPrice(value) },
-  refundAmount: { name: "환불 금액", format: (value) => formatPrice(value) },
-  brokerFee: { name: "예약 수단 수수료", format: (value) => formatPrice(value) },
-  note: { name: "메모" },
-  status: { name: "상태", format: (value) => formatStatus(value) },
-  canceledAt: { name: "취소 시각", format: (value) => dayjs(value).format("YYYY-MM-DD HH:mm:ss") },
-  createdBy: { name: "등록자", format: (value) => formatPrice(value.name) },
-  updatedBy: { name: "수정자", format: (value) => formatPrice(value.name) },
-}
-const historyTypeMap = {
-  CREATED: { name: "생성", color: "primary", icon: "add" },
-  UPDATED: { name: "변경", color: "warning", icon: "edit" },
-  DELETED: { name: "삭제", color: "red", icon: "remove" },
-}
+];
+const reservationHistories = ref<Revision<Reservation>[]>()
 
 function onRequest(tableProps) {
   const { page, rowsPerPage, sortBy, descending } = tableProps.pagination
@@ -150,10 +113,14 @@ function onRequest(tableProps) {
   status.value.isLoading = true
   status.value.isLoaded = false
 
-  api.get(`/api/v1/reservations/${props.id}/histories?size=${rowsPerPage}&page=${page - 1}&sort=${sortBy},${descending ? "desc" : "asc"}`)
-    .then(response => {
-      responseData.value = response.data
-      const page = responseData.value.page
+  fetchReservationHistories(props.id, {
+    page: page - 1,
+    size: rowsPerPage,
+    sort: formatSortParam({ field: sortBy, isDescending: descending }),
+  })
+    .then((response) => {
+      reservationHistories.value = response.values
+      const page = response.page
 
       pagination.value.rowsNumber = page.totalElements
       pagination.value.page = page.index + 1
@@ -162,50 +129,17 @@ function onRequest(tableProps) {
       pagination.value.descending = descending
 
       status.value.isLoaded = true
-    }).finally(() => {
-    status.value.isLoading = false
-  })
+    })
+    .finally(() => {
+      status.value.isLoading = false
+    });
 }
 
 function reloadData() {
   tableRef.value.requestServerInteraction()
 }
 
-function formatValue(field, value) {
-  return columnMap[field].format ? columnMap[field].format(value) : value
-}
-
-function formatPrice(value) {
-  return new Intl.NumberFormat("ko-KR", {
-    style: "currency",
-    currency: "KRW",
-  }).format(value)
-}
-
-function formatStatus(value) {
-  switch (value) {
-    case "NORMAL":
-      return "예약 확정"
-    case "PENDING":
-      return "예약 대기"
-    case "CANCEL":
-      return "취소 요청"
-    case "REFUND":
-      return "환불 완료"
-    default:
-      return value
-  }
-}
-
-function resetData() {
-  responseData.value.values = []
-}
-
-onBeforeMount(() => {
-  resetData()
-})
-
 onMounted(() => {
   reloadData()
-})
+});
 </script>

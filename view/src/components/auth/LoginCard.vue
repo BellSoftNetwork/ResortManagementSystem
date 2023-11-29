@@ -1,7 +1,8 @@
 <template>
   <q-card
     :loading="status.isProgress"
-    class="q-pa-lg shadow-1" style="min-width: 400px;"
+    class="q-pa-lg shadow-1"
+    style="min-width: 400px"
     square
     bordered
   >
@@ -14,7 +15,7 @@
         <q-input
           v-model="formData.email"
           label="이메일"
-          :rules="rules.email"
+          :rules="userStaticRules.email"
           :disabled="status.isProgress"
           required
           autofocus
@@ -24,7 +25,7 @@
           v-model="formData.password"
           type="password"
           label="비밀번호"
-          :rules="rules.password"
+          :rules="userStaticRules.password"
           :disabled="status.isProgress"
           required
         ></q-input>
@@ -58,12 +59,13 @@
   </q-card>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { onBeforeMount, ref } from "vue"
 import { useRouter } from "vue-router"
-import { useAuthStore } from "stores/auth.js"
+import { useAuthStore } from "stores/auth"
 import { useQuasar } from "quasar"
-import { useAppConfigStore } from "stores/appConfig"
+import { useAppConfigStore } from "stores/app-config"
+import { userStaticRules } from "src/schema/user"
 
 const router = useRouter()
 const $q = useQuasar()
@@ -72,20 +74,17 @@ const appConfigStore = useAppConfigStore()
 
 const status = ref({
   isProgress: false,
-})
+});
 const formData = ref({
   email: "",
   password: "",
-})
-const rules = {
-  email: [value => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) || "이메일이 유효하지 않습니다."],
-  password: [value => (value?.length >= 8 && value?.length <= 20) || "비밀번호는 8~20 글자가 필요합니다."],
-}
+});
 
 function login() {
   status.value.isProgress = true
 
-  authStore.login(formData.value.email, formData.value.password)
+  authStore
+    .login(formData.value.email, formData.value.password)
     .then(() => {
       router.push({ name: "Home" })
     })
@@ -95,17 +94,19 @@ function login() {
         type: "negative",
         actions: [
           {
-            icon: "close", color: "white", round: true,
+            icon: "close",
+            color: "white",
+            round: true,
           },
         ],
-      })
+      });
     })
     .finally(() => {
       status.value.isProgress = false
-    })
+    });
 }
 
 onBeforeMount(() => {
   appConfigStore.loadAppConfig()
-})
+});
 </script>

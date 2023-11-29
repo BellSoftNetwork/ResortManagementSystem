@@ -5,9 +5,9 @@
     v-model:pagination="pagination"
     :loading="status.isLoading"
     :columns="columns"
-    :rows="responseData.values"
+    :rows="users"
     :filter="filter"
-    style="height: 90vh;"
+    style="height: 90vh"
     row-key="id"
     title="사용자 계정"
     flat
@@ -16,10 +16,7 @@
   >
     <template v-slot:top-right>
       <div class="row q-gutter-sm">
-        <AccountCreateDialog
-          v-slot="{dialog}"
-          @complete="reloadData"
-        >
+        <AccountCreateDialog v-slot="{ dialog }" @complete="reloadData">
           <q-btn
             @click="dialog.isOpen = true"
             icon="add"
@@ -35,7 +32,7 @@
     <template #body-cell-actions="props">
       <q-td key="actions" :props="props">
         <AccountEditDialog
-          v-slot="{dialog}"
+          v-slot="{ dialog }"
           @complete="reloadData"
           :entity="props.row"
         >
@@ -64,20 +61,25 @@
   </q-table>
 </template>
 
-<script setup>
-import { onBeforeMount, onMounted, ref } from "vue"
-import dayjs from "dayjs"
+<script setup lang="ts">
+import { onMounted, ref } from "vue"
 import { useQuasar } from "quasar"
 import AccountCreateDialog from "components/account/AccountCreateDialog.vue"
 import AccountEditDialog from "components/account/AccountEditDialog.vue"
-import { api } from "boot/axios"
+import { getUserFieldDetail, User } from "src/schema/user"
+import { convertTableColumnDef } from "src/util/table-util"
+import {
+  deleteAdminAccount,
+  fetchAdminAccounts,
+} from "src/api/v1/admin/account"
+import { formatSortParam } from "src/util/query-string-util"
 
 const $q = useQuasar()
 const status = ref({
   isLoading: false,
   isLoaded: false,
   isPatching: false,
-})
+});
 const tableRef = ref()
 const filter = ref("")
 const pagination = ref({
@@ -86,54 +88,41 @@ const pagination = ref({
   page: 1,
   rowsPerPage: 15,
   rowsNumber: 10,
-})
+});
 const columns = [
   {
-    name: "name",
-    field: "name",
-    label: "이름",
+    ...getColumnDef("name"),
     align: "left",
     headerStyle: "width: 10%",
     required: true,
     sortable: true,
   },
   {
-    name: "email",
-    field: "email",
-    label: "이메일",
+    ...getColumnDef("email"),
     align: "left",
     required: true,
     sortable: true,
   },
   {
-    name: "role",
-    field: "role",
-    label: "권한",
+    ...getColumnDef("role"),
     align: "left",
     headerStyle: "width: 10%",
     required: true,
     sortable: true,
-    format: val => roleLabelConvert(val),
   },
   {
-    name: "createdAt",
-    field: "createdAt",
-    label: "생성 시각",
+    ...getColumnDef("createdAt"),
     align: "left",
     headerStyle: "width: 15%",
     required: true,
     sortable: true,
-    format: val => dayjs(val).format("YYYY-MM-DD HH:mm:ss"),
   },
   {
-    name: "updatedAt",
-    field: "updatedAt",
-    label: "수정 시각",
+    ...getColumnDef("updatedAt"),
     align: "left",
     headerStyle: "width: 15%",
     required: true,
     sortable: true,
-    format: val => dayjs(val).format("YYYY-MM-DD HH:mm:ss"),
   },
   {
     name: "actions",
@@ -141,27 +130,11 @@ const columns = [
     align: "center",
     headerStyle: "width: 5%",
   },
-]
-const responseData = ref({
-  page: {
-    index: 0,
-    size: 0,
-    totalPages: 0,
-    totalElements: 0,
-  },
-  values: [
-    {
-      id: 1,
-      name: "방울",
-      email: "bell04204@gmail.com",
-      role: "최고 관리자",
-    },
-  ],
-})
-const roleMap = {
-  "NORMAL": "일반",
-  "ADMIN": "관리자",
-  "SUPER_ADMIN": "최고 관리자",
+];
+const users = ref<User[]>()
+
+function getColumnDef(field: string) {
+  return convertTableColumnDef(getUserFieldDetail(field))
 }
 
 function onRequest(props) {
@@ -170,10 +143,14 @@ function onRequest(props) {
   status.value.isLoading = true
   status.value.isLoaded = false
 
-  api.get(`/api/v1/admin/accounts?size=${rowsPerPage}&page=${page - 1}&sort=${sortBy},${descending ? "desc" : "asc"}`)
-    .then(response => {
-      responseData.value = response.data
-      const page = responseData.value.page
+  fetchAdminAccounts({
+    page: page - 1,
+    size: rowsPerPage,
+    sort: formatSortParam({ field: sortBy, isDescending: descending }),
+  })
+    .then((response) => {
+      users.value = response.values
+      const page = response.page
 
       pagination.value.rowsNumber = page.totalElements
       pagination.value.page = page.index + 1
@@ -182,16 +159,17 @@ function onRequest(props) {
       pagination.value.descending = descending
 
       status.value.isLoaded = true
-    }).finally(() => {
-    status.value.isLoading = false
-  })
+    })
+    .finally(() => {
+      status.value.isLoading = false
+    });
 }
 
 function reloadData() {
   tableRef.value.requestServerInteraction()
 }
 
-function deleteItem(row) {
+function deleteItem(row: User) {
   const itemId = row.id
   const itemName = row.name
 
@@ -209,7 +187,7 @@ function deleteItem(row) {
     },
     focus: "cancel",
   }).onOk(() => {
-    api.delete(`/api/v1/admin/accounts/${itemId}`)
+    deleteAdminAccount(itemId)
       .then(() => {
         reloadData()
       })
@@ -219,27 +197,17 @@ function deleteItem(row) {
           type: "negative",
           actions: [
             {
-              icon: "close", color: "white", round: true,
+              icon: "close",
+              color: "white",
+              round: true,
             },
           ],
-        })
-      })
-  })
+        });
+      });
+  });
 }
-
-function roleLabelConvert(role) {
-  return roleMap[role] || role
-}
-
-function resetData() {
-  responseData.value.values = []
-}
-
-onBeforeMount(() => {
-  resetData()
-})
 
 onMounted(() => {
   reloadData()
-})
+});
 </script>

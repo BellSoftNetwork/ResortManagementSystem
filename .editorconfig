@@ -16,3 +16,6 @@ ktlint_standard_multiline-if-else = disabled
 
 [*.md]
 trim_trailing_whitespace = false
+
+[*.{js,jsx,ts,tsx,vue}]
+indent_size = 2
