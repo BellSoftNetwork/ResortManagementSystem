@@ -256,7 +256,7 @@ const formModel = ref({
     paymentAmount: 0,
     brokerFee: 0,
     note: "",
-    status: "PENDING",
+    status: "NORMAL",
   },
 });
 const selectedRoom = ref<Room[]>([]);
@@ -365,7 +365,7 @@ function resetForm() {
   formModel.value.value.paymentAmount = 0;
   formModel.value.value.brokerFee = 0;
   formModel.value.value.note = "";
-  formModel.value.value.status = "PENDING";
+  formModel.value.value.status = "NORMAL";
 }
 
 onBeforeMount(() => {

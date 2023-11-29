@@ -272,7 +272,7 @@ const formModel = ref({
   paymentAmount: 0,
   brokerFee: 0,
   note: "",
-  status: "PENDING",
+  status: "NORMAL",
 });
 const selectedRoom = ref<Room[]>([]);
 const status = ref({
