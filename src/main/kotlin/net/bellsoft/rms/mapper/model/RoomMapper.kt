@@ -1,13 +1,10 @@
 package net.bellsoft.rms.mapper.model
 
-import net.bellsoft.rms.controller.v1.room.dto.RoomCreateRequest
-import net.bellsoft.rms.controller.v1.room.dto.RoomRequestFilter
 import net.bellsoft.rms.domain.room.Room
 import net.bellsoft.rms.mapper.common.JsonNullableMapper
 import net.bellsoft.rms.mapper.common.ReferenceMapper
 import net.bellsoft.rms.service.room.dto.RoomCreateDto
 import net.bellsoft.rms.service.room.dto.RoomDetailDto
-import net.bellsoft.rms.service.room.dto.RoomFilterDto
 import net.bellsoft.rms.service.room.dto.RoomPatchDto
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
@@ -26,9 +23,6 @@ interface RoomMapper {
         Mapping(target = "updatedBy", source = "updatedBy.email"),
     )
     fun toDto(entity: Room): RoomDetailDto
-
-    fun toDto(dto: RoomCreateRequest): RoomCreateDto
-    fun toDto(dto: RoomRequestFilter): RoomFilterDto
 
     fun toEntity(dto: RoomCreateDto): Room
 

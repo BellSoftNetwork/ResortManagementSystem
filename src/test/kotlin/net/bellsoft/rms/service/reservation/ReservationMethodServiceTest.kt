@@ -58,11 +58,7 @@ internal class ReservationMethodServiceTest(
                 val exception = shouldThrow<DataNotFoundException> {
                     reservationMethodService.update(
                         -1,
-                        ReservationMethodPatchDto(
-                            name = JsonNullable.undefined(),
-                            commissionRate = JsonNullable.undefined(),
-                            requireUnpaidAmountCheck = JsonNullable.undefined(),
-                        ),
+                        ReservationMethodPatchDto(),
                     )
                 }
 
@@ -131,7 +127,6 @@ internal class ReservationMethodServiceTest(
                     ReservationMethodPatchDto(
                         name = JsonNullable.of("BSN"),
                         commissionRate = JsonNullable.of(0.2),
-                        requireUnpaidAmountCheck = JsonNullable.undefined(),
                     ),
                 )
 

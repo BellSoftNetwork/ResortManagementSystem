@@ -14,10 +14,10 @@ import net.bellsoft.rms.controller.v1.admin.dto.AdminUserPatchRequest
 import net.bellsoft.rms.domain.user.User
 import net.bellsoft.rms.domain.user.UserRole
 import net.bellsoft.rms.exception.PermissionRequiredDataException
-import net.bellsoft.rms.mapper.model.PatchDtoMapper
-import net.bellsoft.rms.mapper.model.UserMapper
 import net.bellsoft.rms.service.auth.AuthService
+import net.bellsoft.rms.service.auth.dto.UserCreateDto
 import net.bellsoft.rms.service.auth.dto.UserDetailDto
+import net.bellsoft.rms.service.auth.dto.UserPatchDto
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -40,8 +40,6 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/admin/accounts")
 class AccountController(
     private val authService: AuthService,
-    private val userMapper: UserMapper,
-    private val patchDtoMapper: PatchDtoMapper,
 ) {
     @Operation(summary = "계정 리스트", description = "계정 리스트 조회")
     @ApiResponses(
@@ -70,7 +68,7 @@ class AccountController(
             throw PermissionRequiredDataException("관리자 이상 권한 설정 시 최고 관리자 권한 필요")
 
         return SingleResponse
-            .of(authService.register(userMapper.toDto(request)))
+            .of(authService.register(UserCreateDto.of(request)))
             .toResponseEntity(HttpStatus.CREATED)
     }
 
@@ -95,7 +93,7 @@ class AccountController(
             throw PermissionRequiredDataException("동일 또는 상위 권한 계정 정보 수정 불가")
 
         return SingleResponse
-            .of(authService.updateAccount(id, patchDtoMapper.toDto(request)))
+            .of(authService.updateAccount(id, UserPatchDto.of(request)))
             .toResponseEntity()
     }
 

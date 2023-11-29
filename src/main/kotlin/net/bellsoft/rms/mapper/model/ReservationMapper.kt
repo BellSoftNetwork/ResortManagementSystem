@@ -1,14 +1,11 @@
 package net.bellsoft.rms.mapper.model
 
-import net.bellsoft.rms.controller.v1.reservation.dto.ReservationCreateRequest
-import net.bellsoft.rms.controller.v1.reservation.dto.ReservationRequestFilter
 import net.bellsoft.rms.domain.reservation.Reservation
 import net.bellsoft.rms.mapper.common.IdToReference
 import net.bellsoft.rms.mapper.common.JsonNullableMapper
 import net.bellsoft.rms.mapper.common.ReferenceMapper
 import net.bellsoft.rms.service.reservation.dto.ReservationCreateDto
 import net.bellsoft.rms.service.reservation.dto.ReservationDetailDto
-import net.bellsoft.rms.service.reservation.dto.ReservationFilterDto
 import net.bellsoft.rms.service.reservation.dto.ReservationPatchDto
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
@@ -27,9 +24,6 @@ interface ReservationMapper {
         Mapping(target = "updatedBy", source = "updatedBy.email"),
     )
     fun toDto(entity: Reservation): ReservationDetailDto
-
-    fun toDto(dto: ReservationCreateRequest): ReservationCreateDto
-    fun toDto(dto: ReservationRequestFilter): ReservationFilterDto
 
     @Mappings(
         Mapping(target = "reservationMethod", source = "reservationMethodId", qualifiedBy = [IdToReference::class]),
