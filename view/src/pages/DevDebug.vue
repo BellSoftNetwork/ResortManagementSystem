@@ -7,7 +7,7 @@
   </q-page>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import ApiTestCard from "components/test/ApiTestCard.vue"
-import UserInfoCard from "components/auth/UserInfoCard.vue"
+import UserInfoCard from "components/test/UserInfoCard.vue"
 </script>

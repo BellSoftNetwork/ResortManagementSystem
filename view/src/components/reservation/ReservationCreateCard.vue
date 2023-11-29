@@ -8,7 +8,12 @@
   >
     <q-step
       :name="1"
-      :caption="stayDateDiff <= 0 ? null : `${formModel.value.stayDate.from} ~ ${formModel.value.stayDate.to}`"
+      :caption="
+        formatStayCaption(
+          formModel.value.stayDate.from,
+          formModel.value.stayDate.to,
+        )
+      "
       :error="stayDateDiff <= 0"
       :done="formModel.status.step > 1"
       title="숙박 기간"
@@ -17,18 +22,14 @@
       <q-date
         v-model="formModel.value.stayDate"
         :color="stayDateDiff > 0 ? 'primary' : 'red'"
-        :title="formatSubTitle(stayDateDiff)"
+        :title="formatStayTitle(stayDateDiff)"
         subtitle="숙박 기간"
         range
         mask="YYYY-MM-DD"
       />
 
       <q-stepper-navigation>
-        <q-btn
-          @click="$refs.stepper.next()"
-          label="다음"
-          color="primary"
-        />
+        <q-btn @click="$refs.stepper.next()" label="다음" color="primary" />
       </q-stepper-navigation>
     </q-step>
 
@@ -36,7 +37,11 @@
       :name="2"
       :done="formModel.status.step > 2"
       title="객실 배정"
-      :caption="selectedRoom[0] && Object.keys(selectedRoom[0]).includes('number') ? selectedRoom[0].number : '추후 배정'"
+      :caption="
+        selectedRoom[0] && Object.keys(selectedRoom[0]).includes('number')
+          ? selectedRoom[0].number
+          : '추후 배정'
+      "
       icon="create_new_folder"
     >
       <RoomSelectTable
@@ -46,11 +51,7 @@
       />
 
       <q-stepper-navigation>
-        <q-btn
-          @click="$refs.stepper.next()"
-          label="다음"
-          color="primary"
-        />
+        <q-btn @click="$refs.stepper.next()" label="다음" color="primary" />
         <q-btn
           @click="$refs.stepper.previous()"
           color="primary"
@@ -70,8 +71,8 @@
     >
       <q-form @submit="formModel.status.step = 4">
         <q-input
-          v-model="formModel.value.price"
-          :rules="rules.price"
+          v-model.number="formModel.value.price"
+          :rules="reservationStaticRules.price"
           @update:model-value="changePrice()"
           label="판매 금액"
           placeholder="100000"
@@ -82,8 +83,8 @@
         ></q-input>
 
         <q-input
-          v-model="formModel.value.paymentAmount"
-          :rules="rules.paymentAmount"
+          v-model.number="formModel.value.paymentAmount"
+          :rules="reservationDynamicRules.paymentAmount(formModel.value.price)"
           label="누적 결제 금액"
           placeholder="80000"
           type="number"
@@ -95,9 +96,9 @@
         <q-select
           v-model="formModel.value.reservationMethod"
           @update:model-value="changePrice()"
-          :loading="reservationMethods.status.isLoading"
-          :disable="!reservationMethods.status.isLoaded"
-          :options="reservationMethods.values"
+          :loading="reservationMethodStatus.isLoading"
+          :disable="!reservationMethodStatus.isLoaded"
+          :options="reservationMethods"
           option-label="name"
           label="예약 수단"
           required
@@ -105,8 +106,8 @@
         ></q-select>
 
         <q-input
-          v-model="formModel.value.brokerFee"
-          :rules="rules.brokerFee"
+          v-model.number="formModel.value.brokerFee"
+          :rules="reservationStaticRules.brokerFee"
           :readonly="true"
           label="예약 수단 수수료"
           placeholder="5000"
@@ -117,11 +118,7 @@
         ></q-input>
 
         <q-stepper-navigation>
-          <q-btn
-            type="submit"
-            label="다음"
-            color="primary"
-          />
+          <q-btn type="submit" label="다음" color="primary" />
           <q-btn
             @click="$refs.stepper.previous()"
             color="primary"
@@ -143,7 +140,7 @@
       <q-form @submit="formModel.status.step = 5">
         <q-input
           v-model="formModel.value.name"
-          :rules="rules.name"
+          :rules="reservationStaticRules.name"
           label="예약자명"
           placeholder="홍길동"
           required
@@ -151,14 +148,14 @@
 
         <q-input
           v-model="formModel.value.phone"
-          :rules="rules.phone"
+          :rules="reservationStaticRules.phone"
           label="예약자 연락처"
           placeholder="010-0000-0000"
         ></q-input>
 
         <q-input
-          v-model="formModel.value.peopleCount"
-          :rules="rules.peopleCount"
+          v-model.number="formModel.value.peopleCount"
+          :rules="reservationStaticRules.peopleCount"
           label="예약인원"
           placeholder="4"
           type="number"
@@ -178,18 +175,14 @@
 
         <q-input
           v-model="formModel.value.note"
-          :rules="rules.note"
+          :rules="reservationStaticRules.note"
           type="textarea"
           label="메모"
           placeholder="밤 늦게 입실 예정"
         ></q-input>
 
         <q-stepper-navigation>
-          <q-btn
-            label="다음"
-            type="submit"
-            color="primary"
-          />
+          <q-btn label="다음" type="submit" color="primary" />
           <q-btn
             @click="$refs.stepper.previous()"
             color="primary"
@@ -201,17 +194,9 @@
       </q-form>
     </q-step>
 
-    <q-step
-      :name="5"
-      title="등록"
-      icon="add_comment"
-    >
+    <q-step :name="5" title="등록" icon="add_comment">
       <q-stepper-navigation>
-        <q-btn
-          @click="create"
-          label="등록"
-          color="primary"
-        />
+        <q-btn @click="create" label="등록" color="primary" />
         <q-btn
           @click="$refs.stepper.previous()"
           color="primary"
@@ -224,17 +209,30 @@
   </q-stepper>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, onBeforeMount, ref } from "vue"
 import { useRouter } from "vue-router"
-import { useAuthStore } from "stores/auth.js"
 import { useQuasar } from "quasar"
-import { api } from "boot/axios"
 import dayjs from "dayjs"
 import RoomSelectTable from "components/room/RoomSelectTable.vue"
+import {
+  formatDate,
+  formatDiffDays,
+  formatPrice,
+  formatStayCaption,
+  formatStayTitle,
+} from "src/util/format-util"
+import {
+  reservationDynamicRules,
+  reservationStaticRules,
+} from "src/schema/reservation"
+import { createReservation } from "src/api/v1/reservation"
+import { fetchReservationMethods } from "src/api/v1/reservation-method"
+import { formatSortParam } from "src/util/query-string-util"
+import { ReservationMethod } from "src/schema/reservation-method"
+import { Room } from "src/schema/room"
 
 const router = useRouter()
-const authStore = useAuthStore()
 const $q = useQuasar()
 
 const formModel = ref({
@@ -260,25 +258,11 @@ const formModel = ref({
     note: "",
     status: "PENDING",
   },
-})
-const selectedRoom = ref([])
+});
+const selectedRoom = ref<Room[]>([])
 const status = ref({
   isProgress: false,
-})
-const rules = {
-  name: [value => (value.length >= 2 && value.length <= 30) || "2~30 글자가 필요합니다"],
-  phone: [value => (value.length <= 20) || "20 글자 이내로 입력 가능합니다"],
-  peopleCount: [value => (value >= 0 && value <= 1000) || "1000 명 이하만 입실 가능합니다"],
-  stayStartAt: [value => (/^-?[\d]+-[0-1]\d-[0-3]\d$/.test(value)) || "####-##-## 형태의 날짜만 입력 가능합니다."],
-  stayEndAt: [value => (/^-?[\d]+-[0-1]\d-[0-3]\d$/.test(value)) || "####-##-## 형태의 날짜만 입력 가능합니다."],
-  price: [value => (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다"],
-  paymentAmount: [
-    value => (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다",
-    value => (value <= formModel.value.value.price) || "판매 금액보다 클 수 없습니다",
-  ],
-  brokerFee: [value => (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다"],
-  note: [value => (value.length >= 0 && value.length <= 200) || "200 글자까지 입력 가능합니다"],
-}
+});
 const options = {
   status: [
     { label: "예약 대기", value: "PENDING" },
@@ -286,53 +270,42 @@ const options = {
     { label: "예약 취소", value: "CANCEL" },
     { label: "환불 완료", value: "REFUND" },
   ],
-}
-const stayDateDiff = computed(() => {
-    try {
-      return dayjs(formModel.value.value.stayDate.to).diff(dayjs(formModel.value.value.stayDate.from), "day")
-    } catch (e) {
-      return 0
-    }
-  },
-)
-const reservationMethods = ref({
-  status: {
-    isLoading: false,
-    isLoaded: false,
-  },
-  values: [
-    {
-      id: -1,
-      name: "네이버",
-      commissionRate: 0.1,
-      createdAt: "2021-01-01T00:00:00.000Z",
-      updatedAt: "2021-01-01T00:00:00.000Z",
-    },
-  ],
-})
+};
+const stayDateDiff = computed(() =>
+  formatDiffDays(
+    formModel.value.value.stayDate.from,
+    formModel.value.value.stayDate.to,
+  ),
+);
+const reservationMethodStatus = ref({
+  isLoading: false,
+  isLoaded: false,
+});
+const reservationMethods = ref<ReservationMethod[]>()
 
 function loadReservationMethods() {
-  reservationMethods.value.status.isLoading = true
-  reservationMethods.value.status.isLoaded = false
-  reservationMethods.value.values = []
+  reservationMethodStatus.value.isLoading = true
+  reservationMethodStatus.value.isLoaded = false
+  reservationMethods.value = []
 
-  api.get(`/api/v1/reservation-methods?sort=name`)
-    .then(response => {
-      const values = response.data.values
-
-      reservationMethods.value.values = values
-      formModel.value.value.reservationMethod = values[0]
-
-      reservationMethods.value.status.isLoaded = true
-    }).finally(() => {
-    reservationMethods.value.status.isLoading = false
+  fetchReservationMethods({
+    sort: formatSortParam({ field: "name" }),
   })
+    .then((response) => {
+      reservationMethods.value = response.values
+      formModel.value.value.reservationMethod = response.values[0]
+
+      reservationMethodStatus.value.isLoaded = true
+    })
+    .finally(() => {
+      reservationMethodStatus.value.isLoading = false
+    });
 }
 
 function create() {
   status.value.isProgress = true
 
-  api.post("/api/v1/reservations", formData())
+  createReservation(formData())
     .then(() => {
       router.push({ name: "Reservations" })
 
@@ -344,20 +317,25 @@ function create() {
         type: "negative",
         actions: [
           {
-            icon: "close", color: "white", round: true,
+            icon: "close",
+            color: "white",
+            round: true,
           },
         ],
-      })
+      });
     })
     .finally(() => {
       status.value.isProgress = false
-    })
+    });
 }
 
 function formData() {
   return {
     reservationMethodId: formModel.value.value.reservationMethod.id,
-    roomId: (selectedRoom.value[0] && Object.keys(selectedRoom.value[0]).includes("id")) ? selectedRoom.value[0].id : null,
+    roomId:
+      selectedRoom.value[0] && Object.keys(selectedRoom.value[0]).includes("id")
+        ? selectedRoom.value[0].id
+        : null,
     name: formModel.value.value.name,
     phone: formModel.value.value.phone,
     peopleCount: formModel.value.value.peopleCount,
@@ -368,29 +346,20 @@ function formData() {
     brokerFee: formModel.value.value.brokerFee,
     note: formModel.value.value.note,
     status: formModel.value.value.status,
-  }
-}
-
-function formatSubTitle(dateDiff) {
-  return `${dateDiff}박 ${dateDiff + 1}일`
-}
-
-function formatPrice(value) {
-  return new Intl.NumberFormat("ko-KR", {
-    style: "currency",
-    currency: "KRW",
-  }).format(value)
+  };
 }
 
 function changePrice() {
-  formModel.value.value.brokerFee = formModel.value.value.price * formModel.value.value.reservationMethod.commissionRate
+  formModel.value.value.brokerFee =
+    formModel.value.value.price *
+    formModel.value.value.reservationMethod.commissionRate;
 }
 
 function resetForm() {
   formModel.value.value.name = ""
   formModel.value.value.phone = ""
   formModel.value.value.peopleCount = 4
-  formModel.value.value.stayDate.from = dayjs().format("YYYY-MM-DD")
+  formModel.value.value.stayDate.from = formatDate()
   formModel.value.value.stayDate.to = dayjs().add(1, "d").format("YYYY-MM-DD")
   formModel.value.value.price = 0
   formModel.value.value.paymentAmount = 0
@@ -402,5 +371,5 @@ function resetForm() {
 onBeforeMount(() => {
   resetForm()
   loadReservationMethods()
-})
+});
 </script>

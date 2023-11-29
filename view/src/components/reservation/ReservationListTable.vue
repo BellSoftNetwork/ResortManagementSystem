@@ -5,9 +5,9 @@
     v-model:pagination="pagination"
     :loading="status.isLoading"
     :columns="columns"
-    :rows="responseData.values"
+    :rows="reservations"
     :filter="filter"
-    style="height: 90vh;"
+    style="height: 90vh"
     row-key="id"
     title="다가오는 예약"
     flat
@@ -16,15 +16,8 @@
   >
     <template v-slot:top-right>
       <div class="row q-gutter-sm">
-        <q-btn
-          color="primary"
-          label="상세 검색"
-          icon="search"
-        >
-          <q-menu
-            anchor="bottom end"
-            self="top end"
-          >
+        <q-btn color="primary" label="상세 검색" icon="search">
+          <q-menu anchor="bottom end" self="top end">
             <div class="row no-wrap q-pa-md">
               <q-input
                 v-model="filter.peopleInfo"
@@ -36,13 +29,27 @@
             </div>
 
             <div class="row no-wrap q-pa-md">
-              <q-input v-model="filter.stayStartAt" mask="####-##-##" :readonly="true" outlined>
+              <q-input
+                v-model="filter.stayStartAt"
+                mask="####-##-##"
+                :readonly="true"
+                outlined
+              >
                 <template v-slot:append>
                   <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                    <q-popup-proxy
+                      cover
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
                       <q-date v-model="filter.stayStartAt" mask="YYYY-MM-DD">
                         <div class="row items-center justify-end">
-                          <q-btn v-close-popup label="Close" color="primary" flat />
+                          <q-btn
+                            v-close-popup
+                            label="Close"
+                            color="primary"
+                            flat
+                          />
                         </div>
                       </q-date>
                     </q-popup-proxy>
@@ -50,13 +57,27 @@
                 </template>
               </q-input>
               <span class="self-center q-mx-sm">~</span>
-              <q-input v-model="filter.stayEndAt" mask="####-##-##" :readonly="true" outlined>
+              <q-input
+                v-model="filter.stayEndAt"
+                mask="####-##-##"
+                :readonly="true"
+                outlined
+              >
                 <template v-slot:append>
                   <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                    <q-popup-proxy
+                      cover
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
                       <q-date v-model="filter.stayEndAt" mask="YYYY-MM-DD">
                         <div class="row items-center justify-end">
-                          <q-btn v-close-popup label="Close" color="primary" flat />
+                          <q-btn
+                            v-close-popup
+                            label="Close"
+                            color="primary"
+                            flat
+                          />
                         </div>
                       </q-date>
                     </q-popup-proxy>
@@ -76,10 +97,6 @@
           flat
         />
       </div>
-    </template>
-
-    <template #body-cell-reservationMethod="props">
-      <q-td key="reservationMethod" :props="props">{{ props.row.reservationMethod.name }}</q-td>
     </template>
 
     <template #body-cell-room="props">
@@ -115,163 +132,146 @@
 
     <template #body-cell-actions="props">
       <q-td key="actions" :props="props">
-        <q-btn dense round flat color="grey" icon="edit"
-               :to="{ name: 'EditReservation', params: { id: props.row.id } }"></q-btn>
-        <q-btn dense round flat color="grey" icon="delete" @click="deleteItem(props.row)"></q-btn>
+        <q-btn
+          dense
+          round
+          flat
+          color="grey"
+          icon="edit"
+          :to="{ name: 'EditReservation', params: { id: props.row.id } }"
+        ></q-btn>
+        <q-btn
+          dense
+          round
+          flat
+          color="grey"
+          icon="delete"
+          @click="deleteItem(props.row)"
+        ></q-btn>
       </q-td>
     </template>
   </q-table>
 </template>
 
-<script setup>
-import { onBeforeMount, onMounted, ref } from "vue"
+<script setup lang="ts">
+import { onMounted, ref } from "vue"
 import dayjs from "dayjs"
 import { useQuasar } from "quasar"
-import { api } from "boot/axios"
+import { formatDate } from "src/util/format-util"
+import { getReservationFieldDetail, Reservation } from "src/schema/reservation"
+import { convertTableColumnDef } from "src/util/table-util"
+import { deleteReservation, fetchReservations } from "src/api/v1/reservation"
+import { formatSortParam } from "src/util/query-string-util"
 
 const $q = useQuasar()
 const status = ref({
   isLoading: false,
   isLoaded: false,
   isPatching: false,
-})
+});
 const tableRef = ref()
 const filter = ref({
   peopleInfo: "",
-  stayStartAt: dayjs().format("YYYY-MM-DD"),
+  stayStartAt: formatDate(),
   stayEndAt: dayjs().add(3, "M").format("YYYY-MM-DD"),
-})
+});
 const pagination = ref({
   sortBy: "stayStartAt",
   descending: true,
   page: 1,
   rowsPerPage: 15,
   rowsNumber: 10,
-})
+});
 const columns = [
   {
-    name: "reservationMethod",
-    field: "reservationMethod",
-    label: "예약 수단",
+    ...getColumnDef("reservationMethod"),
     align: "left",
     required: true,
     sortable: true,
   },
   {
-    name: "room",
-    field: "room",
-    label: "객실",
+    ...getColumnDef("room"),
     align: "left",
     headerStyle: "width: 10%",
     required: true,
     sortable: true,
   },
   {
-    name: "name",
-    field: "name",
-    label: "예약자명",
+    ...getColumnDef("name"),
     align: "left",
     headerStyle: "width: 10%",
     required: true,
     sortable: true,
   },
   {
-    name: "phone",
-    field: "phone",
-    label: "예약자 전화번호",
+    ...getColumnDef("phone"),
     align: "left",
     headerStyle: "width: 10%",
     required: true,
     sortable: true,
   },
   {
-    name: "peopleCount",
-    field: "peopleCount",
-    label: "숙박 인원",
+    ...getColumnDef("peopleCount"),
     align: "left",
     headerStyle: "width: 10%",
     required: true,
     sortable: true,
   },
   {
-    name: "stayStartAt",
-    field: "stayStartAt",
-    label: "입실일",
+    ...getColumnDef("stayStartAt"),
     align: "left",
     headerStyle: "width: 10%",
     required: true,
     sortable: true,
-    format: val => dayjs(val).format("YYYY-MM-DD"),
   },
   {
-    name: "stayEndAt",
-    field: "stayEndAt",
-    label: "퇴실일",
+    ...getColumnDef("stayEndAt"),
     align: "left",
     headerStyle: "width: 10%",
     required: true,
     sortable: true,
-    format: val => dayjs(val).format("YYYY-MM-DD"),
   },
   {
-    name: "checkInAt",
-    field: "checkInAt",
-    label: "체크인 시각",
+    ...getColumnDef("checkInAt"),
     align: "left",
     headerStyle: "width: 15%",
     required: true,
     sortable: true,
-    format: val => val ? dayjs(val).format("YYYY-MM-DD HH:mm:ss") : "",
   },
   {
-    name: "checkOutAt",
-    field: "checkOutAt",
-    label: "체크아웃 시각",
+    ...getColumnDef("checkOutAt"),
     align: "left",
     headerStyle: "width: 15%",
     required: true,
     sortable: true,
-    format: val => val ? dayjs(val).format("YYYY-MM-DD HH:mm:ss") : "",
   },
   {
-    name: "price",
-    field: "price",
-    label: "판매 금액",
+    ...getColumnDef("price"),
     align: "left",
     headerStyle: "width: 10%",
     required: true,
     sortable: true,
-    format: (value) => formatPrice(value),
   },
   {
-    name: "paymentAmount",
-    field: "paymentAmount",
-    label: "결제 금액",
+    ...getColumnDef("paymentAmount"),
     align: "left",
     headerStyle: "width: 10%",
     required: true,
     sortable: true,
-    format: (value) => formatPrice(value),
   },
   {
-    name: "status",
-    field: "status",
-    label: "상태",
+    ...getColumnDef("status"),
     align: "left",
     headerStyle: "width: 10%",
     required: true,
     sortable: true,
-    format: (value) => formatStatus(value),
   },
   {
-    name: "updatedAt",
-    field: "updatedAt",
-    label: "수정 시각",
+    ...getColumnDef("updatedAt"),
     align: "left",
     headerStyle: "width: 15%",
     required: true,
     sortable: true,
-    format: val => dayjs(val).format("YYYY-MM-DD HH:mm:ss"),
   },
   {
     name: "actions",
@@ -279,26 +279,12 @@ const columns = [
     align: "center",
     headerStyle: "width: 5%",
   },
-]
-const responseData = ref({
-  page: {
-    index: 0,
-    size: 0,
-    totalPages: 0,
-    totalElements: 0,
-  },
-  values: [
-    {
-      id: 1,
-      number: "101",
-      peekPrice: 100000,
-      offPeekPrice: 80000,
-      status: "ACTIVE",
-      createdAt: "2021-01-01T00:00:00.000Z",
-      updatedAt: "2021-01-01T00:00:00.000Z",
-    },
-  ],
-})
+];
+const reservations = ref<Reservation[]>()
+
+function getColumnDef(field: string) {
+  return convertTableColumnDef(getReservationFieldDetail(field))
+}
 
 function onRequest(props) {
   const { page, rowsPerPage, sortBy, descending } = props.pagination
@@ -306,23 +292,17 @@ function onRequest(props) {
   status.value.isLoading = true
   status.value.isLoaded = false
 
-  const queryParams = {
-    size: rowsPerPage,
+  fetchReservations({
     page: page - 1,
-    sort: `${sortBy},${descending ? "desc" : "asc"}`,
+    size: rowsPerPage,
+    sort: formatSortParam({ field: sortBy, isDescending: descending }),
     stayStartAt: filter.value.stayStartAt,
     stayEndAt: filter.value.stayEndAt,
-  }
-
-  if (filter.value.peopleInfo)
-    queryParams.searchText = encodeURIComponent(filter.value.peopleInfo)
-
-  const queryString = Object.keys(queryParams).map(key => `${key}=${queryParams[key]}`)
-
-  api.get(`/api/v1/reservations?${queryString.join("&")}`)
-    .then(response => {
-      responseData.value = response.data
-      const page = responseData.value.page
+    searchText: filter.value.peopleInfo || undefined,
+  })
+    .then((response) => {
+      reservations.value = response.values
+      const page = response.page
 
       pagination.value.rowsNumber = page.totalElements
       pagination.value.page = page.index + 1
@@ -331,16 +311,17 @@ function onRequest(props) {
       pagination.value.descending = descending
 
       status.value.isLoaded = true
-    }).finally(() => {
-    status.value.isLoading = false
-  })
+    })
+    .finally(() => {
+      status.value.isLoading = false
+    });
 }
 
 function reloadData() {
   tableRef.value.requestServerInteraction()
 }
 
-function deleteItem(row) {
+function deleteItem(row: Reservation) {
   const itemId = row.id
   const itemName = row.name
 
@@ -358,7 +339,7 @@ function deleteItem(row) {
     },
     focus: "cancel",
   }).onOk(() => {
-    api.delete(`/api/v1/reservations/${itemId}`)
+    deleteReservation(itemId)
       .then(() => {
         reloadData()
       })
@@ -368,45 +349,17 @@ function deleteItem(row) {
           type: "negative",
           actions: [
             {
-              icon: "close", color: "white", round: true,
+              icon: "close",
+              color: "white",
+              round: true,
             },
           ],
-        })
-      })
-  })
+        });
+      });
+  });
 }
-
-function formatPrice(value) {
-  return new Intl.NumberFormat("ko-KR", {
-    style: "currency",
-    currency: "KRW",
-  }).format(value)
-}
-
-function formatStatus(value) {
-  switch (value) {
-    case "NORMAL":
-      return "예약 확정"
-    case "PENDING":
-      return "예약 대기"
-    case "CANCEL":
-      return "취소 요청"
-    case "REFUND":
-      return "환불 완료"
-    default:
-      return value
-  }
-}
-
-function resetData() {
-  responseData.value.values = []
-}
-
-onBeforeMount(() => {
-  resetData()
-})
 
 onMounted(() => {
   reloadData()
-})
+});
 </script>

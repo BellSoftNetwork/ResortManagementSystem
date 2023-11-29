@@ -11,7 +11,11 @@
         aria-label="Menu"
       />
 
-      <q-toolbar-title v-if="$q.screen.gt.xs" shrink class="row items-center no-wrap">
+      <q-toolbar-title
+        v-if="$q.screen.gt.xs"
+        shrink
+        class="row items-center no-wrap"
+      >
         <span class="q-ml-sm">Resort Management System</span>
       </q-toolbar-title>
 
@@ -20,7 +24,7 @@
       <div class="q-gutter-sm row items-center no-wrap">
         <q-btn round flat>
           <q-avatar size="26px">
-            <img :src="authStore.user.profileImageUrl" alt="Profile Image">
+            <img :src="authStore.user?.profileImageUrl" alt="Profile Image" />
           </q-avatar>
           <q-menu auto-close>
             <q-list>
@@ -34,7 +38,7 @@
             </q-list>
           </q-menu>
 
-          <q-tooltip>{{ authStore.user.name }}</q-tooltip>
+          <q-tooltip>{{ authStore.user?.name }}</q-tooltip>
         </q-btn>
       </div>
     </q-toolbar>
@@ -45,9 +49,9 @@
   </q-header>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue"
-import { useAuthStore } from "stores/auth.js"
+import { useAuthStore } from "stores/auth"
 import LogoutDialog from "components/auth/LogoutDialog.vue"
 
 const emit = defineEmits(["toggleLeftDrawer"])

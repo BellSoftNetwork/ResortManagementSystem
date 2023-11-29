@@ -8,9 +8,7 @@
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
-
 const { configure } = require("quasar/wrappers")
-
 
 module.exports = configure(function(/* ctx */) {
   return {
@@ -29,15 +27,10 @@ module.exports = configure(function(/* ctx */) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: [
-
-      "axios",
-    ],
+    boot: ["axios"],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
-    css: [
-      "app.scss",
-    ],
+    css: ["app.scss"],
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
@@ -79,7 +72,6 @@ module.exports = configure(function(/* ctx */) {
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
 
-
       // vitePlugins: [
       //   [ 'package-name', { ..options.. } ]
       // ]
@@ -114,10 +106,7 @@ module.exports = configure(function(/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: [
-        "Notify",
-        "Dialog",
-      ],
+      plugins: ["Notify", "Dialog"],
     },
 
     // animations: 'all', // --- includes all animations
@@ -150,7 +139,7 @@ module.exports = configure(function(/* ctx */) {
       // manualPostHydrationTrigger: true,
 
       prodPort: 3000, // The default port that the production server should use
-                      // (gets superseded if process.env.PORT is specified at runtime)
+      // (gets superseded if process.env.PORT is specified at runtime)
 
       middlewares: [
         "render", // keep this as last one
@@ -193,13 +182,11 @@ module.exports = configure(function(/* ctx */) {
 
       packager: {
         // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
-
         // OS X / Mac App Store
         // appBundleId: '',
         // appCategoryType: '',
         // osxSign: '',
         // protocol: 'myapp://path',
-
         // Windows only
         // win32metadata: { ... }
       },
@@ -213,12 +200,10 @@ module.exports = configure(function(/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-browser-extensions/configuring-bex
     bex: {
-      contentScripts: [
-        "my-content-script",
-      ],
+      contentScripts: ["my-content-script"],
 
       // extendBexScriptsConf (esbuildConf) {}
       // extendBexManifestJson (json) {}
     },
-  }
-})
+  };
+});

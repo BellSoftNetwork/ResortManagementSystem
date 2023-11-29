@@ -4,6 +4,6 @@
   </q-page>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import RoomCreateCard from "components/room/RoomCreateCard.vue"
 </script>

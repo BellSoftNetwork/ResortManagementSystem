@@ -5,12 +5,12 @@
     </q-inner-loading>
 
     <q-card-section class="text-h6">
-      {{ entity.number }}
+      {{ entity?.number }}
     </q-card-section>
 
     <q-card-section>
       <q-input
-        v-model="entity.peekPrice"
+        :model-value="entity?.peekPrice"
         :loading="status.isProgress"
         :readonly="true"
         label="성수기 예약금"
@@ -18,7 +18,7 @@
       ></q-input>
 
       <q-input
-        v-model="entity.offPeekPrice"
+        :model-value="entity?.offPeekPrice"
         :loading="status.isProgress"
         :readonly="true"
         label="비성수기 예약금"
@@ -26,7 +26,7 @@
       ></q-input>
 
       <q-input
-        v-model="entity.description"
+        :model-value="entity?.description"
         :loading="status.isProgress"
         :readonly="true"
         type="textarea"
@@ -34,7 +34,7 @@
       ></q-input>
 
       <q-input
-        v-model="entity.note"
+        :model-value="entity?.note"
         :loading="status.isProgress"
         :readonly="true"
         type="textarea"
@@ -42,7 +42,7 @@
       ></q-input>
 
       <q-select
-        v-model="entity.status"
+        :model-value="entity?.status"
         :loading="status.isProgress"
         :readonly="true"
         :options="options.status"
@@ -53,16 +53,10 @@
     </q-card-section>
 
     <q-card-actions align="right">
-      <q-btn
-        @click="deleteItem()"
-        color="red"
-        label="삭제"
-        dense
-        flat
-      ></q-btn>
+      <q-btn @click="deleteItem()" color="red" label="삭제" dense flat></q-btn>
       <q-btn
         :disable="status.isProgress"
-        :to="{ name: 'EditRoom', params: { id: entity.id } }"
+        :to="{ name: 'EditRoom', params: { id: entity?.id } }"
         color="primary"
         label="수정"
         flat
@@ -71,41 +65,23 @@
   </q-card>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { onBeforeMount, ref } from "vue"
 import { useRouter } from "vue-router"
-import { useAuthStore } from "stores/auth.js"
 import { useQuasar } from "quasar"
-import { api } from "boot/axios"
+import { deleteRoom, fetchRoom } from "src/api/v1/room"
+import { Room } from "src/schema/room"
 
 const router = useRouter()
-const authStore = useAuthStore()
 const $q = useQuasar()
-const props = defineProps({
-  id: Number,
-})
-const dialog = ref({
-  isOpen: false,
-})
+const props = defineProps<{
+  id: number;
+}>();
+const id = props.id
 const status = ref({
   isProgress: false,
-})
-const entity = {
-  id: props.id,
-  number: "",
-  peekPrice: 0,
-  offPeekPrice: 0,
-  description: "",
-  note: "",
-  status: "NORMAL",
-}
-const rules = {
-  number: [value => (value.length >= 2 && value.length <= 20) || "2~20 글자가 필요합니다"],
-  peekPrice: [value => (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다"],
-  offPeekPrice: [value => (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다"],
-  description: [value => (value.length >= 0 && value.length <= 200) || "200 글자까지 입력 가능합니다"],
-  note: [value => (value.length >= 0 && value.length <= 200) || "200 글자까지 입력 가능합니다"],
-}
+});
+const entity = ref<Room | null>(null)
 const options = {
   status: [
     { label: "정상", value: "NORMAL" },
@@ -113,34 +89,30 @@ const options = {
     { label: "파손", value: "DAMAGED" },
     { label: "공사 중", value: "CONSTRUCTION" },
   ],
-}
+};
 
 function fetchData() {
   status.value.isProgress = true
 
-  return api.get(`/api/v1/rooms/${entity.id}`)
-    .then(res => {
-      entity.id = res.data.value.id
-      entity.number = res.data.value.number
-      entity.peekPrice = res.data.value.peekPrice
-      entity.offPeekPrice = res.data.value.offPeekPrice
-      entity.description = res.data.value.description
-      entity.note = res.data.value.note
-      entity.status = res.data.value.status
+  return fetchRoom(id)
+    .then((response) => {
+      entity.value = response.value
     })
-    .catch(error => {
-      if (error.response.status === 404)
-        router.push({ name: "ErrorNotFound" })
+    .catch((error) => {
+      if (error.response.status === 404) router.push({ name: "ErrorNotFound" })
 
       console.log(error)
-    }).finally(() => {
-      status.value.isProgress = false
     })
+    .finally(() => {
+      status.value.isProgress = false
+    });
 }
 
 function deleteItem() {
-  const itemId = entity.id
-  const itemName = entity.number
+  if (entity.value === null) return
+
+  const itemId = entity.value.id
+  const itemName = entity.value.number
 
   $q.dialog({
     title: "삭제",
@@ -156,7 +128,7 @@ function deleteItem() {
     },
     focus: "cancel",
   }).onOk(() => {
-    api.delete(`/api/v1/rooms/${itemId}`)
+    deleteRoom(itemId)
       .then(() => {
         router.push({ name: "Rooms" })
       })
@@ -166,15 +138,17 @@ function deleteItem() {
           type: "negative",
           actions: [
             {
-              icon: "close", color: "white", round: true,
+              icon: "close",
+              color: "white",
+              round: true,
             },
           ],
-        })
-      })
-  })
+        });
+      });
+  });
 }
 
 onBeforeMount(() => {
   fetchData()
-})
+});
 </script>

@@ -4,6 +4,6 @@
   </q-page>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import ReservationMethodListTable from "components/reservation-method/ReservationMethodListTable.vue"
 </script>

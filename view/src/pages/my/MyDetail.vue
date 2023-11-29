@@ -4,6 +4,6 @@
   </q-page>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import MyDetailCard from "components/my/MyDetailCard.vue"
 </script>

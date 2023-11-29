@@ -1,33 +1,23 @@
 <template>
   <q-card>
-    <q-card-section class="text-h6">
-      내 정보
-    </q-card-section>
+    <q-card-section class="text-h6"> 내 정보</q-card-section>
 
     <q-form @submit="update">
       <q-card-section>
-        <q-input
-          v-model="authStore.user.name"
-          label="이름"
-          :readonly="true"
-        ></q-input>
+        <q-input v-model="user.name" label="이름" :readonly="true"></q-input>
 
-        <q-input
-          v-model="authStore.user.email"
-          :readonly="true"
-          label="이메일"
-        ></q-input>
+        <q-input v-model="user.email" :readonly="true" label="이메일"></q-input>
 
         <q-input
           v-model="formData.password"
-          :rules="rules.password"
+          :rules="userStaticRules.password"
           type="password"
           label="비밀번호"
         ></q-input>
 
         <q-input
           v-model="formData.passwordConfirm"
-          :rules="rules.passwordConfirm"
+          :rules="userDynamicRules.passwordConfirm(formData.password)"
           type="password"
           label="비밀번호 확인"
         ></q-input>
@@ -46,12 +36,13 @@
   </q-card>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue"
 import { useRouter } from "vue-router"
-import { useAuthStore } from "stores/auth.js"
+import { useAuthStore } from "stores/auth"
 import { useQuasar } from "quasar"
-import { api } from "boot/axios"
+import { User, userDynamicRules, userStaticRules } from "src/schema/user"
+import { MyPatchParams, patchMy } from "src/api/v1/main"
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -59,14 +50,12 @@ const $q = useQuasar()
 
 const status = ref({
   isProgress: false,
-})
+});
+const user = authStore.user as User
 const formData = ref({
   password: "",
-})
-const rules = {
-  password: [value => (value.length === 0 || (value.length >= 8 && value.length <= 20)) || "비밀번호는 8~20 글자가 필요합니다."],
-  passwordConfirm: [value => (formData.value.password === value) || "비밀번호가 일치하지 않습니다."],
-}
+  passwordConfirm: "",
+});
 
 function update() {
   if (!isChanged()) {
@@ -75,33 +64,38 @@ function update() {
       type: "info",
       actions: [
         {
-          icon: "close", color: "white", round: true,
+          icon: "close",
+          color: "white",
+          round: true,
         },
       ],
-    })
+    });
 
     return
   }
 
   status.value.isProgress = true
 
-  api.patch(`/api/v1/my`, patchedData())
+  patchMy(patchedData())
     .then(() => {
       $q.notify({
         message: "정보가 정상적으로 변경되었습니다",
         type: "positive",
         actions: [
           {
-            icon: "close", color: "white", round: true,
+            icon: "close",
+            color: "white",
+            round: true,
           },
         ],
-      })
+      });
 
-      authStore.logout()
+      authStore
+        .logout()
         .then(() => {
           authStore.loadAccountInfo().finally(() => {
             router.push({ name: "Login" })
-          })
+          });
         })
         .catch((error) => {
           $q.notify({
@@ -109,11 +103,13 @@ function update() {
             type: "negative",
             actions: [
               {
-                icon: "close", color: "white", round: true,
+                icon: "close",
+                color: "white",
+                round: true,
               },
             ],
-          })
-        })
+          });
+        });
     })
     .catch((error) => {
       $q.notify({
@@ -121,14 +117,16 @@ function update() {
         type: "negative",
         actions: [
           {
-            icon: "close", color: "white", round: true,
+            icon: "close",
+            color: "white",
+            round: true,
           },
         ],
-      })
+      });
     })
     .finally(() => {
       status.value.isProgress = false
-    })
+    });
 }
 
 function isChanged() {
@@ -136,7 +134,7 @@ function isChanged() {
 }
 
 function patchedData() {
-  const patchData = {}
+  const patchData: MyPatchParams = {}
 
   if (formData.value.password.length > 0)
     patchData.password = formData.value.password

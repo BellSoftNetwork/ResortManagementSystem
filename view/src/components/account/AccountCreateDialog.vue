@@ -1,8 +1,6 @@
 <template>
   <slot :dialog="dialog">
-    <q-btn @click="dialog.isOpen = true">
-      추가
-    </q-btn>
+    <q-btn @click="dialog.isOpen = true"> 추가</q-btn>
   </slot>
 
   <q-dialog
@@ -11,29 +9,27 @@
     @beforeShow="resetForm"
   >
     <q-card style="width: 500px">
-      <q-card-section class="text-h6">
-        계정 추가
-      </q-card-section>
+      <q-card-section class="text-h6"> 계정 추가</q-card-section>
 
       <q-form @submit="create">
         <q-card-section>
           <q-input
             v-model="formData.name"
-            :rules="rules.name"
+            :rules="userStaticRules.name"
             label="이름"
             required
           ></q-input>
 
           <q-input
             v-model="formData.email"
-            :rules="rules.email"
+            :rules="userStaticRules.email"
             label="이메일"
             required
           ></q-input>
 
           <q-input
             v-model="formData.password"
-            :rules="rules.password"
+            :rules="userStaticRules.password"
             type="password"
             label="비밀번호"
             required
@@ -70,46 +66,40 @@
   </q-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue"
-import { useRouter } from "vue-router"
-import { useAuthStore } from "stores/auth.js"
+import { useAuthStore } from "stores/auth"
 import { useQuasar } from "quasar"
-import { api } from "boot/axios"
+import { userStaticRules } from "src/schema/user"
+import { createAdminAccount } from "src/api/v1/admin/account"
 
-const router = useRouter()
 const authStore = useAuthStore()
 const $q = useQuasar()
 
 const emit = defineEmits(["complete"])
 const dialog = ref({
   isOpen: false,
-})
+});
 const status = ref({
   isProgress: false,
-})
+});
 const formData = ref({
   name: "",
   email: "",
   password: "",
   role: "NORMAL",
-})
-const rules = {
-  name: [value => (value.length >= 2 && value.length <= 20) || "2~20 글자가 필요합니다"],
-  email: [value => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) || "이메일이 유효하지 않습니다."],
-  password: [value => (value.length >= 8 && value.length <= 20) || "비밀번호는 8~20 글자가 필요합니다."],
-}
+});
 const options = {
   role: [
     { label: "일반", value: "NORMAL" },
     { label: "관리자", value: "ADMIN", disable: !authStore.isSuperAdminRole },
   ],
-}
+};
 
 function create() {
   status.value.isProgress = true
 
-  api.post("/api/v1/admin/accounts", formData.value)
+  createAdminAccount(formData.value)
     .then(() => {
       emit("complete")
       dialog.value.isOpen = false
@@ -122,14 +112,16 @@ function create() {
         type: "negative",
         actions: [
           {
-            icon: "close", color: "white", round: true,
+            icon: "close",
+            color: "white",
+            round: true,
           },
         ],
-      })
+      });
     })
     .finally(() => {
       status.value.isProgress = false
-    })
+    });
 }
 
 function resetForm() {

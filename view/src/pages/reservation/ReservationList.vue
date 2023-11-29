@@ -4,6 +4,6 @@
   </q-page>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import ReservationListTable from "components/reservation/ReservationListTable.vue"
 </script>

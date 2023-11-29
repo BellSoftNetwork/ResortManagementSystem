@@ -1,8 +1,6 @@
 <template>
   <q-card flat bordered>
-    <q-card-section class="text-h6">
-      입실 정보 요약
-    </q-card-section>
+    <q-card-section class="text-h6"> 입실 정보 요약</q-card-section>
 
     <q-card-section>
       <div class="row">
@@ -31,16 +29,15 @@
                 flat
                 bordered
               >
-                <template #body-cell-reservationMethod="props">
-                  <q-td key="reservationMethod" :props="props">{{ props.row.reservationMethod.name }}</q-td>
-                </template>
-
                 <template #body-cell-room="props">
                   <q-td key="room" :props="props">
                     <div v-if="props.row.room">
                       <div v-if="authStore.isAdminRole">
                         <q-btn
-                          :to="{ name: 'Room', params: { id: props.row.room.id } }"
+                          :to="{
+                            name: 'Room',
+                            params: { id: props.row.room.id },
+                          }"
                           class="full-width"
                           align="left"
                           color="primary"
@@ -61,7 +58,10 @@
                   <q-td key="name" :props="props">
                     <div v-if="authStore.isAdminRole">
                       <q-btn
-                        :to="{ name: 'Reservation', params: { id: props.row.id } }"
+                        :to="{
+                          name: 'Reservation',
+                          params: { id: props.row.id },
+                        }"
                         class="full-width"
                         align="left"
                         color="primary"
@@ -87,13 +87,15 @@
                 </template>
 
                 <template #body-cell-note="props">
-                  <q-td
-                    :props="props"
-                    key="note"
-                  >
+                  <q-td :props="props" key="note">
                     <q-btn
                       v-if="props.row.note"
-                      @click="$q.dialog({ title: `${props.row.name}님 예약 메모`, message: props.row.note })"
+                      @click="
+                        $q.dialog({
+                          title: `${props.row.name}님 예약 메모`,
+                          message: props.row.note,
+                        })
+                      "
                       color="primary"
                     >
                       메모 확인
@@ -109,12 +111,15 @@
   </q-card>
 </template>
 
-<script setup>
-import { computed, onBeforeMount, onMounted, ref } from "vue"
+<script setup lang="ts">
+import { computed, onMounted, ref } from "vue"
 import dayjs from "dayjs"
 import { useQuasar } from "quasar"
-import { api } from "boot/axios"
 import { useAuthStore } from "stores/auth"
+import { formatDate, formatPrice } from "src/util/format-util"
+import { convertTableColumnDef } from "src/util/table-util"
+import { getReservationFieldDetail, Reservation } from "src/schema/reservation"
+import { fetchReservations } from "src/api/v1/reservation"
 
 const $q = useQuasar()
 const authStore = useAuthStore()
@@ -122,12 +127,12 @@ const status = ref({
   isLoading: false,
   isLoaded: false,
   isPatching: false,
-})
+});
 const filter = ref({
   sort: "stayStartAt",
   stayStartAt: dayjs().startOf("month").format("YYYY-MM-DD"),
   stayEndAt: dayjs().endOf("month").format("YYYY-MM-DD"),
-})
+});
 const columns = [
   {
     name: "type",
@@ -138,9 +143,7 @@ const columns = [
     sortable: true,
   },
   {
-    name: "name",
-    field: "name",
-    label: "예약자명",
+    ...getColumnDef("name"),
     align: "left",
     required: true,
     sortable: true,
@@ -153,107 +156,89 @@ const columns = [
     required: true,
   },
   {
-    name: "reservationMethod",
-    field: "reservationMethod",
-    label: "예약 수단",
+    ...getColumnDef("reservationMethod"),
     align: "left",
     required: true,
     sortable: true,
   },
   {
-    name: "room",
-    field: "room",
-    label: "객실",
+    ...getColumnDef("room"),
     align: "left",
     required: true,
     sortable: true,
   },
   {
-    name: "note",
-    field: "note",
-    label: "메모",
+    ...getColumnDef("note"),
     align: "left",
     headerStyle: "width: 10%",
   },
-]
-const date = ref(dayjs().format("YYYY-MM-DD"))
+];
+const date = ref(formatDate())
 const reservationsOfDay = ref({})
-const events = computed(() => Object.keys(reservationsOfDay.value).map((date) => dayjs(date).format("YYYY/MM/DD")))
-const responseData = ref({
-  page: {
-    index: 0,
-    size: 0,
-    totalPages: 0,
-    totalElements: 0,
-  },
-  values: [
-    {
-      id: 1,
-      number: "101",
-      peekPrice: 100000,
-      offPeekPrice: 80000,
-      status: "ACTIVE",
-      createdAt: "2021-01-01T00:00:00.000Z",
-      updatedAt: "2021-01-01T00:00:00.000Z",
-    },
-  ],
-})
+const events = computed(() =>
+  Object.keys(reservationsOfDay.value).map((date) =>
+    dayjs(date).format("YYYY/MM/DD"),
+  ),
+);
+
+function getColumnDef(field: string) {
+  return convertTableColumnDef(getReservationFieldDetail(field))
+}
 
 function fetchData() {
   status.value.isLoading = true
   status.value.isLoaded = false
 
-  const queryParams = {
+  fetchReservations({
     stayStartAt: filter.value.stayStartAt,
     stayEndAt: filter.value.stayEndAt,
-  }
-
-  const queryString = Object.keys(queryParams).map(key => `${key}=${queryParams[key]}`)
-
-  api.get(`/api/v1/reservations?${queryString.join("&")}`)
-    .then(response => {
-      reservationsOfDay.value = setReservations(response.data)
+  })
+    .then((response) => {
+      reservationsOfDay.value = formatReservations(response.values)
 
       status.value.isLoaded = true
-    }).finally(() => {
-    status.value.isLoading = false
-  })
+    })
+    .finally(() => {
+      status.value.isLoading = false
+    });
 }
 
-function setReservations(responseData) {
-  responseData.value = responseData
+function formatReservations(reservations: Reservation[]) {
+  const reservationMap: { [date: string]: Reservation[] } = {}
 
-  const reservationMap = {}
-
-  responseData.value.values.forEach((reservation) => {
+  reservations.forEach((reservation) => {
     reservation.missPrice = reservation.price - reservation.paymentAmount
 
-    for (let [index, date] of getDateArray(reservation.stayStartAt, reservation.stayEndAt).entries()) {
+    for (let [index, date] of getDateArray(
+      reservation.stayStartAt,
+      reservation.stayEndAt,
+    ).entries()) {
       if (!Object.keys(reservationMap).includes(date))
         reservationMap[date] = []
 
       const reservationCopy = { ...reservation, type: "N/A" }
 
-      if (index === 0)
-        reservationCopy.type = "입실"
-      else if (date === reservation.stayEndAt)
-        reservationCopy.type = "퇴실"
-      else
-        reservationCopy.type = "연박"
+      if (index === 0) reservationCopy.type = "입실"
+      else if (date === reservation.stayEndAt) reservationCopy.type = "퇴실"
+      else reservationCopy.type = "연박"
 
       reservationMap[date].push(reservationCopy)
     }
-  })
+  });
 
   return reservationMap
 }
 
-function getDateArray(startDate, endDate) {
-  const stayStartDate = dayjs(startDate).format("YYYY-MM-DD")
-  const stayEndAt = dayjs(endDate).format("YYYY-MM-DD")
+function getDateArray(startDate: string, endDate: string) {
+  const stayStartDate = formatDate(startDate)
+  const stayEndAt = formatDate(endDate)
   const dateArray = []
 
-  for (let date = stayStartDate; date <= stayEndAt; date = dayjs(date).add(1, "day").format("YYYY-MM-DD")) {
+  for (
+    let date = stayStartDate;
+    date <= stayEndAt;
+    date = dayjs(date).add(1, "day").format("YYYY-MM-DD")
+  ) {
     dateArray.push(date)
   }
 
@@ -264,38 +249,25 @@ function changeView(view) {
   const year = view.year
   const month = view.month
 
-  filter.value.stayStartAt = dayjs(`${year}-${month}-01`).startOf("month").format("YYYY-MM-DD")
-  filter.value.stayEndAt = dayjs(`${year}-${month}-01`).endOf("month").format("YYYY-MM-DD")
+  filter.value.stayStartAt = dayjs(`${year}-${month}-01`)
+    .startOf("month")
+    .format("YYYY-MM-DD");
+  filter.value.stayEndAt = dayjs(`${year}-${month}-01`)
+    .endOf("month")
+    .format("YYYY-MM-DD");
 
   fetchData()
 }
 
-function formatPrice(value) {
-  return new Intl.NumberFormat("ko-KR", {
-    style: "currency",
-    currency: "KRW",
-  }).format(value)
-}
-
 function missPriceBackgroundColor(value) {
-  if (value.reservationMethod.requireUnpaidAmountCheck === false)
-    return ""
+  if (value.reservationMethod.requireUnpaidAmountCheck === false) return ""
 
-  if (value.missPrice > 0)
-    return "bg-warning"
+  if (value.missPrice > 0) return "bg-warning"
 
   return ""
 }
 
-function resetData() {
-  responseData.value.values = []
-}
-
-onBeforeMount(() => {
-  resetData()
-})
-
 onMounted(() => {
   fetchData()
-})
+});
 </script>
