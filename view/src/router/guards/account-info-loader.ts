@@ -1,12 +1,12 @@
-import { useAuthStore } from "stores/auth"
-import { Router } from "vue-router"
+import { useAuthStore } from "stores/auth";
+import { Router } from "vue-router";
 
 export default (router: Router) => {
   router.beforeEach((to, from, next) => {
-    const authStore = useAuthStore()
+    const authStore = useAuthStore();
 
-    if (!authStore.isFirstRequest) return next()
+    if (!authStore.isFirstRequest) return next();
 
-    authStore.loadAccountInfo().finally(() => next())
+    authStore.loadAccountInfo().finally(() => next());
   });
 };

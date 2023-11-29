@@ -33,18 +33,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
-import { useRouter } from "vue-router"
-import { useAuthStore } from "stores/auth"
-import { useQuasar } from "quasar"
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "stores/auth";
+import { useQuasar } from "quasar";
 
 defineExpose({
   openDialog,
 });
 
-const router = useRouter()
-const authStore = useAuthStore()
-const $q = useQuasar()
+const router = useRouter();
+const authStore = useAuthStore();
+const $q = useQuasar();
 
 const dialog = ref({
   isOpen: false,
@@ -54,17 +54,17 @@ const status = ref({
 });
 
 function openDialog() {
-  dialog.value.isOpen = true
+  dialog.value.isOpen = true;
 }
 
 function logout() {
-  status.value.isProgress = true
+  status.value.isProgress = true;
 
   authStore
     .logout()
     .then(() => {
       authStore.loadAccountInfo().finally(() => {
-        router.push({ name: "Login" })
+        router.push({ name: "Login" });
       });
     })
     .catch((error) => {
@@ -81,7 +81,7 @@ function logout() {
       });
     })
     .finally(() => {
-      status.value.isProgress = false
+      status.value.isProgress = false;
     });
 }
 </script>

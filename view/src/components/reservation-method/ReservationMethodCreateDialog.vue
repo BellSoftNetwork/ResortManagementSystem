@@ -62,14 +62,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
-import { useQuasar } from "quasar"
-import { reservationMethodStaticRules } from "src/schema/reservation-method"
-import { createReservationMethod } from "src/api/v1/reservation-method"
+import { ref } from "vue";
+import { useQuasar } from "quasar";
+import { reservationMethodStaticRules } from "src/schema/reservation-method";
+import { createReservationMethod } from "src/api/v1/reservation-method";
 
-const $q = useQuasar()
+const $q = useQuasar();
 
-const emit = defineEmits(["complete"])
+const emit = defineEmits(["complete"]);
 const dialog = ref({
   isOpen: false,
 });
@@ -83,7 +83,7 @@ const formData = ref({
 });
 
 function create() {
-  status.value.isProgress = true
+  status.value.isProgress = true;
 
   createReservationMethod({
     name: formData.value.name,
@@ -91,10 +91,10 @@ function create() {
     requireUnpaidAmountCheck: formData.value.requireUnpaidAmountCheck,
   })
     .then(() => {
-      emit("complete")
-      dialog.value.isOpen = false
+      emit("complete");
+      dialog.value.isOpen = false;
 
-      resetForm()
+      resetForm();
     })
     .catch((error) => {
       $q.notify({
@@ -110,13 +110,13 @@ function create() {
       });
     })
     .finally(() => {
-      status.value.isProgress = false
+      status.value.isProgress = false;
     });
 }
 
 function resetForm() {
-  formData.value.name = ""
-  formData.value.commissionRatePercent = 0
-  formData.value.requireUnpaidAmountCheck = false
+  formData.value.name = "";
+  formData.value.commissionRatePercent = 0;
+  formData.value.requireUnpaidAmountCheck = false;
 }
 </script>

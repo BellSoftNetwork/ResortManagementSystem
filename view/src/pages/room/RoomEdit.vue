@@ -5,5 +5,5 @@
 </template>
 
 <script setup lang="ts">
-import RoomEditCard from "components/room/RoomEditCard.vue"
+import RoomEditCard from "components/room/RoomEditCard.vue";
 </script>

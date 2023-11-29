@@ -66,22 +66,22 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from "vue"
-import { useRouter } from "vue-router"
-import { useQuasar } from "quasar"
-import { deleteRoom, fetchRoom } from "src/api/v1/room"
-import { Room } from "src/schema/room"
+import { onBeforeMount, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useQuasar } from "quasar";
+import { deleteRoom, fetchRoom } from "src/api/v1/room";
+import { Room } from "src/schema/room";
 
-const router = useRouter()
-const $q = useQuasar()
+const router = useRouter();
+const $q = useQuasar();
 const props = defineProps<{
   id: number;
 }>();
-const id = props.id
+const id = props.id;
 const status = ref({
   isProgress: false,
 });
-const entity = ref<Room | null>(null)
+const entity = ref<Room | null>(null);
 const options = {
   status: [
     { label: "정상", value: "NORMAL" },
@@ -92,27 +92,27 @@ const options = {
 };
 
 function fetchData() {
-  status.value.isProgress = true
+  status.value.isProgress = true;
 
   return fetchRoom(id)
     .then((response) => {
-      entity.value = response.value
+      entity.value = response.value;
     })
     .catch((error) => {
-      if (error.response.status === 404) router.push({ name: "ErrorNotFound" })
+      if (error.response.status === 404) router.push({ name: "ErrorNotFound" });
 
-      console.log(error)
+      console.log(error);
     })
     .finally(() => {
-      status.value.isProgress = false
+      status.value.isProgress = false;
     });
 }
 
 function deleteItem() {
-  if (entity.value === null) return
+  if (entity.value === null) return;
 
-  const itemId = entity.value.id
-  const itemName = entity.value.number
+  const itemId = entity.value.id;
+  const itemName = entity.value.number;
 
   $q.dialog({
     title: "삭제",
@@ -130,7 +130,7 @@ function deleteItem() {
   }).onOk(() => {
     deleteRoom(itemId)
       .then(() => {
-        router.push({ name: "Rooms" })
+        router.push({ name: "Rooms" });
       })
       .catch((error) => {
         $q.notify({
@@ -149,6 +149,6 @@ function deleteItem() {
 }
 
 onBeforeMount(() => {
-  fetchData()
+  fetchData();
 });
 </script>

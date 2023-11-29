@@ -17,11 +17,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue"
-import { getRoomFieldDetail, Room } from "src/schema/room"
-import { convertTableColumnDef } from "src/util/table-util"
-import { fetchRooms } from "src/api/v1/room"
-import { formatSortParam } from "src/util/query-string-util"
+import { computed, onMounted, ref } from "vue";
+import { getRoomFieldDetail, Room } from "src/schema/room";
+import { convertTableColumnDef } from "src/util/table-util";
+import { fetchRooms } from "src/api/v1/room";
+import { formatSortParam } from "src/util/query-string-util";
 
 const props = defineProps<{
   selected: Room[];
@@ -29,7 +29,7 @@ const props = defineProps<{
   stayStartAt: string;
   stayEndAt: string;
 }>();
-const emit = defineEmits(["update:selected"])
+const emit = defineEmits(["update:selected"]);
 
 const status = ref({
   isLoading: false,
@@ -39,15 +39,15 @@ const status = ref({
 
 const selected = computed({
   get() {
-    return props.selected
+    return props.selected;
   },
   set(value) {
-    emit("update:selected", value)
+    emit("update:selected", value);
   },
 });
 
-const tableRef = ref()
-const filter = ref("")
+const tableRef = ref();
+const filter = ref("");
 const pagination = ref({
   sortBy: "number",
   descending: false,
@@ -84,17 +84,17 @@ const columns = [
     sortable: true,
   },
 ];
-const rooms = ref<Room[]>()
+const rooms = ref<Room[]>();
 
 function getColumnDef(field: string) {
-  return convertTableColumnDef(getRoomFieldDetail(field))
+  return convertTableColumnDef(getRoomFieldDetail(field));
 }
 
 function onRequest(tableProps) {
-  const { page, rowsPerPage, sortBy, descending } = tableProps.pagination
+  const { page, rowsPerPage, sortBy, descending } = tableProps.pagination;
 
-  status.value.isLoading = true
-  status.value.isLoaded = false
+  status.value.isLoading = true;
+  status.value.isLoaded = false;
 
   fetchRooms({
     page: page - 1,
@@ -105,29 +105,29 @@ function onRequest(tableProps) {
     status: "NORMAL",
   })
     .then((response) => {
-      rooms.value = response.values
-      if (props.firstValue) rooms.value.push(props.firstValue)
+      rooms.value = response.values;
+      if (props.firstValue) rooms.value.push(props.firstValue);
 
-      const page = response.page
+      const page = response.page;
 
-      pagination.value.rowsNumber = page.totalElements
-      pagination.value.page = page.index + 1
-      pagination.value.rowsPerPage = page.size
-      pagination.value.sortBy = sortBy
-      pagination.value.descending = descending
+      pagination.value.rowsNumber = page.totalElements;
+      pagination.value.page = page.index + 1;
+      pagination.value.rowsPerPage = page.size;
+      pagination.value.sortBy = sortBy;
+      pagination.value.descending = descending;
 
-      status.value.isLoaded = true
+      status.value.isLoaded = true;
     })
     .finally(() => {
-      status.value.isLoading = false
+      status.value.isLoading = false;
     });
 }
 
 function reloadData() {
-  tableRef.value.requestServerInteraction()
+  tableRef.value.requestServerInteraction();
 }
 
 onMounted(() => {
-  reloadData()
+  reloadData();
 });
 </script>

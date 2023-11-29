@@ -1,6 +1,7 @@
 package net.bellsoft.rms.service.reservation.dto
 
 import net.bellsoft.rms.domain.reservation.ReservationStatus
+import net.bellsoft.rms.service.auth.dto.UserSummaryDto
 import net.bellsoft.rms.service.room.dto.RoomDetailDto
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -24,7 +25,7 @@ data class ReservationDetailDto(
     val canceledAt: LocalDateTime?,
     val status: ReservationStatus,
     val createdAt: LocalDateTime,
-    val createdBy: String,
+    val createdBy: UserSummaryDto,
     val updatedAt: LocalDateTime,
-    val updatedBy: String,
+    val updatedBy: UserSummaryDto,
 )

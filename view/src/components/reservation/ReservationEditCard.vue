@@ -216,9 +216,23 @@ import { computed, onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import RoomSelectTable from "components/room/RoomSelectTable.vue";
-import { formatDate, formatDiffDays, formatPrice, formatStayCaption, formatStayTitle } from "src/util/format-util";
-import { Reservation, reservationDynamicRules, reservationStaticRules } from "src/schema/reservation";
-import { fetchReservation, patchReservation, ReservationPatchParams } from "src/api/v1/reservation";
+import {
+  formatDate,
+  formatDiffDays,
+  formatPrice,
+  formatStayCaption,
+  formatStayTitle,
+} from "src/util/format-util";
+import {
+  Reservation,
+  reservationDynamicRules,
+  reservationStaticRules,
+} from "src/schema/reservation";
+import {
+  fetchReservation,
+  patchReservation,
+  ReservationPatchParams,
+} from "src/api/v1/reservation";
 import { fetchReservationMethods } from "src/api/v1/reservation-method";
 import { formatSortParam } from "src/util/query-string-util";
 import { Room } from "src/schema/room";

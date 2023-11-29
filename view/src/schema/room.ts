@@ -1,11 +1,11 @@
-import { formatPrice } from "src/util/format-util"
-import { EnumMap, FieldDetail, FieldMap, StaticRuleMap } from "src/types/map"
+import { formatPrice } from "src/util/format-util";
+import { EnumMap, FieldDetail, FieldMap, StaticRuleMap } from "src/types/map";
 import {
   BASE_AUDIT_FIELD_MAP,
   BASE_TIME_FIELD_MAP,
   BaseAudit,
   BaseTime,
-} from "src/schema/base"
+} from "src/schema/base";
 
 const ROOM_STATUS_MAP: EnumMap = {
   NORMAL: "정상",
@@ -16,7 +16,7 @@ const ROOM_STATUS_MAP: EnumMap = {
 export type RoomStatus = keyof typeof ROOM_STATUS_MAP;
 
 export function roomStatusValueToName(role: RoomStatus) {
-  return ROOM_STATUS_MAP[role] || role
+  return ROOM_STATUS_MAP[role] || role;
 }
 
 export type Room = {
@@ -43,23 +43,23 @@ const RoomFieldMap: FieldMap = {
 } as const;
 
 export function getRoomFieldDetail(field: string): FieldDetail | null {
-  const fieldDetail = RoomFieldMap[field]
+  const fieldDetail = RoomFieldMap[field];
 
   return fieldDetail
     ? {
-      field: field,
-      ...fieldDetail,
-    }
+        field: field,
+        ...fieldDetail,
+      }
     : null;
 }
 
 export function formatRoomFieldToLabel(field: string) {
-  return getRoomFieldDetail(field)?.label ?? field
+  return getRoomFieldDetail(field)?.label ?? field;
 }
 
 export function formatRoomValue(field: string, value: string | number | null) {
-  const fieldDetail = getRoomFieldDetail(field)
-  return fieldDetail?.format ? fieldDetail.format(value) : value
+  const fieldDetail = getRoomFieldDetail(field);
+  return fieldDetail?.format ? fieldDetail.format(value) : value;
 }
 
 export const roomStaticRules: StaticRuleMap = {

@@ -22,13 +22,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue"
-import { getServerEnv } from "src/api/v1/main"
-import { ServerEnv } from "src/schema/server-config"
+import { onMounted, ref } from "vue";
+import { getServerEnv } from "src/api/v1/main";
+import { ServerEnv } from "src/schema/server-config";
 
-let env = ref<ServerEnv | null>(null)
+let env = ref<ServerEnv | null>(null);
 
 onMounted(() => {
-  getServerEnv().then((response) => (env.value = response.value))
+  getServerEnv().then((response) => (env.value = response.value));
 });
 </script>

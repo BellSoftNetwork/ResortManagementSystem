@@ -62,26 +62,26 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue"
-import { useQuasar } from "quasar"
-import AccountCreateDialog from "components/account/AccountCreateDialog.vue"
-import AccountEditDialog from "components/account/AccountEditDialog.vue"
-import { getUserFieldDetail, User } from "src/schema/user"
-import { convertTableColumnDef } from "src/util/table-util"
+import { onMounted, ref } from "vue";
+import { useQuasar } from "quasar";
+import AccountCreateDialog from "components/account/AccountCreateDialog.vue";
+import AccountEditDialog from "components/account/AccountEditDialog.vue";
+import { getUserFieldDetail, User } from "src/schema/user";
+import { convertTableColumnDef } from "src/util/table-util";
 import {
   deleteAdminAccount,
   fetchAdminAccounts,
-} from "src/api/v1/admin/account"
-import { formatSortParam } from "src/util/query-string-util"
+} from "src/api/v1/admin/account";
+import { formatSortParam } from "src/util/query-string-util";
 
-const $q = useQuasar()
+const $q = useQuasar();
 const status = ref({
   isLoading: false,
   isLoaded: false,
   isPatching: false,
 });
-const tableRef = ref()
-const filter = ref("")
+const tableRef = ref();
+const filter = ref("");
 const pagination = ref({
   sortBy: "name",
   descending: false,
@@ -131,17 +131,17 @@ const columns = [
     headerStyle: "width: 5%",
   },
 ];
-const users = ref<User[]>()
+const users = ref<User[]>();
 
 function getColumnDef(field: string) {
-  return convertTableColumnDef(getUserFieldDetail(field))
+  return convertTableColumnDef(getUserFieldDetail(field));
 }
 
 function onRequest(props) {
-  const { page, rowsPerPage, sortBy, descending } = props.pagination
+  const { page, rowsPerPage, sortBy, descending } = props.pagination;
 
-  status.value.isLoading = true
-  status.value.isLoaded = false
+  status.value.isLoading = true;
+  status.value.isLoaded = false;
 
   fetchAdminAccounts({
     page: page - 1,
@@ -149,29 +149,29 @@ function onRequest(props) {
     sort: formatSortParam({ field: sortBy, isDescending: descending }),
   })
     .then((response) => {
-      users.value = response.values
-      const page = response.page
+      users.value = response.values;
+      const page = response.page;
 
-      pagination.value.rowsNumber = page.totalElements
-      pagination.value.page = page.index + 1
-      pagination.value.rowsPerPage = page.size
-      pagination.value.sortBy = sortBy
-      pagination.value.descending = descending
+      pagination.value.rowsNumber = page.totalElements;
+      pagination.value.page = page.index + 1;
+      pagination.value.rowsPerPage = page.size;
+      pagination.value.sortBy = sortBy;
+      pagination.value.descending = descending;
 
-      status.value.isLoaded = true
+      status.value.isLoaded = true;
     })
     .finally(() => {
-      status.value.isLoading = false
+      status.value.isLoading = false;
     });
 }
 
 function reloadData() {
-  tableRef.value.requestServerInteraction()
+  tableRef.value.requestServerInteraction();
 }
 
 function deleteItem(row: User) {
-  const itemId = row.id
-  const itemName = row.name
+  const itemId = row.id;
+  const itemName = row.name;
 
   $q.dialog({
     title: "삭제",
@@ -189,7 +189,7 @@ function deleteItem(row: User) {
   }).onOk(() => {
     deleteAdminAccount(itemId)
       .then(() => {
-        reloadData()
+        reloadData();
       })
       .catch((error) => {
         $q.notify({
@@ -208,6 +208,6 @@ function deleteItem(row: User) {
 }
 
 onMounted(() => {
-  reloadData()
+  reloadData();
 });
 </script>

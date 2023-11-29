@@ -15,11 +15,11 @@
 </template>
 
 <script setup lang="ts">
-import RoomDetailCard from "components/room/RoomDetailCard.vue"
-import RoomHistoryTable from "components/room/RoomHistoryTable.vue"
-import { useRoute } from "vue-router"
+import RoomDetailCard from "components/room/RoomDetailCard.vue";
+import RoomHistoryTable from "components/room/RoomHistoryTable.vue";
+import { useRoute } from "vue-router";
 
-const route = useRoute()
+const route = useRoute();
 
-const id = Number.parseInt(route.params.id as string)
+const id = Number.parseInt(route.params.id as string);
 </script>

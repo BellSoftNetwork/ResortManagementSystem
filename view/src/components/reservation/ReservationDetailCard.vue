@@ -111,56 +111,56 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeMount, ref } from "vue"
-import { useRouter } from "vue-router"
-import { useQuasar } from "quasar"
+import { computed, onBeforeMount, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useQuasar } from "quasar";
 import {
   formatDiffDays,
   formatPrice,
   formatStayTitle,
-} from "src/util/format-util"
-import { deleteReservation, fetchReservation } from "src/api/v1/reservation"
+} from "src/util/format-util";
+import { deleteReservation, fetchReservation } from "src/api/v1/reservation";
 import {
   Reservation,
   reservationStatusValueToName,
-} from "src/schema/reservation"
+} from "src/schema/reservation";
 
-const router = useRouter()
-const $q = useQuasar()
+const router = useRouter();
+const $q = useQuasar();
 const props = defineProps<{
   id: number;
 }>();
-const id = props.id
+const id = props.id;
 const status = ref({
   isProgress: false,
 });
-const entity = ref<Reservation>()
+const entity = ref<Reservation>();
 const stayDateDiff = computed(() =>
   formatDiffDays(entity.value?.stayStartAt, entity.value?.stayEndAt),
 );
 
 function fetchData() {
-  status.value.isProgress = true
+  status.value.isProgress = true;
 
   fetchReservation(id)
     .then((response) => {
-      entity.value = response.value
+      entity.value = response.value;
     })
     .catch((error) => {
-      if (error.response.status === 404) router.push({ name: "ErrorNotFound" })
+      if (error.response.status === 404) router.push({ name: "ErrorNotFound" });
 
-      console.log(error)
+      console.log(error);
     })
     .finally(() => {
-      status.value.isProgress = false
+      status.value.isProgress = false;
     });
 }
 
 function deleteItem() {
-  if (entity.value === undefined) return
+  if (entity.value === undefined) return;
 
-  const itemId = entity.value.id
-  const itemName = entity.value.name
+  const itemId = entity.value.id;
+  const itemName = entity.value.name;
 
   $q.dialog({
     title: "삭제",
@@ -180,7 +180,7 @@ function deleteItem() {
   }).onOk(() => {
     deleteReservation(itemId)
       .then(() => {
-        router.push({ name: "Reservations" })
+        router.push({ name: "Reservations" });
       })
       .catch((error) => {
         $q.notify({
@@ -199,6 +199,6 @@ function deleteItem() {
 }
 
 onBeforeMount(() => {
-  fetchData()
+  fetchData();
 });
 </script>

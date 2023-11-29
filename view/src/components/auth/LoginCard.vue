@@ -60,17 +60,17 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from "vue"
-import { useRouter } from "vue-router"
-import { useAuthStore } from "stores/auth"
-import { useQuasar } from "quasar"
-import { useAppConfigStore } from "stores/app-config"
-import { userStaticRules } from "src/schema/user"
+import { onBeforeMount, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "stores/auth";
+import { useQuasar } from "quasar";
+import { useAppConfigStore } from "stores/app-config";
+import { userStaticRules } from "src/schema/user";
 
-const router = useRouter()
-const $q = useQuasar()
-const authStore = useAuthStore()
-const appConfigStore = useAppConfigStore()
+const router = useRouter();
+const $q = useQuasar();
+const authStore = useAuthStore();
+const appConfigStore = useAppConfigStore();
 
 const status = ref({
   isProgress: false,
@@ -81,12 +81,12 @@ const formData = ref({
 });
 
 function login() {
-  status.value.isProgress = true
+  status.value.isProgress = true;
 
   authStore
     .login(formData.value.email, formData.value.password)
     .then(() => {
-      router.push({ name: "Home" })
+      router.push({ name: "Home" });
     })
     .catch((error) => {
       $q.notify({
@@ -102,11 +102,11 @@ function login() {
       });
     })
     .finally(() => {
-      status.value.isProgress = false
+      status.value.isProgress = false;
     });
 }
 
 onBeforeMount(() => {
-  appConfigStore.loadAppConfig()
+  appConfigStore.loadAppConfig();
 });
 </script>

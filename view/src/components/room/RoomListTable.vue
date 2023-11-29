@@ -36,7 +36,7 @@
           color="primary"
           dense
           flat
-        >{{ props.row.number }}
+          >{{ props.row.number }}
         </q-btn>
       </q-td>
     </template>
@@ -65,21 +65,21 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue"
-import { useQuasar } from "quasar"
-import { getRoomFieldDetail, Room } from "src/schema/room"
-import { convertTableColumnDef } from "src/util/table-util"
-import { deleteRoom, fetchRooms } from "src/api/v1/room"
-import { formatSortParam } from "src/util/query-string-util"
+import { onMounted, ref } from "vue";
+import { useQuasar } from "quasar";
+import { getRoomFieldDetail, Room } from "src/schema/room";
+import { convertTableColumnDef } from "src/util/table-util";
+import { deleteRoom, fetchRooms } from "src/api/v1/room";
+import { formatSortParam } from "src/util/query-string-util";
 
-const $q = useQuasar()
+const $q = useQuasar();
 const status = ref({
   isLoading: false,
   isLoaded: false,
   isPatching: false,
 });
-const tableRef = ref()
-const filter = ref("")
+const tableRef = ref();
+const filter = ref("");
 const pagination = ref({
   sortBy: "number",
   descending: false,
@@ -136,17 +136,17 @@ const columns = [
     headerStyle: "width: 5%",
   },
 ];
-const rooms = ref<Room[]>()
+const rooms = ref<Room[]>();
 
 function getColumnDef(field: string) {
-  return convertTableColumnDef(getRoomFieldDetail(field))
+  return convertTableColumnDef(getRoomFieldDetail(field));
 }
 
 function onRequest(props) {
-  const { page, rowsPerPage, sortBy, descending } = props.pagination
+  const { page, rowsPerPage, sortBy, descending } = props.pagination;
 
-  status.value.isLoading = true
-  status.value.isLoaded = false
+  status.value.isLoading = true;
+  status.value.isLoaded = false;
 
   fetchRooms({
     page: page - 1,
@@ -154,30 +154,30 @@ function onRequest(props) {
     sort: formatSortParam({ field: sortBy, isDescending: descending }),
   })
     .then((response) => {
-      rooms.value = response.values
+      rooms.value = response.values;
 
-      const page = response.page
+      const page = response.page;
 
-      pagination.value.rowsNumber = page.totalElements
-      pagination.value.page = page.index + 1
-      pagination.value.rowsPerPage = page.size
-      pagination.value.sortBy = sortBy
-      pagination.value.descending = descending
+      pagination.value.rowsNumber = page.totalElements;
+      pagination.value.page = page.index + 1;
+      pagination.value.rowsPerPage = page.size;
+      pagination.value.sortBy = sortBy;
+      pagination.value.descending = descending;
 
-      status.value.isLoaded = true
+      status.value.isLoaded = true;
     })
     .finally(() => {
-      status.value.isLoading = false
+      status.value.isLoading = false;
     });
 }
 
 function reloadData() {
-  tableRef.value.requestServerInteraction()
+  tableRef.value.requestServerInteraction();
 }
 
 function deleteItem(row: Room) {
-  const itemId = row.id
-  const itemName = row.number
+  const itemId = row.id;
+  const itemName = row.number;
 
   $q.dialog({
     title: "삭제",
@@ -195,7 +195,7 @@ function deleteItem(row: Room) {
   }).onOk(() => {
     deleteRoom(itemId)
       .then(() => {
-        reloadData()
+        reloadData();
       })
       .catch((error) => {
         $q.notify({
@@ -214,6 +214,6 @@ function deleteItem(row: Room) {
 }
 
 onMounted(() => {
-  reloadData()
+  reloadData();
 });
 </script>

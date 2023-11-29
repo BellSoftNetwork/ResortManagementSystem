@@ -127,32 +127,32 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue"
-import { useQuasar } from "quasar"
-import ReservationMethodCreateDialog from "components/reservation-method/ReservationMethodCreateDialog.vue"
+import { onMounted, ref } from "vue";
+import { useQuasar } from "quasar";
+import ReservationMethodCreateDialog from "components/reservation-method/ReservationMethodCreateDialog.vue";
 import {
   getReservationMethodFieldDetail,
   ReservationMethod,
   reservationMethodStaticRules,
 } from "src/schema/reservation-method";
-import { convertTableColumnDef } from "src/util/table-util"
-import { formatCommissionRate } from "src/util/format-util"
+import { convertTableColumnDef } from "src/util/table-util";
+import { formatCommissionRate } from "src/util/format-util";
 import {
   deleteReservationMethod,
   fetchReservationMethods,
   patchReservationMethod,
 } from "src/api/v1/reservation-method";
-import { formatSortParam } from "src/util/query-string-util"
+import { formatSortParam } from "src/util/query-string-util";
 
-const $q = useQuasar()
+const $q = useQuasar();
 const status = ref({
   isLoading: false,
   isLoaded: false,
   isPatching: false,
 });
-const tableRef = ref()
-const inputRef = ref(null)
-const filter = ref("")
+const tableRef = ref();
+const inputRef = ref(null);
+const filter = ref("");
 const pagination = ref({
   sortBy: "name",
   descending: false,
@@ -202,17 +202,17 @@ const columns = [
     headerStyle: "width: 5%",
   },
 ];
-const reservationMethods = ref<ReservationMethod[]>()
+const reservationMethods = ref<ReservationMethod[]>();
 
 function getColumnDef(field: string) {
-  return convertTableColumnDef(getReservationMethodFieldDetail(field))
+  return convertTableColumnDef(getReservationMethodFieldDetail(field));
 }
 
 function onRequest(props) {
-  const { page, rowsPerPage, sortBy, descending } = props.pagination
+  const { page, rowsPerPage, sortBy, descending } = props.pagination;
 
-  status.value.isLoading = true
-  status.value.isLoaded = false
+  status.value.isLoading = true;
+  status.value.isLoaded = false;
 
   fetchReservationMethods({
     page: page - 1,
@@ -220,24 +220,24 @@ function onRequest(props) {
     sort: formatSortParam({ field: sortBy, isDescending: descending }),
   })
     .then((response) => {
-      reservationMethods.value = response.values
-      const page = response.page
+      reservationMethods.value = response.values;
+      const page = response.page;
 
-      pagination.value.rowsNumber = page.totalElements
-      pagination.value.page = page.index + 1
-      pagination.value.rowsPerPage = page.size
-      pagination.value.sortBy = sortBy
-      pagination.value.descending = descending
+      pagination.value.rowsNumber = page.totalElements;
+      pagination.value.page = page.index + 1;
+      pagination.value.rowsPerPage = page.size;
+      pagination.value.sortBy = sortBy;
+      pagination.value.descending = descending;
 
-      status.value.isLoaded = true
+      status.value.isLoaded = true;
     })
     .finally(() => {
-      status.value.isLoading = false
+      status.value.isLoading = false;
     });
 }
 
 function reloadData() {
-  tableRef.value.requestServerInteraction()
+  tableRef.value.requestServerInteraction();
 }
 
 function updateScope(row, scope, key, formatter) {
@@ -245,16 +245,16 @@ function updateScope(row, scope, key, formatter) {
     (inputRef.value && !inputRef.value.validate()) ||
     row[key] === scope.value
   )
-    return
+    return;
 
-  const patchData = {}
-  patchData[key] = formatter ? formatter(scope.value) : scope.value
+  const patchData = {};
+  patchData[key] = formatter ? formatter(scope.value) : scope.value;
 
-  status.value.isPatching = true
+  status.value.isPatching = true;
   patchReservationMethod(row.id, patchData)
     .then((response) => {
-      scope.set()
-      row[key] = response.value[key]
+      scope.set();
+      row[key] = response.value[key];
     })
     .catch((error) => {
       $q.notify({
@@ -270,13 +270,13 @@ function updateScope(row, scope, key, formatter) {
       });
     })
     .finally(() => {
-      status.value.isPatching = false
+      status.value.isPatching = false;
     });
 }
 
 function deleteItem(row: ReservationMethod) {
-  const itemId = row.id
-  const itemName = row.name
+  const itemId = row.id;
+  const itemName = row.name;
 
   $q.dialog({
     title: "삭제",
@@ -294,7 +294,7 @@ function deleteItem(row: ReservationMethod) {
   }).onOk(() => {
     deleteReservationMethod(itemId)
       .then(() => {
-        reloadData()
+        reloadData();
       })
       .catch((error) => {
         $q.notify({
@@ -313,6 +313,6 @@ function deleteItem(row: ReservationMethod) {
 }
 
 onMounted(() => {
-  reloadData()
+  reloadData();
 });
 </script>

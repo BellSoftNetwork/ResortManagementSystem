@@ -50,15 +50,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
-import { useAuthStore } from "stores/auth"
-import LogoutDialog from "components/auth/LogoutDialog.vue"
+import { ref } from "vue";
+import { useAuthStore } from "stores/auth";
+import LogoutDialog from "components/auth/LogoutDialog.vue";
 
-const emit = defineEmits(["toggleLeftDrawer"])
-const authStore = useAuthStore()
-const logoutDialogRef = ref()
+const emit = defineEmits(["toggleLeftDrawer"]);
+const authStore = useAuthStore();
+const logoutDialogRef = ref();
 
 function openDialog() {
-  logoutDialogRef.value.openDialog()
+  logoutDialogRef.value.openDialog();
 }
 </script>

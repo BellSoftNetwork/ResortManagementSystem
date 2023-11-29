@@ -109,7 +109,7 @@
             color="primary"
             dense
             flat
-          >{{ props.row.room.number }}
+            >{{ props.row.room.number }}
           </q-btn>
         </div>
         <div v-else class="text-grey">미배정</div>
@@ -125,7 +125,7 @@
           color="primary"
           dense
           flat
-        >{{ props.row.name }}
+          >{{ props.row.name }}
         </q-btn>
       </q-td>
     </template>
@@ -154,22 +154,22 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue"
-import dayjs from "dayjs"
-import { useQuasar } from "quasar"
-import { formatDate } from "src/util/format-util"
-import { getReservationFieldDetail, Reservation } from "src/schema/reservation"
-import { convertTableColumnDef } from "src/util/table-util"
-import { deleteReservation, fetchReservations } from "src/api/v1/reservation"
-import { formatSortParam } from "src/util/query-string-util"
+import { onMounted, ref } from "vue";
+import dayjs from "dayjs";
+import { useQuasar } from "quasar";
+import { formatDate } from "src/util/format-util";
+import { getReservationFieldDetail, Reservation } from "src/schema/reservation";
+import { convertTableColumnDef } from "src/util/table-util";
+import { deleteReservation, fetchReservations } from "src/api/v1/reservation";
+import { formatSortParam } from "src/util/query-string-util";
 
-const $q = useQuasar()
+const $q = useQuasar();
 const status = ref({
   isLoading: false,
   isLoaded: false,
   isPatching: false,
 });
-const tableRef = ref()
+const tableRef = ref();
 const filter = ref({
   peopleInfo: "",
   stayStartAt: formatDate(),
@@ -280,17 +280,17 @@ const columns = [
     headerStyle: "width: 5%",
   },
 ];
-const reservations = ref<Reservation[]>()
+const reservations = ref<Reservation[]>();
 
 function getColumnDef(field: string) {
-  return convertTableColumnDef(getReservationFieldDetail(field))
+  return convertTableColumnDef(getReservationFieldDetail(field));
 }
 
 function onRequest(props) {
-  const { page, rowsPerPage, sortBy, descending } = props.pagination
+  const { page, rowsPerPage, sortBy, descending } = props.pagination;
 
-  status.value.isLoading = true
-  status.value.isLoaded = false
+  status.value.isLoading = true;
+  status.value.isLoaded = false;
 
   fetchReservations({
     page: page - 1,
@@ -301,29 +301,29 @@ function onRequest(props) {
     searchText: filter.value.peopleInfo || undefined,
   })
     .then((response) => {
-      reservations.value = response.values
-      const page = response.page
+      reservations.value = response.values;
+      const page = response.page;
 
-      pagination.value.rowsNumber = page.totalElements
-      pagination.value.page = page.index + 1
-      pagination.value.rowsPerPage = page.size
-      pagination.value.sortBy = sortBy
-      pagination.value.descending = descending
+      pagination.value.rowsNumber = page.totalElements;
+      pagination.value.page = page.index + 1;
+      pagination.value.rowsPerPage = page.size;
+      pagination.value.sortBy = sortBy;
+      pagination.value.descending = descending;
 
-      status.value.isLoaded = true
+      status.value.isLoaded = true;
     })
     .finally(() => {
-      status.value.isLoading = false
+      status.value.isLoading = false;
     });
 }
 
 function reloadData() {
-  tableRef.value.requestServerInteraction()
+  tableRef.value.requestServerInteraction();
 }
 
 function deleteItem(row: Reservation) {
-  const itemId = row.id
-  const itemName = row.name
+  const itemId = row.id;
+  const itemName = row.name;
 
   $q.dialog({
     title: "삭제",
@@ -341,7 +341,7 @@ function deleteItem(row: Reservation) {
   }).onOk(() => {
     deleteReservation(itemId)
       .then(() => {
-        reloadData()
+        reloadData();
       })
       .catch((error) => {
         $q.notify({
@@ -360,6 +360,6 @@ function deleteItem(row: Reservation) {
 }
 
 onMounted(() => {
-  reloadData()
+  reloadData();
 });
 </script>

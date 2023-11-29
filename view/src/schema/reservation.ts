@@ -1,19 +1,19 @@
-import { Room } from "src/schema/room"
-import { ReservationMethod } from "src/schema/reservation-method"
+import { Room } from "src/schema/room";
+import { ReservationMethod } from "src/schema/reservation-method";
 import {
   DynamicRuleMap,
   EnumMap,
   FieldDetail,
   FieldMap,
   StaticRuleMap,
-} from "src/types/map"
-import { formatDate, formatDateTime, formatPrice } from "src/util/format-util"
+} from "src/types/map";
+import { formatDate, formatDateTime, formatPrice } from "src/util/format-util";
 import {
   BASE_AUDIT_FIELD_MAP,
   BASE_TIME_FIELD_MAP,
   BaseAudit,
   BaseTime,
-} from "src/schema/base"
+} from "src/schema/base";
 
 const RESERVATION_STATUS_MAP: EnumMap = {
   NORMAL: "예약 확정",
@@ -24,7 +24,7 @@ const RESERVATION_STATUS_MAP: EnumMap = {
 export type ReservationStatus = keyof typeof RESERVATION_STATUS_MAP;
 
 export function reservationStatusValueToName(role: ReservationStatus) {
-  return RESERVATION_STATUS_MAP[role] || role
+  return RESERVATION_STATUS_MAP[role] || role;
 }
 
 export type Reservation = {
@@ -86,26 +86,26 @@ const ReservationFieldMap: FieldMap = {
 } as const;
 
 export function getReservationFieldDetail(field: string): FieldDetail | null {
-  const fieldDetail = ReservationFieldMap[field]
+  const fieldDetail = ReservationFieldMap[field];
 
   return fieldDetail
     ? {
-      field: field,
-      ...fieldDetail,
-    }
+        field: field,
+        ...fieldDetail,
+      }
     : null;
 }
 
 export function formatReservationFieldToLabel(field: string) {
-  return getReservationFieldDetail(field)?.label ?? field
+  return getReservationFieldDetail(field)?.label ?? field;
 }
 
 export function formatReservationValue(
   field: string,
   value: string | number | null,
 ) {
-  const fieldDetail = getReservationFieldDetail(field)
-  return fieldDetail?.format ? fieldDetail.format(value) : value
+  const fieldDetail = getReservationFieldDetail(field);
+  return fieldDetail?.format ? fieldDetail.format(value) : value;
 }
 
 export const reservationStaticRules: StaticRuleMap = {

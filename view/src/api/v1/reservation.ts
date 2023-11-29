@@ -1,12 +1,12 @@
-import { api } from "boot/axios"
+import { api } from "boot/axios";
 import {
   ListResponse,
   PageRequestParams,
   SingleResponse,
   SortRequestParams,
 } from "src/schema/response";
-import { Reservation, ReservationStatus } from "src/schema/reservation"
-import { Revision } from "src/schema/revision"
+import { Reservation, ReservationStatus } from "src/schema/reservation";
+import { Revision } from "src/schema/revision";
 
 export type FetchReservationsRequestParams = Partial<
   {
@@ -14,7 +14,7 @@ export type FetchReservationsRequestParams = Partial<
     stayEndAt: string;
     searchText: string;
   } & PageRequestParams &
-  SortRequestParams
+    SortRequestParams
 >;
 
 export async function fetchReservations(
@@ -26,14 +26,14 @@ export async function fetchReservations(
       params,
     },
   );
-  return result.data
+  return result.data;
 }
 
 export async function fetchReservation(id: number) {
   const result = await api.get<SingleResponse<Reservation>>(
     `/api/v1/reservations/${id}`,
   );
-  return result.data
+  return result.data;
 }
 
 type ReservationParams = {
@@ -58,7 +58,7 @@ export async function createReservation(params: ReservationCreateParams) {
     "/api/v1/reservations",
     params,
   );
-  return result.data
+  return result.data;
 }
 
 export type ReservationPatchParams = Partial<ReservationParams>;
@@ -71,12 +71,12 @@ export async function patchReservation(
     `/api/v1/reservations/${id}`,
     params,
   );
-  return result.data
+  return result.data;
 }
 
 export async function deleteReservation(id: number) {
-  const result = await api.delete(`/api/v1/reservations/${id}`)
-  return result.data
+  const result = await api.delete(`/api/v1/reservations/${id}`);
+  return result.data;
 }
 
 type FetchReservationHistoriesRequestParams = Partial<
@@ -93,5 +93,5 @@ export async function fetchReservationHistories(
       params,
     },
   );
-  return result.data
+  return result.data;
 }

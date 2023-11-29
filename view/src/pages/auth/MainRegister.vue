@@ -18,23 +18,23 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from "vue-router"
-import { useAuthStore } from "stores/auth"
+import { useRouter } from "vue-router";
+import { useAuthStore } from "stores/auth";
 
-import RegisterCard from "components/auth/RegisterCard.vue"
-import { useAppConfigStore } from "stores/app-config"
-import { onBeforeMount } from "vue"
+import RegisterCard from "components/auth/RegisterCard.vue";
+import { useAppConfigStore } from "stores/app-config";
+import { onBeforeMount } from "vue";
 
-const router = useRouter()
-const authStore = useAuthStore()
-const appConfigStore = useAppConfigStore()
+const router = useRouter();
+const authStore = useAuthStore();
+const appConfigStore = useAppConfigStore();
 
 onBeforeMount(() => {
-  if (authStore.isLoggedIn) router.push({ name: "Home" })
+  if (authStore.isLoggedIn) router.push({ name: "Home" });
 
   appConfigStore.loadAppConfig(true).finally(() => {
     if (!appConfigStore.config.isAvailableRegistration)
-      router.push({ name: "Login" })
+      router.push({ name: "Login" });
   });
 });
 </script>

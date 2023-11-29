@@ -1,4 +1,4 @@
-import { FieldDetail } from "src/types/map"
+import { FieldDetail } from "src/types/map";
 
 type TableColumnDefinition = {
   label: string;
@@ -12,8 +12,8 @@ export function convertTableColumnDef(
 ): TableColumnDefinition | null {
   return fieldDetail
     ? ({
-      ...fieldDetail,
-      name: fieldDetail.field,
-    } as TableColumnDefinition)
+        ...fieldDetail,
+        name: fieldDetail.field,
+      } as TableColumnDefinition)
     : null;
 }

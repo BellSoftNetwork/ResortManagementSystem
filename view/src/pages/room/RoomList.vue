@@ -5,5 +5,5 @@
 </template>
 
 <script setup lang="ts">
-import RoomListTable from "components/room/RoomListTable.vue"
+import RoomListTable from "components/room/RoomListTable.vue";
 </script>

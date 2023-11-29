@@ -67,23 +67,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
-import { useAuthStore } from "stores/auth"
-import { useQuasar } from "quasar"
-import { User, userStaticRules } from "src/schema/user"
+import { ref } from "vue";
+import { useAuthStore } from "stores/auth";
+import { useQuasar } from "quasar";
+import { User, userStaticRules } from "src/schema/user";
 import {
   AdminAccountPatchParams,
   patchAdminAccount,
-} from "src/api/v1/admin/account"
+} from "src/api/v1/admin/account";
 
-const authStore = useAuthStore()
-const $q = useQuasar()
+const authStore = useAuthStore();
+const $q = useQuasar();
 
-const emit = defineEmits(["complete"])
+const emit = defineEmits(["complete"]);
 const props = defineProps<{
   entity: User;
 }>();
-const id = props.entity.id
+const id = props.entity.id;
 const dialog = ref({
   isOpen: false,
 });
@@ -117,15 +117,15 @@ function update() {
       ],
     });
 
-    return
+    return;
   }
 
-  status.value.isProgress = true
+  status.value.isProgress = true;
 
   patchAdminAccount(id, patchedData())
     .then(() => {
-      emit("complete")
-      dialog.value.isOpen = false
+      emit("complete");
+      dialog.value.isOpen = false;
     })
     .catch((error) => {
       $q.notify({
@@ -141,7 +141,7 @@ function update() {
       });
     })
     .finally(() => {
-      status.value.isProgress = false
+      status.value.isProgress = false;
     });
 }
 
@@ -154,22 +154,22 @@ function isChanged() {
 }
 
 function patchedData() {
-  const patchData: AdminAccountPatchParams = {}
+  const patchData: AdminAccountPatchParams = {};
 
   if (props.entity.name !== formData.value.name)
-    patchData.name = formData.value.name
+    patchData.name = formData.value.name;
   if (props.entity.role !== formData.value.role)
-    patchData.role = formData.value.role
+    patchData.role = formData.value.role;
   if (formData.value.password.length > 0)
-    patchData.password = formData.value.password
+    patchData.password = formData.value.password;
 
-  return patchData
+  return patchData;
 }
 
 function resetForm() {
-  formData.value.email = props.entity.email
-  formData.value.name = props.entity.name
-  formData.value.password = ""
-  formData.value.role = props.entity.role
+  formData.value.email = props.entity.email;
+  formData.value.name = props.entity.name;
+  formData.value.password = "";
+  formData.value.role = props.entity.role;
 }
 </script>

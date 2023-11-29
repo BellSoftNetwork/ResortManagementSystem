@@ -14,15 +14,17 @@ import org.mapstruct.Mappings
 import org.mapstruct.NullValuePropertyMappingStrategy
 
 @Mapper(
-    uses = [JsonNullableMapper::class, ReferenceMapper::class, RoomMapper::class, ReservationMethodMapper::class],
+    uses = [
+        JsonNullableMapper::class,
+        ReferenceMapper::class,
+        UserMapper::class,
+        RoomMapper::class,
+        ReservationMethodMapper::class,
+    ],
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
     componentModel = "spring",
 )
 interface ReservationMapper {
-    @Mappings(
-        Mapping(target = "createdBy", source = "createdBy.email"),
-        Mapping(target = "updatedBy", source = "updatedBy.email"),
-    )
     fun toDto(entity: Reservation): ReservationDetailDto
 
     @Mappings(

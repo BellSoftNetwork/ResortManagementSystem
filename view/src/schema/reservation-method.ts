@@ -1,6 +1,6 @@
-import { FieldDetail, FieldMap, StaticRuleMap } from "src/types/map"
-import { formatCommissionRate } from "src/util/format-util"
-import { BASE_TIME_FIELD_MAP, BaseTime } from "src/schema/base"
+import { FieldDetail, FieldMap, StaticRuleMap } from "src/types/map";
+import { formatCommissionRate } from "src/util/format-util";
+import { BASE_TIME_FIELD_MAP, BaseTime } from "src/schema/base";
 
 export type ReservationMethod = {
   id: number;
@@ -23,26 +23,26 @@ const ReservationMethodFieldMap: FieldMap = {
 export function getReservationMethodFieldDetail(
   field: string,
 ): FieldDetail | null {
-  const fieldDetail = ReservationMethodFieldMap[field]
+  const fieldDetail = ReservationMethodFieldMap[field];
 
   return fieldDetail
     ? {
-      field: field,
-      ...fieldDetail,
-    }
+        field: field,
+        ...fieldDetail,
+      }
     : null;
 }
 
 export function formatReservationMethodFieldToLabel(field: string) {
-  return getReservationMethodFieldDetail(field)?.label ?? field
+  return getReservationMethodFieldDetail(field)?.label ?? field;
 }
 
 export function formatReservationMethodValue(
   field: string,
   value: string | number | null,
 ) {
-  const fieldDetail = getReservationMethodFieldDetail(field)
-  return fieldDetail?.format ? fieldDetail.format(value) : value
+  const fieldDetail = getReservationMethodFieldDetail(field);
+  return fieldDetail?.format ? fieldDetail.format(value) : value;
 }
 
 export const reservationMethodStaticRules: StaticRuleMap = {

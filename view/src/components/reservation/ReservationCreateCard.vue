@@ -210,30 +210,30 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeMount, ref } from "vue"
-import { useRouter } from "vue-router"
-import { useQuasar } from "quasar"
-import dayjs from "dayjs"
-import RoomSelectTable from "components/room/RoomSelectTable.vue"
+import { computed, onBeforeMount, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useQuasar } from "quasar";
+import dayjs from "dayjs";
+import RoomSelectTable from "components/room/RoomSelectTable.vue";
 import {
   formatDate,
   formatDiffDays,
   formatPrice,
   formatStayCaption,
   formatStayTitle,
-} from "src/util/format-util"
+} from "src/util/format-util";
 import {
   reservationDynamicRules,
   reservationStaticRules,
-} from "src/schema/reservation"
-import { createReservation } from "src/api/v1/reservation"
-import { fetchReservationMethods } from "src/api/v1/reservation-method"
-import { formatSortParam } from "src/util/query-string-util"
-import { ReservationMethod } from "src/schema/reservation-method"
-import { Room } from "src/schema/room"
+} from "src/schema/reservation";
+import { createReservation } from "src/api/v1/reservation";
+import { fetchReservationMethods } from "src/api/v1/reservation-method";
+import { formatSortParam } from "src/util/query-string-util";
+import { ReservationMethod } from "src/schema/reservation-method";
+import { Room } from "src/schema/room";
 
-const router = useRouter()
-const $q = useQuasar()
+const router = useRouter();
+const $q = useQuasar();
 
 const formModel = ref({
   status: {
@@ -259,7 +259,7 @@ const formModel = ref({
     status: "PENDING",
   },
 });
-const selectedRoom = ref<Room[]>([])
+const selectedRoom = ref<Room[]>([]);
 const status = ref({
   isProgress: false,
 });
@@ -281,35 +281,35 @@ const reservationMethodStatus = ref({
   isLoading: false,
   isLoaded: false,
 });
-const reservationMethods = ref<ReservationMethod[]>()
+const reservationMethods = ref<ReservationMethod[]>();
 
 function loadReservationMethods() {
-  reservationMethodStatus.value.isLoading = true
-  reservationMethodStatus.value.isLoaded = false
-  reservationMethods.value = []
+  reservationMethodStatus.value.isLoading = true;
+  reservationMethodStatus.value.isLoaded = false;
+  reservationMethods.value = [];
 
   fetchReservationMethods({
     sort: formatSortParam({ field: "name" }),
   })
     .then((response) => {
-      reservationMethods.value = response.values
-      formModel.value.value.reservationMethod = response.values[0]
+      reservationMethods.value = response.values;
+      formModel.value.value.reservationMethod = response.values[0];
 
-      reservationMethodStatus.value.isLoaded = true
+      reservationMethodStatus.value.isLoaded = true;
     })
     .finally(() => {
-      reservationMethodStatus.value.isLoading = false
+      reservationMethodStatus.value.isLoading = false;
     });
 }
 
 function create() {
-  status.value.isProgress = true
+  status.value.isProgress = true;
 
   createReservation(formData())
     .then(() => {
-      router.push({ name: "Reservations" })
+      router.push({ name: "Reservations" });
 
-      resetForm()
+      resetForm();
     })
     .catch((error) => {
       $q.notify({
@@ -325,7 +325,7 @@ function create() {
       });
     })
     .finally(() => {
-      status.value.isProgress = false
+      status.value.isProgress = false;
     });
 }
 
@@ -356,20 +356,20 @@ function changePrice() {
 }
 
 function resetForm() {
-  formModel.value.value.name = ""
-  formModel.value.value.phone = ""
-  formModel.value.value.peopleCount = 4
-  formModel.value.value.stayDate.from = formatDate()
-  formModel.value.value.stayDate.to = dayjs().add(1, "d").format("YYYY-MM-DD")
-  formModel.value.value.price = 0
-  formModel.value.value.paymentAmount = 0
-  formModel.value.value.brokerFee = 0
-  formModel.value.value.note = ""
-  formModel.value.value.status = "PENDING"
+  formModel.value.value.name = "";
+  formModel.value.value.phone = "";
+  formModel.value.value.peopleCount = 4;
+  formModel.value.value.stayDate.from = formatDate();
+  formModel.value.value.stayDate.to = dayjs().add(1, "d").format("YYYY-MM-DD");
+  formModel.value.value.price = 0;
+  formModel.value.value.paymentAmount = 0;
+  formModel.value.value.brokerFee = 0;
+  formModel.value.value.note = "";
+  formModel.value.value.status = "PENDING";
 }
 
 onBeforeMount(() => {
-  resetForm()
-  loadReservationMethods()
+  resetForm();
+  loadReservationMethods();
 });
 </script>

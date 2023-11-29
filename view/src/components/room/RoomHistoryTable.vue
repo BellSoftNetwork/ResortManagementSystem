@@ -50,12 +50,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue"
-import { formatDateTime } from "src/util/format-util"
-import { formatRoomFieldToLabel, formatRoomValue, Room } from "src/schema/room"
-import { Revision, REVISION_TYPE_MAP } from "src/schema/revision"
-import { fetchRoomHistories } from "src/api/v1/room"
-import { formatSortParam } from "src/util/query-string-util"
+import { onMounted, ref } from "vue";
+import { formatDateTime } from "src/util/format-util";
+import { formatRoomFieldToLabel, formatRoomValue, Room } from "src/schema/room";
+import { Revision, REVISION_TYPE_MAP } from "src/schema/revision";
+import { fetchRoomHistories } from "src/api/v1/room";
+import { formatSortParam } from "src/util/query-string-util";
 
 const props = defineProps<{
   id: number;
@@ -65,8 +65,8 @@ const status = ref({
   isLoaded: false,
   isPatching: false,
 });
-const tableRef = ref()
-const filter = ref("")
+const tableRef = ref();
+const filter = ref("");
 const pagination = ref({
   sortBy: "updatedAt",
   descending: true,
@@ -101,13 +101,13 @@ const columns = [
     format: formatDateTime,
   },
 ];
-const roomHistories = ref<Revision<Room>[]>()
+const roomHistories = ref<Revision<Room>[]>();
 
 function onRequest(tableProps) {
-  const { page, rowsPerPage, sortBy, descending } = tableProps.pagination
+  const { page, rowsPerPage, sortBy, descending } = tableProps.pagination;
 
-  status.value.isLoading = true
-  status.value.isLoaded = false
+  status.value.isLoading = true;
+  status.value.isLoaded = false;
 
   fetchRoomHistories(props.id, {
     page: page - 1,
@@ -115,27 +115,27 @@ function onRequest(tableProps) {
     sort: formatSortParam({ field: sortBy, isDescending: descending }),
   })
     .then((response) => {
-      roomHistories.value = response.values
-      const page = response.page
+      roomHistories.value = response.values;
+      const page = response.page;
 
-      pagination.value.rowsNumber = page.totalElements
-      pagination.value.page = page.index + 1
-      pagination.value.rowsPerPage = page.size
-      pagination.value.sortBy = sortBy
-      pagination.value.descending = descending
+      pagination.value.rowsNumber = page.totalElements;
+      pagination.value.page = page.index + 1;
+      pagination.value.rowsPerPage = page.size;
+      pagination.value.sortBy = sortBy;
+      pagination.value.descending = descending;
 
-      status.value.isLoaded = true
+      status.value.isLoaded = true;
     })
     .finally(() => {
-      status.value.isLoading = false
+      status.value.isLoading = false;
     });
 }
 
 function reloadData() {
-  tableRef.value.requestServerInteraction()
+  tableRef.value.requestServerInteraction();
 }
 
 onMounted(() => {
-  reloadData()
+  reloadData();
 });
 </script>

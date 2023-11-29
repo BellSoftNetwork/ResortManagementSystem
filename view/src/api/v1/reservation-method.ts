@@ -1,11 +1,11 @@
-import { api } from "boot/axios"
+import { api } from "boot/axios";
 import {
   ListResponse,
   PageRequestParams,
   SingleResponse,
   SortRequestParams,
 } from "src/schema/response";
-import { ReservationMethod } from "src/schema/reservation-method"
+import { ReservationMethod } from "src/schema/reservation-method";
 
 type FetchReservationMethodsRequestParams = Partial<
   PageRequestParams & SortRequestParams
@@ -20,14 +20,14 @@ export async function fetchReservationMethods(
       params,
     },
   );
-  return result.data
+  return result.data;
 }
 
 export async function fetchReservationMethod(id: number) {
   const result = await api.get<SingleResponse<ReservationMethod>>(
     `/api/v1/reservation-methods/${id}`,
   );
-  return result.data
+  return result.data;
 }
 
 type ReservationMethodParams = {
@@ -41,7 +41,7 @@ export async function createReservationMethod(params: ReservationMethodParams) {
     "/api/v1/reservation-methods",
     params,
   );
-  return result.data
+  return result.data;
 }
 
 export async function patchReservationMethod(
@@ -52,10 +52,10 @@ export async function patchReservationMethod(
     `/api/v1/reservation-methods/${id}`,
     params,
   );
-  return result.data
+  return result.data;
 }
 
 export async function deleteReservationMethod(id: number) {
-  const result = await api.delete(`/api/v1/reservation-methods/${id}`)
-  return result.data
+  const result = await api.delete(`/api/v1/reservation-methods/${id}`);
+  return result.data;
 }
