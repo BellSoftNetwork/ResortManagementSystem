@@ -1,8 +1,8 @@
 // Utilities
-import { defineStore } from "pinia"
-import { User } from "src/schema/user"
-import { postLogin, postLogout } from "src/api/v1/auth"
-import { postMy } from "src/api/v1/main"
+import { defineStore } from "pinia";
+import { User } from "src/schema/user";
+import { postLogin, postLogout } from "src/api/v1/auth";
+import { postMy } from "src/api/v1/main";
 
 interface State {
   status: {
@@ -33,18 +33,18 @@ export const useAuthStore = defineStore("auth", {
     loadAccountInfo() {
       return postMy()
         .then((response) => {
-          this.user = response.value
+          this.user = response.value;
         })
         .catch(() => {
-          this.user = null
+          this.user = null;
         })
         .finally(() => {
-          this.status.isFirstRequest = false
+          this.status.isFirstRequest = false;
         });
     },
 
     login(email: string, password: string) {
-      this.user = null
+      this.user = null;
 
       const account = {
         email: email,
@@ -52,13 +52,13 @@ export const useAuthStore = defineStore("auth", {
       };
 
       return postLogin(account).then((response) => {
-        this.user = response.value
+        this.user = response.value;
       });
     },
 
     logout() {
       return postLogout().then(() => {
-        this.user = null
+        this.user = null;
       });
     },
   },

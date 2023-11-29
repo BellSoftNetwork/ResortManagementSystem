@@ -5,5 +5,5 @@
 </template>
 
 <script setup lang="ts">
-import MyDetailCard from "components/my/MyDetailCard.vue"
+import MyDetailCard from "components/my/MyDetailCard.vue";
 </script>

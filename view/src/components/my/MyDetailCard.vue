@@ -37,21 +37,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
-import { useRouter } from "vue-router"
-import { useAuthStore } from "stores/auth"
-import { useQuasar } from "quasar"
-import { User, userDynamicRules, userStaticRules } from "src/schema/user"
-import { MyPatchParams, patchMy } from "src/api/v1/main"
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "stores/auth";
+import { useQuasar } from "quasar";
+import { User, userDynamicRules, userStaticRules } from "src/schema/user";
+import { MyPatchParams, patchMy } from "src/api/v1/main";
 
-const router = useRouter()
-const authStore = useAuthStore()
-const $q = useQuasar()
+const router = useRouter();
+const authStore = useAuthStore();
+const $q = useQuasar();
 
 const status = ref({
   isProgress: false,
 });
-const user = authStore.user as User
+const user = authStore.user as User;
 const formData = ref({
   password: "",
   passwordConfirm: "",
@@ -71,10 +71,10 @@ function update() {
       ],
     });
 
-    return
+    return;
   }
 
-  status.value.isProgress = true
+  status.value.isProgress = true;
 
   patchMy(patchedData())
     .then(() => {
@@ -94,7 +94,7 @@ function update() {
         .logout()
         .then(() => {
           authStore.loadAccountInfo().finally(() => {
-            router.push({ name: "Login" })
+            router.push({ name: "Login" });
           });
         })
         .catch((error) => {
@@ -125,20 +125,20 @@ function update() {
       });
     })
     .finally(() => {
-      status.value.isProgress = false
+      status.value.isProgress = false;
     });
 }
 
 function isChanged() {
-  return formData.value.password.length > 0
+  return formData.value.password.length > 0;
 }
 
 function patchedData() {
-  const patchData: MyPatchParams = {}
+  const patchData: MyPatchParams = {};
 
   if (formData.value.password.length > 0)
-    patchData.password = formData.value.password
+    patchData.password = formData.value.password;
 
-  return patchData
+  return patchData;
 }
 </script>

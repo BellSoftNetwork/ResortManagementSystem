@@ -22,8 +22,8 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from "stores/auth"
-import { formatDateTime } from "src/util/format-util"
+import { useAuthStore } from "stores/auth";
+import { formatDateTime } from "src/util/format-util";
 
-const authStore = useAuthStore()
+const authStore = useAuthStore();
 </script>

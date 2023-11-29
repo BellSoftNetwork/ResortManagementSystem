@@ -43,7 +43,7 @@
                           color="primary"
                           dense
                           flat
-                        >{{ props.row.room.number }}
+                          >{{ props.row.room.number }}
                         </q-btn>
                       </div>
                       <div v-else>
@@ -67,7 +67,7 @@
                         color="primary"
                         dense
                         flat
-                      >{{ props.row.name }}
+                        >{{ props.row.name }}
                       </q-btn>
                     </div>
                     <div v-else>
@@ -112,17 +112,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue"
-import dayjs from "dayjs"
-import { useQuasar } from "quasar"
-import { useAuthStore } from "stores/auth"
-import { formatDate, formatPrice } from "src/util/format-util"
-import { convertTableColumnDef } from "src/util/table-util"
-import { getReservationFieldDetail, Reservation } from "src/schema/reservation"
-import { fetchReservations } from "src/api/v1/reservation"
+import { computed, onMounted, ref } from "vue";
+import dayjs from "dayjs";
+import { useQuasar } from "quasar";
+import { useAuthStore } from "stores/auth";
+import { formatDate, formatPrice } from "src/util/format-util";
+import { convertTableColumnDef } from "src/util/table-util";
+import { getReservationFieldDetail, Reservation } from "src/schema/reservation";
+import { fetchReservations } from "src/api/v1/reservation";
 
-const $q = useQuasar()
-const authStore = useAuthStore()
+const $q = useQuasar();
+const authStore = useAuthStore();
 const status = ref({
   isLoading: false,
   isLoaded: false,
@@ -173,8 +173,8 @@ const columns = [
     headerStyle: "width: 10%",
   },
 ];
-const date = ref(formatDate())
-const reservationsOfDay = ref({})
+const date = ref(formatDate());
+const reservationsOfDay = ref({});
 const events = computed(() =>
   Object.keys(reservationsOfDay.value).map((date) =>
     dayjs(date).format("YYYY/MM/DD"),
@@ -182,72 +182,74 @@ const events = computed(() =>
 );
 
 function getColumnDef(field: string) {
-  return convertTableColumnDef(getReservationFieldDetail(field))
+  return convertTableColumnDef(getReservationFieldDetail(field));
 }
 
 function fetchData() {
-  status.value.isLoading = true
-  status.value.isLoaded = false
+  status.value.isLoading = true;
+  status.value.isLoaded = false;
 
   fetchReservations({
     stayStartAt: filter.value.stayStartAt,
     stayEndAt: filter.value.stayEndAt,
   })
     .then((response) => {
-      reservationsOfDay.value = formatReservations(response.values)
+      reservationsOfDay.value = formatReservations(response.values);
 
-      status.value.isLoaded = true
+      status.value.isLoaded = true;
     })
     .finally(() => {
-      status.value.isLoading = false
+      status.value.isLoading = false;
     });
 }
 
 function formatReservations(reservations: Reservation[]) {
-  const reservationMap: { [date: string]: Reservation[] } = {}
+  const reservationMap: {
+    [date: string]: Reservation[];
+  } = {};
 
   reservations.forEach((reservation) => {
-    reservation.missPrice = reservation.price - reservation.paymentAmount
+    reservation.missPrice = reservation.price - reservation.paymentAmount;
 
     for (let [index, date] of getDateArray(
       reservation.stayStartAt,
       reservation.stayEndAt,
     ).entries()) {
       if (!Object.keys(reservationMap).includes(date))
-        reservationMap[date] = []
+        reservationMap[date] = [];
 
-      const reservationCopy = { ...reservation, type: "N/A" }
+      const reservationCopy = { ...reservation, type: "N/A" };
 
-      if (index === 0) reservationCopy.type = "입실"
-      else if (date === reservation.stayEndAt) reservationCopy.type = "퇴실"
-      else reservationCopy.type = "연박"
+      if (index === 0) reservationCopy.type = "입실";
+      else if (date === reservation.stayEndAt) reservationCopy.type = "퇴실";
+      else reservationCopy.type = "연박";
 
-      reservationMap[date].push(reservationCopy)
+      reservationMap[date].push(reservationCopy);
     }
   });
 
-  return reservationMap
+  return reservationMap;
 }
 
 function getDateArray(startDate: string, endDate: string) {
-  const stayStartDate = formatDate(startDate)
-  const stayEndAt = formatDate(endDate)
-  const dateArray = []
+  const stayStartDate = formatDate(startDate);
+  const stayEndAt = formatDate(endDate);
+  const dateArray = [];
 
   for (
     let date = stayStartDate;
     date <= stayEndAt;
     date = dayjs(date).add(1, "day").format("YYYY-MM-DD")
   ) {
-    dateArray.push(date)
+    dateArray.push(date);
   }
 
-  return dateArray
+  return dateArray;
 }
 
 function changeView(view) {
-  const year = view.year
-  const month = view.month
+  const year = view.year;
+  const month = view.month;
 
   filter.value.stayStartAt = dayjs(`${year}-${month}-01`)
     .startOf("month")
@@ -256,18 +258,18 @@ function changeView(view) {
     .endOf("month")
     .format("YYYY-MM-DD");
 
-  fetchData()
+  fetchData();
 }
 
 function missPriceBackgroundColor(value) {
-  if (value.reservationMethod.requireUnpaidAmountCheck === false) return ""
+  if (value.reservationMethod.requireUnpaidAmountCheck === false) return "";
 
-  if (value.missPrice > 0) return "bg-warning"
+  if (value.missPrice > 0) return "bg-warning";
 
-  return ""
+  return "";
 }
 
 onMounted(() => {
-  fetchData()
+  fetchData();
 });
 </script>

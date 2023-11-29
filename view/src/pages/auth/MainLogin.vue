@@ -18,16 +18,16 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from "vue-router"
-import { useAuthStore } from "stores/auth"
+import { useRouter } from "vue-router";
+import { useAuthStore } from "stores/auth";
 
-import LoginCard from "components/auth/LoginCard.vue"
-import { onBeforeMount } from "vue"
+import LoginCard from "components/auth/LoginCard.vue";
+import { onBeforeMount } from "vue";
 
-const router = useRouter()
-const authStore = useAuthStore()
+const router = useRouter();
+const authStore = useAuthStore();
 
 onBeforeMount(() => {
-  if (authStore.isLoggedIn) router.push({ name: "Home" })
+  if (authStore.isLoggedIn) router.push({ name: "Home" });
 });
 </script>

@@ -70,16 +70,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
-import { useRouter } from "vue-router"
-import { useAuthStore } from "stores/auth"
-import { useQuasar } from "quasar"
-import { userDynamicRules, userStaticRules } from "src/schema/user"
-import { postRegister } from "src/api/v1/auth"
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "stores/auth";
+import { useQuasar } from "quasar";
+import { userDynamicRules, userStaticRules } from "src/schema/user";
+import { postRegister } from "src/api/v1/auth";
 
-const router = useRouter()
-const $q = useQuasar()
-const authStore = useAuthStore()
+const router = useRouter();
+const $q = useQuasar();
+const authStore = useAuthStore();
 
 const status = ref({
   isProgress: false,
@@ -92,14 +92,14 @@ const formData = ref({
 });
 
 function register() {
-  status.value.isProgress = true
+  status.value.isProgress = true;
 
   postRegister(formData.value)
     .then(() => {
       authStore
         .login(formData.value.email, formData.value.password)
         .then(() => {
-          router.push({ name: "Home" })
+          router.push({ name: "Home" });
         })
         .catch((error) => {
           $q.notify({
@@ -114,10 +114,10 @@ function register() {
             ],
           });
 
-          router.push({ name: "Login" })
+          router.push({ name: "Login" });
         })
         .finally(() => {
-          status.value.isProgress = false
+          status.value.isProgress = false;
         });
     })
     .catch((error) => {
@@ -134,7 +134,7 @@ function register() {
       });
     })
     .finally(() => {
-      status.value.isProgress = false
+      status.value.isProgress = false;
     });
 }
 </script>

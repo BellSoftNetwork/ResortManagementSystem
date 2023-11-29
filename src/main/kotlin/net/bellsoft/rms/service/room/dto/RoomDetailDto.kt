@@ -1,6 +1,7 @@
 package net.bellsoft.rms.service.room.dto
 
 import net.bellsoft.rms.domain.room.RoomStatus
+import net.bellsoft.rms.service.auth.dto.UserSummaryDto
 import java.time.LocalDateTime
 
 data class RoomDetailDto(
@@ -12,7 +13,7 @@ data class RoomDetailDto(
     val note: String,
     val status: RoomStatus,
     val createdAt: LocalDateTime,
-    val createdBy: String,
+    val createdBy: UserSummaryDto,
     val updatedAt: LocalDateTime,
-    val updatedBy: String,
+    val updatedBy: UserSummaryDto,
 )

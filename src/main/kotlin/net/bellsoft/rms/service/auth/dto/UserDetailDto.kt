@@ -5,7 +5,7 @@ import net.bellsoft.rms.domain.user.UserRole
 import net.bellsoft.rms.domain.user.UserStatus
 import java.time.LocalDateTime
 
-@Schema(description = "사용자 정보")
+@Schema(description = "사용자 상세 정보")
 data class UserDetailDto(
     @Schema(description = "사용자 고유 id", example = "1")
     val id: Long,

@@ -1,4 +1,4 @@
-import { ValidationRule } from "quasar"
+import { ValidationRule } from "quasar";
 
 export type EnumMap = {
   [field: string]: string;

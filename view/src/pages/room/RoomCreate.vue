@@ -5,5 +5,5 @@
 </template>
 
 <script setup lang="ts">
-import RoomCreateCard from "components/room/RoomCreateCard.vue"
+import RoomCreateCard from "components/room/RoomCreateCard.vue";
 </script>

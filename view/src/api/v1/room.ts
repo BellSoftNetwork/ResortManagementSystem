@@ -1,12 +1,12 @@
-import { api } from "boot/axios"
+import { api } from "boot/axios";
 import {
   ListResponse,
   PageRequestParams,
   SingleResponse,
   SortRequestParams,
 } from "src/schema/response";
-import { Room, RoomStatus } from "src/schema/room"
-import { Revision } from "src/schema/revision"
+import { Room, RoomStatus } from "src/schema/room";
+import { Revision } from "src/schema/revision";
 
 type FetchRoomsRequestParams = Partial<
   {
@@ -14,19 +14,19 @@ type FetchRoomsRequestParams = Partial<
     stayEndAt: string;
     status: RoomStatus;
   } & PageRequestParams &
-  SortRequestParams
+    SortRequestParams
 >;
 
 export async function fetchRooms(params: FetchRoomsRequestParams) {
   const result = await api.get<ListResponse<Room>>("/api/v1/rooms", {
     params,
   });
-  return result.data
+  return result.data;
 }
 
 export async function fetchRoom(id: number) {
-  const result = await api.get<SingleResponse<Room>>(`/api/v1/rooms/${id}`)
-  return result.data
+  const result = await api.get<SingleResponse<Room>>(`/api/v1/rooms/${id}`);
+  return result.data;
 }
 
 type RoomParams = {
@@ -39,8 +39,8 @@ type RoomParams = {
 };
 
 export async function createRoom(params: RoomParams) {
-  const result = await api.post<SingleResponse<Room>>("/api/v1/rooms", params)
-  return result.data
+  const result = await api.post<SingleResponse<Room>>("/api/v1/rooms", params);
+  return result.data;
 }
 
 export async function patchRoom(id: number, params: Partial<RoomParams>) {
@@ -48,12 +48,12 @@ export async function patchRoom(id: number, params: Partial<RoomParams>) {
     `/api/v1/rooms/${id}`,
     params,
   );
-  return result.data
+  return result.data;
 }
 
 export async function deleteRoom(id: number) {
-  const result = await api.delete(`/api/v1/rooms/${id}`)
-  return result.data
+  const result = await api.delete(`/api/v1/rooms/${id}`);
+  return result.data;
 }
 
 type FetchRoomHistoriesRequestParams = Partial<
@@ -70,5 +70,5 @@ export async function fetchRoomHistories(
       params,
     },
   );
-  return result.data
+  return result.data;
 }

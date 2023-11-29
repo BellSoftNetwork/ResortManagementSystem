@@ -8,6 +8,6 @@
 </template>
 
 <script setup lang="ts">
-import ApiTestCard from "components/test/ApiTestCard.vue"
-import UserInfoCard from "components/test/UserInfoCard.vue"
+import ApiTestCard from "components/test/ApiTestCard.vue";
+import UserInfoCard from "components/test/UserInfoCard.vue";
 </script>

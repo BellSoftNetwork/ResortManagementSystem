@@ -215,7 +215,7 @@ internal class ReservationServiceTest(
                         it[1].updatedFields shouldBe setOf("updatedBy", "room", "name")
                         it[1].entity.name shouldBe "UPDATED"
                         it[1].entity.room!!.id shouldBe newRoom.id
-                        it[1].entity.updatedBy shouldBe newLoginUser.email
+                        it[1].entity.updatedBy.id shouldBe newLoginUser.id
                     }
                 }
 
@@ -245,12 +245,12 @@ internal class ReservationServiceTest(
                     assertSoftly {
                         entityListDto.values.toList().let {
                             it[0].historyType shouldBe HistoryType.CREATED
-                            it[0].entity.createdBy shouldBe loginUser.email
-                            it[0].entity.updatedBy shouldBe loginUser.email
+                            it[0].entity.createdBy.id shouldBe loginUser.id
+                            it[0].entity.updatedBy.id shouldBe loginUser.id
 
                             it[1].historyType shouldBe HistoryType.DELETED
-                            it[1].entity.createdBy shouldBe loginUser.email
-                            it[1].entity.updatedBy shouldBe newLoginUser.email
+                            it[1].entity.createdBy.id shouldBe loginUser.id
+                            it[1].entity.updatedBy.id shouldBe newLoginUser.id
                         }
                     }
                 }

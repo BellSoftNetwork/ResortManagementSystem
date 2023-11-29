@@ -11,13 +11,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
-import TopHeader from "./TopHeader.vue"
-import LeftDrawer from "./LeftDrawer.vue"
+import { ref } from "vue";
+import TopHeader from "./TopHeader.vue";
+import LeftDrawer from "./LeftDrawer.vue";
 
-const leftDrawerRef = ref()
+const leftDrawerRef = ref();
 
 function toggleLeftDrawer() {
-  leftDrawerRef.value.toggleLeftDrawer()
+  leftDrawerRef.value.toggleLeftDrawer();
 }
 </script>

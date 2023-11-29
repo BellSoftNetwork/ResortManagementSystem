@@ -67,16 +67,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
-import { useAuthStore } from "stores/auth"
-import { useQuasar } from "quasar"
-import { userStaticRules } from "src/schema/user"
-import { createAdminAccount } from "src/api/v1/admin/account"
+import { ref } from "vue";
+import { useAuthStore } from "stores/auth";
+import { useQuasar } from "quasar";
+import { userStaticRules } from "src/schema/user";
+import { createAdminAccount } from "src/api/v1/admin/account";
 
-const authStore = useAuthStore()
-const $q = useQuasar()
+const authStore = useAuthStore();
+const $q = useQuasar();
 
-const emit = defineEmits(["complete"])
+const emit = defineEmits(["complete"]);
 const dialog = ref({
   isOpen: false,
 });
@@ -97,14 +97,14 @@ const options = {
 };
 
 function create() {
-  status.value.isProgress = true
+  status.value.isProgress = true;
 
   createAdminAccount(formData.value)
     .then(() => {
-      emit("complete")
-      dialog.value.isOpen = false
+      emit("complete");
+      dialog.value.isOpen = false;
 
-      resetForm()
+      resetForm();
     })
     .catch((error) => {
       $q.notify({
@@ -120,14 +120,14 @@ function create() {
       });
     })
     .finally(() => {
-      status.value.isProgress = false
+      status.value.isProgress = false;
     });
 }
 
 function resetForm() {
-  formData.value.name = ""
-  formData.value.email = ""
-  formData.value.password = ""
-  formData.value.role = "NORMAL"
+  formData.value.name = "";
+  formData.value.email = "";
+  formData.value.password = "";
+  formData.value.role = "NORMAL";
 }
 </script>

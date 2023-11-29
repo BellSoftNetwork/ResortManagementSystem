@@ -79,14 +79,14 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from "vue"
-import { useRouter } from "vue-router"
-import { useQuasar } from "quasar"
-import { roomStaticRules } from "src/schema/room"
-import { createRoom } from "src/api/v1/room"
+import { onBeforeMount, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useQuasar } from "quasar";
+import { roomStaticRules } from "src/schema/room";
+import { createRoom } from "src/api/v1/room";
 
-const router = useRouter()
-const $q = useQuasar()
+const router = useRouter();
+const $q = useQuasar();
 
 const status = ref({
   isProgress: false,
@@ -109,13 +109,13 @@ const options = {
 };
 
 function create() {
-  status.value.isProgress = true
+  status.value.isProgress = true;
 
   createRoom(formData.value)
     .then(() => {
-      router.push({ name: "Rooms" })
+      router.push({ name: "Rooms" });
 
-      resetForm()
+      resetForm();
     })
     .catch((error) => {
       $q.notify({
@@ -131,19 +131,19 @@ function create() {
       });
     })
     .finally(() => {
-      status.value.isProgress = false
+      status.value.isProgress = false;
     });
 }
 
 function resetForm() {
-  formData.value.number = ""
-  formData.value.peekPrice = 0
-  formData.value.offPeekPrice = 0
-  formData.value.description = ""
-  formData.value.status = "NORMAL"
+  formData.value.number = "";
+  formData.value.peekPrice = 0;
+  formData.value.offPeekPrice = 0;
+  formData.value.description = "";
+  formData.value.status = "NORMAL";
 }
 
 onBeforeMount(() => {
-  resetForm()
+  resetForm();
 });
 </script>

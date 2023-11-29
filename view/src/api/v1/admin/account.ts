@@ -1,11 +1,11 @@
-import { api } from "boot/axios"
+import { api } from "boot/axios";
 import {
   ListResponse,
   PageRequestParams,
   SingleResponse,
   SortRequestParams,
 } from "src/schema/response";
-import { User, UserRole } from "src/schema/user"
+import { User, UserRole } from "src/schema/user";
 
 export type FetchAdminAccountsRequestParams = Partial<
   PageRequestParams & SortRequestParams
@@ -17,7 +17,7 @@ export async function fetchAdminAccounts(
   const result = await api.get<ListResponse<User>>("/api/v1/admin/accounts", {
     params,
   });
-  return result.data
+  return result.data;
 }
 
 type AdminAccountParams = {
@@ -34,7 +34,7 @@ export async function createAdminAccount(params: AdminAccountCreateParams) {
     "/api/v1/admin/accounts",
     params,
   );
-  return result.data
+  return result.data;
 }
 
 export type AdminAccountPatchParams = Partial<AdminAccountParams>;
@@ -47,10 +47,10 @@ export async function patchAdminAccount(
     `/api/v1/admin/accounts/${id}`,
     params,
   );
-  return result.data
+  return result.data;
 }
 
 export async function deleteAdminAccount(id: number) {
-  const result = await api.delete(`/api/v1/admin/accounts/${id}`)
-  return result.data
+  const result = await api.delete(`/api/v1/admin/accounts/${id}`);
+  return result.data;
 }

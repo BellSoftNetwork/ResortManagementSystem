@@ -4,8 +4,8 @@ import {
   FieldDetail,
   FieldMap,
   StaticRuleMap,
-} from "src/types/map"
-import { BASE_TIME_FIELD_MAP, BaseTime } from "src/schema/base"
+} from "src/types/map";
+import { BASE_TIME_FIELD_MAP, BaseTime } from "src/schema/base";
 
 const USER_ROLE_MAP: EnumMap = {
   NORMAL: "일반",
@@ -15,7 +15,7 @@ const USER_ROLE_MAP: EnumMap = {
 export type UserRole = keyof typeof USER_ROLE_MAP;
 
 export function userRoleValueToName(role: UserRole) {
-  return USER_ROLE_MAP[role] || role
+  return USER_ROLE_MAP[role] || role;
 }
 
 const USER_STATUS_MAP: EnumMap = {
@@ -33,6 +33,13 @@ export type User = {
   profileImageUrl: string;
 } & BaseTime;
 
+export type UserSummary = {
+  id: number;
+  name: string;
+  email: string;
+  profileImageUrl: string;
+};
+
 const UserFieldMap: FieldMap = {
   id: { label: "ID" } as const,
   name: { label: "이름" } as const,
@@ -44,23 +51,23 @@ const UserFieldMap: FieldMap = {
 } as const;
 
 export function getUserFieldDetail(field: string): FieldDetail | null {
-  const fieldDetail = UserFieldMap[field]
+  const fieldDetail = UserFieldMap[field];
 
   return fieldDetail
     ? {
-      field: field,
-      ...fieldDetail,
-    }
+        field: field,
+        ...fieldDetail,
+      }
     : null;
 }
 
 export function formatUserFieldToLabel(field: string) {
-  return getUserFieldDetail(field)?.label ?? field
+  return getUserFieldDetail(field)?.label ?? field;
 }
 
 export function formatUserValue(field: string, value: string | number | null) {
-  const fieldDetail = getUserFieldDetail(field)
-  return fieldDetail?.format ? fieldDetail.format(value) : value
+  const fieldDetail = getUserFieldDetail(field);
+  return fieldDetail?.format ? fieldDetail.format(value) : value;
 }
 
 export const userStaticRules: StaticRuleMap = {

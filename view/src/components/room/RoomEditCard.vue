@@ -95,21 +95,21 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from "vue"
-import { useRoute, useRouter } from "vue-router"
-import { useQuasar } from "quasar"
-import { Room, roomStaticRules } from "src/schema/room"
-import { fetchRoom, patchRoom } from "src/api/v1/room"
-import { getPatchedFormData, isFormValueChanged } from "src/util/data-util"
+import { onBeforeMount, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useQuasar } from "quasar";
+import { Room, roomStaticRules } from "src/schema/room";
+import { fetchRoom, patchRoom } from "src/api/v1/room";
+import { getPatchedFormData, isFormValueChanged } from "src/util/data-util";
 
-const router = useRouter()
-const route = useRoute()
-const $q = useQuasar()
-const id = Number.parseInt(route.params.id as string)
+const router = useRouter();
+const route = useRoute();
+const $q = useQuasar();
+const id = Number.parseInt(route.params.id as string);
 const status = ref({
   isProgress: false,
 });
-const entity = ref<Room | null>(null)
+const entity = ref<Room | null>(null);
 const formData = ref<Partial<Room>>({
   number: "",
   peekPrice: 0,
@@ -128,19 +128,19 @@ const options = {
 };
 
 function fetchData() {
-  status.value.isProgress = true
+  status.value.isProgress = true;
 
   return fetchRoom(id)
     .then((response) => {
-      entity.value = response.value
+      entity.value = response.value;
     })
     .catch((error) => {
-      if (error.response.status === 404) router.push({ name: "ErrorNotFound" })
+      if (error.response.status === 404) router.push({ name: "ErrorNotFound" });
 
-      console.log(error)
+      console.log(error);
     })
     .finally(() => {
-      status.value.isProgress = false
+      status.value.isProgress = false;
     });
 }
 
@@ -158,14 +158,14 @@ function update() {
       ],
     });
 
-    return
+    return;
   }
 
-  status.value.isProgress = true
+  status.value.isProgress = true;
 
   patchRoom(id, getPatchedFormData(entity.value, formData.value))
     .then(() => {
-      router.push({ name: "Room", params: { id: id } })
+      router.push({ name: "Room", params: { id: id } });
     })
     .catch((error) => {
       $q.notify({
@@ -181,17 +181,17 @@ function update() {
       });
     })
     .finally(() => {
-      status.value.isProgress = false
+      status.value.isProgress = false;
     });
 }
 
 function resetForm() {
-  Object.assign(formData.value, entity.value)
+  Object.assign(formData.value, entity.value);
 }
 
 onBeforeMount(() => {
   fetchData().then(() => {
-    resetForm()
+    resetForm();
   });
 });
 </script>

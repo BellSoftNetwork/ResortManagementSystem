@@ -1,6 +1,6 @@
-import { FieldMap } from "src/types/map"
-import { formatDateTime } from "src/util/format-util"
-import { User } from "src/schema/user"
+import { FieldMap } from "src/types/map";
+import { formatDateTime } from "src/util/format-util";
+import { User, UserSummary } from "src/schema/user";
 
 export type BaseTime = {
   createdAt: string;
@@ -13,8 +13,8 @@ export const BASE_TIME_FIELD_MAP: FieldMap = {
 };
 
 export type BaseAudit = {
-  createdBy: string; // TODO: API 응답 개선하면서 User 로 변경 필요
-  updatedBy: string; // TODO API 응답 개선하면서 User 로 변경 필요
+  createdBy: UserSummary;
+  updatedBy: UserSummary;
 };
 
 export const BASE_AUDIT_FIELD_MAP: FieldMap = {
