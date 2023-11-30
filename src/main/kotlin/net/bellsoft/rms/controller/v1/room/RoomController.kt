@@ -6,18 +6,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import net.bellsoft.rms.component.history.dto.EntityHistoryDto
 import net.bellsoft.rms.controller.common.dto.ListResponse
 import net.bellsoft.rms.controller.common.dto.SingleResponse
 import net.bellsoft.rms.controller.v1.room.dto.RoomCreateRequest
 import net.bellsoft.rms.controller.v1.room.dto.RoomPatchRequest
 import net.bellsoft.rms.controller.v1.room.dto.RoomRequestFilter
 import net.bellsoft.rms.domain.user.User
-import net.bellsoft.rms.service.room.RoomService
-import net.bellsoft.rms.service.room.dto.RoomCreateDto
-import net.bellsoft.rms.service.room.dto.RoomFilterDto
-import net.bellsoft.rms.service.room.dto.RoomPatchDto
+import net.bellsoft.rms.service.room.dto.RoomDetailDto
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.annotation.Validated
@@ -36,9 +35,7 @@ import org.springframework.web.bind.annotation.RestController
 @Validated
 @RestController
 @RequestMapping("/api/v1/rooms")
-class RoomController(
-    private val roomService: RoomService,
-) {
+interface RoomController {
     @Operation(summary = "객실 리스트", description = "객실 리스트 조회")
     @ApiResponses(
         value = [
@@ -46,9 +43,7 @@ class RoomController(
         ],
     )
     @GetMapping
-    fun getRooms(pageable: Pageable, filter: RoomRequestFilter) = ListResponse
-        .of(roomService.findAll(pageable, RoomFilterDto.of(filter)), filter)
-        .toResponseEntity()
+    fun getRooms(pageable: Pageable, filter: RoomRequestFilter): ResponseEntity<ListResponse<RoomDetailDto>>
 
     @Operation(summary = "객실 조회", description = "객실 단건 조회")
     @ApiResponses(
@@ -57,9 +52,7 @@ class RoomController(
         ],
     )
     @GetMapping("/{id}")
-    fun getRoom(@PathVariable("id") id: Long) = SingleResponse
-        .of(roomService.find(id))
-        .toResponseEntity()
+    fun getRoom(@PathVariable("id") id: Long): ResponseEntity<SingleResponse<RoomDetailDto>>
 
     @Operation(summary = "객실 생성", description = "객실 생성")
     @ApiResponses(
@@ -74,8 +67,7 @@ class RoomController(
 
         @RequestBody @Valid
         request: RoomCreateRequest,
-    ) = SingleResponse
-        .of(roomService.create(RoomCreateDto.of(request)))
+    ): SingleResponse<RoomDetailDto>
 
     @Operation(summary = "객실 수정", description = "기존 객실 정보 수정")
     @ApiResponses(
@@ -91,9 +83,7 @@ class RoomController(
 
         @RequestBody @Valid
         request: RoomPatchRequest,
-    ) = SingleResponse
-        .of(roomService.update(id, RoomPatchDto.of(request)))
-        .toResponseEntity()
+    ): ResponseEntity<SingleResponse<RoomDetailDto>>
 
     @Operation(summary = "객실 삭제", description = "기존 객실 삭제")
     @ApiResponses(
@@ -107,9 +97,7 @@ class RoomController(
     fun deleteRoom(
         @AuthenticationPrincipal user: User,
         @PathVariable("id") id: Long,
-    ) {
-        roomService.delete(id)
-    }
+    )
 
     @Operation(summary = "객실 이력", description = "객실 정보 변경 이력 조회")
     @ApiResponses(
@@ -122,7 +110,5 @@ class RoomController(
     fun getRoomHistory(
         @PathVariable("id") id: Long,
         pageable: Pageable,
-    ) = ListResponse
-        .of(roomService.findHistory(id, pageable))
-        .toResponseEntity()
+    ): ResponseEntity<ListResponse<EntityHistoryDto<RoomDetailDto>>>
 }

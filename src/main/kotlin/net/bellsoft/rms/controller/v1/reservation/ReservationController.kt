@@ -6,19 +6,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import mu.KLogging
+import net.bellsoft.rms.component.history.dto.EntityHistoryDto
 import net.bellsoft.rms.controller.common.dto.ListResponse
 import net.bellsoft.rms.controller.common.dto.SingleResponse
 import net.bellsoft.rms.controller.v1.reservation.dto.ReservationCreateRequest
 import net.bellsoft.rms.controller.v1.reservation.dto.ReservationPatchRequest
 import net.bellsoft.rms.controller.v1.reservation.dto.ReservationRequestFilter
 import net.bellsoft.rms.domain.user.User
-import net.bellsoft.rms.service.reservation.ReservationService
-import net.bellsoft.rms.service.reservation.dto.ReservationCreateDto
-import net.bellsoft.rms.service.reservation.dto.ReservationFilterDto
-import net.bellsoft.rms.service.reservation.dto.ReservationPatchDto
+import net.bellsoft.rms.service.reservation.dto.ReservationDetailDto
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.annotation.Validated
@@ -37,9 +35,7 @@ import org.springframework.web.bind.annotation.RestController
 @Validated
 @RestController
 @RequestMapping("/api/v1/reservations")
-class ReservationController(
-    private val reservationService: ReservationService,
-) {
+interface ReservationController {
     @Operation(summary = "예약 리스트", description = "예약 리스트 조회")
     @ApiResponses(
         value = [
@@ -50,9 +46,7 @@ class ReservationController(
     fun getReservations(
         pageable: Pageable,
         filter: ReservationRequestFilter,
-    ) = ListResponse
-        .of(reservationService.findAll(pageable, ReservationFilterDto.of(filter)), filter)
-        .toResponseEntity()
+    ): ResponseEntity<ListResponse<ReservationDetailDto>>
 
     @Operation(summary = "예약 조회", description = "예약 단건 조회")
     @ApiResponses(
@@ -61,9 +55,7 @@ class ReservationController(
         ],
     )
     @GetMapping("/{id}")
-    fun getReservation(@PathVariable("id") id: Long) = SingleResponse
-        .of(reservationService.findById(id))
-        .toResponseEntity()
+    fun getReservation(@PathVariable("id") id: Long): ResponseEntity<SingleResponse<ReservationDetailDto>>
 
     @Operation(summary = "예약 생성", description = "예약 생성")
     @ApiResponses(
@@ -78,8 +70,7 @@ class ReservationController(
 
         @RequestBody @Valid
         request: ReservationCreateRequest,
-    ) = SingleResponse
-        .of(reservationService.create(ReservationCreateDto.of(request)))
+    ): SingleResponse<ReservationDetailDto>
 
     @Operation(summary = "예약 수정", description = "기존 예약 정보 수정")
     @ApiResponses(
@@ -95,9 +86,7 @@ class ReservationController(
 
         @RequestBody @Valid
         request: ReservationPatchRequest,
-    ) = SingleResponse
-        .of(reservationService.update(id, ReservationPatchDto.of(request)))
-        .toResponseEntity()
+    ): ResponseEntity<SingleResponse<ReservationDetailDto>>
 
     @Operation(summary = "예약 삭제", description = "기존 예약 삭제")
     @ApiResponses(
@@ -111,9 +100,7 @@ class ReservationController(
     fun deleteReservation(
         @AuthenticationPrincipal user: User,
         @PathVariable("id") id: Long,
-    ) {
-        reservationService.delete(id)
-    }
+    )
 
     @Operation(summary = "예약 이력", description = "예약 정보 변경 이력 조회")
     @ApiResponses(
@@ -126,9 +113,5 @@ class ReservationController(
     fun getReservationHistory(
         @PathVariable("id") id: Long,
         pageable: Pageable,
-    ) = ListResponse
-        .of(reservationService.findHistory(id, pageable))
-        .toResponseEntity()
-
-    companion object : KLogging()
+    ): ResponseEntity<ListResponse<EntityHistoryDto<ReservationDetailDto>>>
 }

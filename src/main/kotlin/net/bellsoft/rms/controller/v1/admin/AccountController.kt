@@ -6,20 +6,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import mu.KLogging
 import net.bellsoft.rms.controller.common.dto.ListResponse
 import net.bellsoft.rms.controller.common.dto.SingleResponse
 import net.bellsoft.rms.controller.v1.admin.dto.AdminUserCreateRequest
 import net.bellsoft.rms.controller.v1.admin.dto.AdminUserPatchRequest
 import net.bellsoft.rms.domain.user.User
-import net.bellsoft.rms.domain.user.UserRole
-import net.bellsoft.rms.exception.PermissionRequiredDataException
-import net.bellsoft.rms.service.auth.AuthService
-import net.bellsoft.rms.service.auth.dto.UserCreateDto
 import net.bellsoft.rms.service.auth.dto.UserDetailDto
-import net.bellsoft.rms.service.auth.dto.UserPatchDto
 import org.springframework.data.domain.Pageable
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -38,9 +31,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @Secured("ADMIN", "SUPER_ADMIN")
 @RequestMapping("/api/v1/admin/accounts")
-class AccountController(
-    private val authService: AuthService,
-) {
+interface AccountController {
     @Operation(summary = "계정 리스트", description = "계정 리스트 조회")
     @ApiResponses(
         value = [
@@ -48,9 +39,7 @@ class AccountController(
         ],
     )
     @GetMapping
-    fun getAccounts(pageable: Pageable) = ListResponse
-        .of((authService.findAll(pageable)))
-        .toResponseEntity()
+    fun getAccounts(pageable: Pageable): ResponseEntity<ListResponse<UserDetailDto>>
 
     @Operation(summary = "계정 생성", description = "신규 계정 추가")
     @ApiResponses(
@@ -63,14 +52,7 @@ class AccountController(
         @AuthenticationPrincipal user: User,
         @RequestBody @Valid
         request: AdminUserCreateRequest,
-    ): ResponseEntity<SingleResponse<UserDetailDto>> {
-        if (request.role >= UserRole.ADMIN && user.role != UserRole.SUPER_ADMIN)
-            throw PermissionRequiredDataException("관리자 이상 권한 설정 시 최고 관리자 권한 필요")
-
-        return SingleResponse
-            .of(authService.register(UserCreateDto.of(request)))
-            .toResponseEntity(HttpStatus.CREATED)
-    }
+    ): ResponseEntity<SingleResponse<UserDetailDto>>
 
     @Operation(summary = "계정 수정", description = "기존 계정 수정")
     @ApiResponses(
@@ -84,18 +66,5 @@ class AccountController(
         @AuthenticationPrincipal user: User,
         @RequestBody @Valid
         request: AdminUserPatchRequest,
-    ): ResponseEntity<SingleResponse<UserDetailDto>> {
-        request.role.orElse(null)?.let {
-            if (it >= UserRole.ADMIN && user.role != UserRole.SUPER_ADMIN)
-                throw PermissionRequiredDataException("관리자 이상 권한 설정 시 최고 관리자 권한 필요")
-        }
-        if (!authService.isUpdatableAccount(user, id))
-            throw PermissionRequiredDataException("동일 또는 상위 권한 계정 정보 수정 불가")
-
-        return SingleResponse
-            .of(authService.updateAccount(id, UserPatchDto.of(request)))
-            .toResponseEntity()
-    }
-
-    companion object : KLogging()
+    ): ResponseEntity<SingleResponse<UserDetailDto>>
 }
