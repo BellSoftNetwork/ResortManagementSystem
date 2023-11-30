@@ -5,12 +5,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import mu.KLogging
 import net.bellsoft.rms.controller.common.dto.SingleResponse
 import net.bellsoft.rms.controller.v1.auth.dto.UserRegistrationRequest
-import net.bellsoft.rms.service.auth.AuthService
-import net.bellsoft.rms.service.auth.dto.UserCreateDto
-import org.springframework.http.HttpStatus
+import net.bellsoft.rms.service.auth.dto.UserDetailDto
+import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -21,9 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 @Validated
 @RestController
 @RequestMapping("/api/v1/auth")
-class AuthController(
-    private val authService: AuthService,
-) {
+interface AuthController {
     @Operation(summary = "회원가입", description = "회원가입 처리")
     @ApiResponses(
         value = [
@@ -34,9 +30,5 @@ class AuthController(
     fun registerUser(
         @RequestBody @Valid
         userRegistrationRequest: UserRegistrationRequest,
-    ) = SingleResponse
-        .of((authService.register(UserCreateDto.of(userRegistrationRequest))))
-        .toResponseEntity(HttpStatus.CREATED)
-
-    companion object : KLogging()
+    ): ResponseEntity<SingleResponse<UserDetailDto>>
 }
