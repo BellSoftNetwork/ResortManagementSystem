@@ -21,6 +21,13 @@
           ></q-input>
 
           <q-input
+            v-model="formData.userId"
+            :rules="userStaticRules.userId"
+            label="계정 ID"
+            required
+          ></q-input>
+
+          <q-input
             v-model="formData.email"
             :rules="userStaticRules.email"
             label="이메일"
@@ -85,6 +92,7 @@ const status = ref({
 });
 const formData = ref({
   name: "",
+  userId: "",
   email: "",
   password: "",
   role: "NORMAL",
@@ -126,6 +134,7 @@ function create() {
 
 function resetForm() {
   formData.value.name = "";
+  formData.value.userId = "";
   formData.value.email = "";
   formData.value.password = "";
   formData.value.role = "NORMAL";

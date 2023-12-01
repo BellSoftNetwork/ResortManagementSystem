@@ -3,6 +3,7 @@ package net.bellsoft.rms.domain.user
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 import net.bellsoft.rms.annotation.ExcludeFromJacocoGeneratedReport
 import net.bellsoft.rms.domain.base.BaseTimeEntity
 import org.hibernate.annotations.SQLDelete
@@ -15,11 +16,22 @@ import java.io.Serial
 import java.io.Serializable
 
 @Entity
-@Table(name = "user")
+@Table(
+    name = "user",
+    uniqueConstraints = [
+        UniqueConstraint(name = "uc_user_user_id", columnNames = ["user_id", "deleted_at"]),
+        UniqueConstraint(name = "uc_user_email", columnNames = ["email", "deleted_at"]),
+    ],
+)
 @SQLDelete(sql = "UPDATE user SET deleted_at = NOW() WHERE id = ?")
 @Where(clause = BaseTimeEntity.SOFT_DELETE_CONDITION)
 class User(
-    @Column(name = "email", nullable = false, unique = true, length = 100)
+    // TODO: 2차 배포 시 Not Null 로 변경
+    @Column(name = "user_id", nullable = true, length = 30)
+    var userId: String?,
+
+    // TODO: 2차 배포 시 Nullable 로 변경
+    @Column(name = "email", nullable = false, length = 100)
     var email: String,
 
     @Column(name = "name", nullable = false, length = 20)

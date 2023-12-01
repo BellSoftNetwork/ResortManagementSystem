@@ -6,7 +6,16 @@
       <q-card-section>
         <q-input v-model="user.name" label="이름" :readonly="true"></q-input>
 
-        <q-input v-model="user.email" :readonly="true" label="이메일"></q-input>
+        <q-input
+          v-model="user.userId"
+          :readonly="true"
+          label="계정 ID"
+        ></q-input>
+        <q-input
+          v-model="formData.email"
+          :rules="userStaticRules.email"
+          label="이메일"
+        ></q-input>
 
         <q-input
           v-model="formData.password"
@@ -38,13 +47,11 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useRouter } from "vue-router";
 import { useAuthStore } from "stores/auth";
 import { useQuasar } from "quasar";
 import { User, userDynamicRules, userStaticRules } from "src/schema/user";
 import { MyPatchParams, patchMy } from "src/api/v1/main";
 
-const router = useRouter();
 const authStore = useAuthStore();
 const $q = useQuasar();
 
@@ -53,6 +60,7 @@ const status = ref({
 });
 const user = authStore.user as User;
 const formData = ref({
+  email: user.email,
   password: "",
   passwordConfirm: "",
 });
@@ -89,27 +97,6 @@ function update() {
           },
         ],
       });
-
-      authStore
-        .logout()
-        .then(() => {
-          authStore.loadAccountInfo().finally(() => {
-            router.push({ name: "Login" });
-          });
-        })
-        .catch((error) => {
-          $q.notify({
-            message: error.response.data.message,
-            type: "negative",
-            actions: [
-              {
-                icon: "close",
-                color: "white",
-                round: true,
-              },
-            ],
-          });
-        });
     })
     .catch((error) => {
       $q.notify({
@@ -130,11 +117,16 @@ function update() {
 }
 
 function isChanged() {
-  return formData.value.password.length > 0;
+  return (
+    formData.value.email !== user.email || formData.value.password.length > 0
+  );
 }
 
 function patchedData() {
   const patchData: MyPatchParams = {};
+
+  if (formData.value.email !== user.email)
+    patchData.email = formData.value.email;
 
   if (formData.value.password.length > 0)
     patchData.password = formData.value.password;

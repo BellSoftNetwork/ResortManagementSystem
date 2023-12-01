@@ -14,10 +14,14 @@
       <q-form @submit="update">
         <q-card-section>
           <q-input
+            v-model="formData.userId"
+            :rules="userStaticRules.userId"
+            label="계정 ID"
+          ></q-input>
+
+          <q-input
             v-model="formData.email"
             :rules="userStaticRules.email"
-            :readonly="true"
-            :disable="true"
             label="이메일"
           ></q-input>
 
@@ -91,6 +95,7 @@ const status = ref({
   isProgress: false,
 });
 const formData = ref({
+  userId: props.entity.userId,
   email: props.entity.email,
   name: props.entity.name,
   password: "",
@@ -147,6 +152,8 @@ function update() {
 
 function isChanged() {
   return (
+    formData.value.userId !== props.entity.userId ||
+    formData.value.email !== props.entity.email ||
     formData.value.name !== props.entity.name ||
     formData.value.role !== props.entity.role ||
     formData.value.password.length > 0
@@ -156,6 +163,10 @@ function isChanged() {
 function patchedData() {
   const patchData: AdminAccountPatchParams = {};
 
+  if (props.entity.userId !== formData.value.userId)
+    patchData.userId = formData.value.userId;
+  if (props.entity.email !== formData.value.email)
+    patchData.email = formData.value.email;
   if (props.entity.name !== formData.value.name)
     patchData.name = formData.value.name;
   if (props.entity.role !== formData.value.role)
@@ -167,6 +178,7 @@ function patchedData() {
 }
 
 function resetForm() {
+  formData.value.userId = props.entity.userId;
   formData.value.email = props.entity.email;
   formData.value.name = props.entity.name;
   formData.value.password = "";

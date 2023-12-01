@@ -37,6 +37,7 @@ class UserFixture {
         private val FAKER = Faker(Locale.KOREA)
 
         val BASE_CONFIGURATION = fixtureConfig {
+            property(User::userId) { "userId-${FAKER.random().hex(5)}" }
             property(User::email) { "${FAKER.random().hex(5)}-${FAKER.internet().emailAddress()}" }
             property(User::name) { "name-${FAKER.random().hex(10)}" }
         }

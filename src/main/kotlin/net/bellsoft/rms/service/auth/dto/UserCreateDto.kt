@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 
 data class UserCreateDto(
     val name: String,
+    val userId: String,
     val email: String,
     val password: String,
     val status: UserStatus = UserStatus.ACTIVE,
@@ -16,6 +17,7 @@ data class UserCreateDto(
 ) {
     fun toEntity(passwordEncoder: PasswordEncoder): User {
         return User(
+            userId = userId,
             email = email,
             name = name,
             password = passwordEncoder.encode(password),
@@ -27,6 +29,7 @@ data class UserCreateDto(
     companion object {
         fun of(dto: AdminUserCreateRequest) = UserCreateDto(
             name = dto.name,
+            userId = dto.userId,
             email = dto.email,
             password = dto.password,
             role = dto.role,
@@ -34,6 +37,7 @@ data class UserCreateDto(
 
         fun of(dto: UserRegistrationRequest) = UserCreateDto(
             name = dto.name,
+            userId = dto.userId,
             email = dto.email,
             password = dto.password,
         )

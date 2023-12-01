@@ -24,7 +24,7 @@ class JsonAuthenticationSuccessHandler(
         authentication: Authentication,
     ) {
         val user = authentication.principal as User
-        logger.info { "인증 성공 (email: ${user.username}, authorities: ${user.authorities})" }
+        logger.info { "인증 성공 (username: ${user.username}, authorities: ${user.authorities})" }
 
         response.apply {
             this.status = HttpStatus.OK.value()

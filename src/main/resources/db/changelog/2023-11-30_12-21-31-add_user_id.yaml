@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1701314491516-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: user_id
+                  type: VARCHAR(30)
+            tableName: user
+  - changeSet:
+      id: 1701314491516-2
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropUniqueConstraint:
+            constraintName: uc_user_email
+            tableName: user
+        - addUniqueConstraint:
+            columnNames: user_id, deleted_at
+            constraintName: uc_user_user_id
+            tableName: user
+        - addUniqueConstraint:
+            columnNames: email, deleted_at
+            constraintName: uc_user_email
+            tableName: user
+

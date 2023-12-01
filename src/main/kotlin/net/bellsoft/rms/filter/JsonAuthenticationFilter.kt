@@ -24,13 +24,13 @@ class JsonAuthenticationFilter(requestMatcher: AntPathRequestMatcher, private va
             throw InvalidAuthHeaderException("'Content-Type: application/json' 설정 필요")
 
         val signInRequest = objectMapper.readValue(request.reader, LoginRequest::class.java)
-        request.setAttribute("email", signInRequest.email)
+        request.setAttribute("username", signInRequest.username)
 
         val token = signInRequest.let {
-            if ((StringUtils.hasText(it.email) && StringUtils.hasText(it.password)).not())
-                throw AuthenticationCredentialsNotFoundException("'email' 및 'password' 정보 필요")
+            if (StringUtils.hasText(it.username).not() || StringUtils.hasText(it.password).not())
+                throw AuthenticationCredentialsNotFoundException("'username' 및 'password' 정보 필요")
 
-            UsernamePasswordAuthenticationToken(it.email, it.password)
+            UsernamePasswordAuthenticationToken(it.username, it.password)
         }
 
         return authenticationManager.authenticate(token)

@@ -18,8 +18,8 @@ class JsonAuthenticationFailureHandler(private val objectMapper: ObjectMapper) :
         response: HttpServletResponse,
         exception: AuthenticationException,
     ) {
-        val email = request.getAttribute("email") as String
-        logger.warn { "인증 실패 - ${exception.message} (email: $email)" }
+        val username = request.getAttribute("username") as String
+        logger.warn { "인증 실패 - ${exception.message} (username: $username)" }
 
         response.apply {
             this.status = HttpStatus.UNAUTHORIZED.value()
@@ -29,7 +29,7 @@ class JsonAuthenticationFailureHandler(private val objectMapper: ObjectMapper) :
         objectMapper.writeValue(
             response.writer,
             AuthenticationFailureResponse(
-                email = email,
+                username = username,
                 message = exception.message.toString(),
             ),
         )
