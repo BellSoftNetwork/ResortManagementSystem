@@ -26,10 +26,14 @@ internal class UserRepositoryTest(
         mockkStatic(LocalDateTime::class)
 
         Given("한 유저가 생성된 상황에서") {
-            val user = userRepository.save(fixture())
+            val user = userRepository.save(
+                fixture {
+                    property(User::email) { "bell@bellsoft.net" }
+                },
+            )
 
             When("등록된 이메일로 유저를 조회하면") {
-                val selectedUser = userRepository.findByEmail(user.email)
+                val selectedUser = userRepository.findByEmail("bell@bellsoft.net")
 
                 Then("정상적으로 조회된다") {
                     selectedUser?.id shouldBe user.id

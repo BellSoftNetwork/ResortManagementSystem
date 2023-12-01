@@ -3,6 +3,8 @@ package net.bellsoft.rms.config
 import com.fasterxml.jackson.databind.ObjectMapper
 import net.bellsoft.rms.component.auth.JsonAuthenticationFailureHandler
 import net.bellsoft.rms.component.auth.JsonAuthenticationSuccessHandler
+import net.bellsoft.rms.component.auth.SessionSecurityContextRepository
+import net.bellsoft.rms.domain.user.UserRepository
 import net.bellsoft.rms.filter.JsonAuthenticationFilter
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -18,7 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
@@ -31,6 +32,7 @@ class SecurityConfig(
     private val authenticationConfiguration: AuthenticationConfiguration,
     private val jsonAuthenticationSuccessHandler: JsonAuthenticationSuccessHandler,
     private val jsonAuthenticationFailureHandler: JsonAuthenticationFailureHandler,
+    private val userRepository: UserRepository,
     private val objectMapper: ObjectMapper,
 ) {
     @Bean
@@ -84,7 +86,7 @@ class SecurityConfig(
     }
 
     @Bean
-    fun securityContextRepository() = HttpSessionSecurityContextRepository()
+    fun securityContextRepository() = SessionSecurityContextRepository(userRepository)
 
     @Bean
     fun passwordEncoder(): PasswordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder()

@@ -12,7 +12,7 @@ data class UserRegistrationRequest(
 
     @Schema(description = "이메일", example = "bell@bellsoft.net")
     @field:Email
-    val email: String,
+    val email: String?,
 
     @Schema(description = "비밀번호", example = "password!@#")
     @field:Size(min = 8, max = 20)

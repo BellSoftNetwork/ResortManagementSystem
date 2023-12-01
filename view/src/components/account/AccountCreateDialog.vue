@@ -31,7 +31,6 @@
             v-model="formData.email"
             :rules="userStaticRules.email"
             label="이메일"
-            required
           ></q-input>
 
           <q-input

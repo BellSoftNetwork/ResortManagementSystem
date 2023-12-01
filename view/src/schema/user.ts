@@ -27,8 +27,8 @@ export type UserStatus = keyof typeof USER_STATUS_MAP;
 export type User = {
   id: number;
   name: string;
-  userId: string | null; // TODO: Not Null 로 변경 예정
-  email: string;
+  userId: string;
+  email: string | null;
   role: UserRole;
   status: UserStatus;
   profileImageUrl: string;
@@ -37,8 +37,8 @@ export type User = {
 export type UserSummary = {
   id: number;
   name: string;
-  userId: string | null; // TODO: Not Null 로 변경 예정
-  email: string;
+  userId: string;
+  email: string | null;
   profileImageUrl: string;
 };
 
@@ -80,13 +80,14 @@ export const userStaticRules: StaticRuleMap = {
   ] as const,
   email: [
     (value: string) =>
+      value.length <= 0 ||
       /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
       "이메일이 유효하지 않습니다.",
   ] as const,
   userId: [
     (value: string) =>
-      (value.length >= 3 && value.length <= 30) ||
-      "아이디가 유효하지 않습니다.",
+      (value.length >= 4 && value.length <= 30) ||
+      "아이디는 4글자 이상 30글자가 필요합니다.",
   ] as const,
   username: [
     (value: string) =>

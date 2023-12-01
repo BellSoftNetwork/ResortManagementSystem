@@ -26,5 +26,7 @@ abstract class UserMapper {
     abstract fun toDto(dto: UserDetailDto): UserSummaryDto
 
     @Named("emailToProfileImageUrl")
-    fun emailToProfileImageUrl(email: String) = "https://gravatar.com/avatar/${MD5Util.md5Hex(email)}"
+    fun emailToProfileImageUrl(email: String?) =
+        email?.let { "https://gravatar.com/avatar/${MD5Util.md5Hex(email)}" }
+            ?: "https://gravatar.com/avatar/00000000000000000000"
 }

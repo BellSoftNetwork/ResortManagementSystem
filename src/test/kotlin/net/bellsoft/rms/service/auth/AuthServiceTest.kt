@@ -36,22 +36,22 @@ internal class AuthServiceTest(
         Given("가입한 사용자가 없는 상황에서") {
             When("신규 회원 가입 시도 시") {
                 val userCreateDto: UserCreateDto = fixture {
-                    property(UserCreateDto::email) { "userId@mail.com" }
+                    property(UserCreateDto::userId) { "userId" }
                 }
                 val user = authService.register(userCreateDto)
 
                 Then("정상적으로 가입된다") {
-                    user.email shouldBe userCreateDto.email
+                    user.userId shouldBe userCreateDto.userId
                 }
             }
 
             When("존재하지 않는 계정 아이디로 유저 로드 시도 시") {
-                val email = "NOT_EXISTS_USER_ID@mail.com"
+                val userId = "NOT_EXISTS_USER_ID"
 
                 Then("유저 로드에 실패한다") {
                     shouldThrow<UsernameNotFoundException> {
-                        authService.loadUserByUsername(email)
-                    }.message shouldBe "$email 은 존재하지 않는 사용자입니다"
+                        authService.loadUserByUsername(userId)
+                    }.message shouldBe "$userId 은 존재하지 않는 사용자입니다"
                 }
             }
 
@@ -68,6 +68,7 @@ internal class AuthServiceTest(
                 val result = authService.register(userCreateDto)
 
                 Then("정상적으로 등록된다") {
+                    result.userId shouldBe userCreateDto.userId
                     result.email shouldBe userCreateDto.email
                     result.name shouldBe userCreateDto.name
                     result.role shouldBe userCreateDto.role
@@ -86,7 +87,10 @@ internal class AuthServiceTest(
         }
 
         Given("기존에 가입한 사용자가 있는 상황에서") {
-            val userCreateDto: UserCreateDto = fixture()
+            val userCreateDto: UserCreateDto = fixture {
+                property(UserCreateDto::userId) { "userId" }
+                property(UserCreateDto::email) { "userId@mail.com" }
+            }
             authService.register(userCreateDto)
 
             When("기존 사용자 ID 와 동일한 ID 로 가입 요청 시") {
@@ -99,27 +103,27 @@ internal class AuthServiceTest(
 
             When("기존 사용자 ID 와 다른 ID 로 가입 요청 시") {
                 val newUserCreateDto: UserCreateDto = fixture {
-                    property(UserCreateDto::email) { "new@mail.com" }
+                    property(UserCreateDto::userId) { "newId" }
+                    property(UserCreateDto::email) { "newId@mail.com" }
                 }
                 val newUser = authService.register(newUserCreateDto)
 
                 Then("정상적으로 가입된다") {
+                    newUser.userId shouldBe newUserCreateDto.userId
                     newUser.email shouldBe newUserCreateDto.email
                 }
             }
 
             When("유효한 계정 아이디로 유저 로드 시도 시") {
-                val email = userCreateDto.email
-
                 Then("유저 엔티티가 정상적으로 로드된다") {
-                    authService.loadUserByUsername(email).username shouldBe email
+                    authService.loadUserByUsername("userId@mail.com").username shouldBe "userId"
                 }
             }
         }
 
         Given("50개의 계정이 생성된 상태에서") {
             val accounts = userRepository.saveAll(
-                (1..50).map { fixture<User> { property(User::email) { "find_all_test$it@mail.com" } } },
+                (1..50).map { fixture<User> { property(User::userId) { "find_all_test$it" } } },
             )
 
             When("계정 리스트 조회 시") {
@@ -147,6 +151,7 @@ internal class AuthServiceTest(
                 val result = authService.register(userCreateDto)
 
                 Then("정상적으로 등록된다") {
+                    result.userId shouldBe userCreateDto.userId
                     result.email shouldBe userCreateDto.email
                     result.name shouldBe userCreateDto.name
                     result.role shouldBe userCreateDto.role

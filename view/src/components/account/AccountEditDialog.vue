@@ -17,6 +17,7 @@
             v-model="formData.userId"
             :rules="userStaticRules.userId"
             label="계정 ID"
+            required
           ></q-input>
 
           <q-input
@@ -165,8 +166,10 @@ function patchedData() {
 
   if (props.entity.userId !== formData.value.userId)
     patchData.userId = formData.value.userId;
-  if (props.entity.email !== formData.value.email)
-    patchData.email = formData.value.email;
+  if (props.entity.email !== formData.value.email) {
+    const email = formData.value.email ? formData.value.email : null;
+    patchData.email = email;
+  }
   if (props.entity.name !== formData.value.name)
     patchData.name = formData.value.name;
   if (props.entity.role !== formData.value.role)
