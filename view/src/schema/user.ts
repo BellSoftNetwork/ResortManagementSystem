@@ -27,6 +27,7 @@ export type UserStatus = keyof typeof USER_STATUS_MAP;
 export type User = {
   id: number;
   name: string;
+  userId: string | null; // TODO: Not Null 로 변경 예정
   email: string;
   role: UserRole;
   status: UserStatus;
@@ -36,6 +37,7 @@ export type User = {
 export type UserSummary = {
   id: number;
   name: string;
+  userId: string | null; // TODO: Not Null 로 변경 예정
   email: string;
   profileImageUrl: string;
 };
@@ -43,6 +45,7 @@ export type UserSummary = {
 const UserFieldMap: FieldMap = {
   id: { label: "ID" } as const,
   name: { label: "이름" } as const,
+  userId: { label: "계정 ID" } as const,
   email: { label: "이메일" } as const,
   role: { label: "권한", format: userRoleValueToName } as const,
   status: { label: "상태" } as const,
@@ -79,6 +82,21 @@ export const userStaticRules: StaticRuleMap = {
     (value: string) =>
       /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
       "이메일이 유효하지 않습니다.",
+  ] as const,
+  userId: [
+    (value: string) =>
+      (value.length >= 3 && value.length <= 30) ||
+      "아이디가 유효하지 않습니다.",
+  ] as const,
+  username: [
+    (value: string) =>
+      !value.includes("@") ||
+      /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
+      "이메일이 유효하지 않습니다.",
+    (value: string) =>
+      value.includes("@") ||
+      (value.length >= 3 && value.length <= 30) ||
+      "아이디가 유효하지 않습니다.",
   ] as const,
   password: [
     (value: string) =>

@@ -98,6 +98,13 @@ const columns = [
     sortable: true,
   },
   {
+    ...getColumnDef("userId"),
+    align: "left",
+    headerStyle: "width: 10%",
+    required: true,
+    sortable: true,
+  },
+  {
     ...getColumnDef("email"),
     align: "left",
     required: true,

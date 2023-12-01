@@ -30,8 +30,12 @@ class AuthService(
 ) : UserDetailsService {
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(username: String): UserDetails {
-        return userRepository.findByEmail(username)
-            ?: throw UserNotFoundException("$username 은 존재하지 않는 사용자입니다")
+        val user = if (username.contains("@"))
+            userRepository.findByEmail(username)
+        else
+            userRepository.findByUserId(username)
+
+        return user ?: throw UserNotFoundException("$username 은 존재하지 않는 사용자입니다")
     }
 
     @Transactional
@@ -39,7 +43,7 @@ class AuthService(
         try {
             return userMapper.toDto(userRepository.save(userCreateDto.toEntity(passwordEncoder)))
         } catch (ex: DataIntegrityViolationException) {
-            throw UnprocessableEntityException("${userCreateDto.email} 로 가입할 수 없습니다")
+            throw UnprocessableEntityException("${userCreateDto.userId}(${userCreateDto.email}) 로 가입할 수 없습니다")
         }
     }
 

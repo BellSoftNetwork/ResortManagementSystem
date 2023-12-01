@@ -1,7 +1,7 @@
 // Utilities
 import { defineStore } from "pinia";
 import { User } from "src/schema/user";
-import { postLogin, postLogout } from "src/api/v1/auth";
+import { LoginParams, postLogin, postLogout } from "src/api/v1/auth";
 import { postMy } from "src/api/v1/main";
 
 interface State {
@@ -43,15 +43,10 @@ export const useAuthStore = defineStore("auth", {
         });
     },
 
-    login(email: string, password: string) {
+    login(params: LoginParams) {
       this.user = null;
 
-      const account = {
-        email: email,
-        password: password,
-      };
-
-      return postLogin(account).then((response) => {
+      return postLogin(params).then((response) => {
         this.user = response.value;
       });
     },

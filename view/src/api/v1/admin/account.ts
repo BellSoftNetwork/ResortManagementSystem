@@ -22,6 +22,7 @@ export async function fetchAdminAccounts(
 
 type AdminAccountParams = {
   name: string;
+  userId: string;
   email: string;
   password: string;
   role: UserRole;

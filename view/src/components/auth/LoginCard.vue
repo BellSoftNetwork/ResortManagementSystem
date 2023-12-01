@@ -13,9 +13,9 @@
     <q-form @submit="login">
       <q-card-section>
         <q-input
-          v-model="formData.email"
-          label="이메일"
-          :rules="userStaticRules.email"
+          v-model="formData.username"
+          label="ID 또는 이메일"
+          :rules="userStaticRules.username"
           :disabled="status.isProgress"
           required
           autofocus
@@ -76,7 +76,7 @@ const status = ref({
   isProgress: false,
 });
 const formData = ref({
-  email: "",
+  username: "",
   password: "",
 });
 
@@ -84,7 +84,7 @@ function login() {
   status.value.isProgress = true;
 
   authStore
-    .login(formData.value.email, formData.value.password)
+    .login(formData.value)
     .then(() => {
       router.push({ name: "Home" });
     })

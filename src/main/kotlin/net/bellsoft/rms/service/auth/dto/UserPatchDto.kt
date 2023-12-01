@@ -11,18 +11,24 @@ import org.springframework.security.crypto.password.PasswordEncoder
 data class UserPatchDto(
     val password: JsonNullable<String> = JsonNullable.undefined(),
     val name: JsonNullable<String> = JsonNullable.undefined(),
+    val userId: JsonNullable<String> = JsonNullable.undefined(),
+    val email: JsonNullable<String> = JsonNullable.undefined(),
     val isLock: JsonNullable<Boolean> = JsonNullable.undefined(),
     val role: JsonNullable<UserRole> = JsonNullable.undefined(),
 ) {
     fun updateEntity(entity: User, passwordEncoder: PasswordEncoder) {
         password.orElse(null)?.let { entity.changePassword(passwordEncoder, it) }
         name.orElse(null)?.let { entity.name = it }
+        userId.orElse(null)?.let { entity.userId = it }
+        email.orElse(null)?.let { entity.email = it }
         isLock.orElse(null)?.let { entity.status = if (it) UserStatus.INACTIVE else UserStatus.ACTIVE }
         role.orElse(null)?.let { entity.role = it }
     }
 
     companion object {
         fun of(dto: AdminUserPatchRequest) = UserPatchDto(
+            userId = dto.userId,
+            email = dto.email,
             password = dto.password,
             name = dto.name,
             isLock = dto.isLock,
@@ -30,6 +36,7 @@ data class UserPatchDto(
         )
 
         fun of(dto: MyPatchRequest) = UserPatchDto(
+            email = dto.email,
             password = dto.password,
         )
     }

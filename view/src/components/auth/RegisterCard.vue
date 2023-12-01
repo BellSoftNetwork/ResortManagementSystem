@@ -13,6 +13,15 @@
     <q-form @submit="register">
       <q-card-section>
         <q-input
+          v-model="formData.userId"
+          label="이메일"
+          :rules="userStaticRules.userId"
+          :disabled="status.isProgress"
+          required
+          autofocus
+        ></q-input>
+
+        <q-input
           v-model="formData.email"
           label="이메일"
           :rules="userStaticRules.email"
@@ -85,6 +94,7 @@ const status = ref({
   isProgress: false,
 });
 const formData = ref({
+  userId: "",
   email: "",
   name: "",
   password: "",
@@ -97,7 +107,10 @@ function register() {
   postRegister(formData.value)
     .then(() => {
       authStore
-        .login(formData.value.email, formData.value.password)
+        .login({
+          username: formData.value.email,
+          password: formData.value.password,
+        })
         .then(() => {
           router.push({ name: "Home" });
         })

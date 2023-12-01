@@ -31,6 +31,7 @@ class UserCreateDtoFixture {
 
         val BASE_CONFIGURATION = fixtureConfig {
             property(UserCreateDto::name) { "name-${FAKER.random().hex(10)}" }
+            property(UserCreateDto::userId) { "userId-${FAKER.random().hex(5)}" }
             property(UserCreateDto::email) { "${FAKER.random().hex(5)}-${FAKER.internet().emailAddress()}" }
             property(UserCreateDto::password) { FAKER.random().hex(10).toString() }
         }

@@ -10,6 +10,9 @@ data class UserDetailDto(
     @Schema(description = "사용자 고유 id", example = "1")
     val id: Long,
 
+    @Schema(description = "사용자 계정", example = "bell")
+    val userId: String?, // TODO: Not Null 로 변경 예정
+
     @Schema(description = "사용자 이메일", example = "bell@softbell.net")
     val email: String,
 

@@ -6,6 +6,10 @@ import jakarta.validation.constraints.Size
 
 @Schema(description = "회원가입 요청 정보")
 data class UserRegistrationRequest(
+    @Schema(description = "계정 ID", example = "bell")
+    @field:Size(min = 4, max = 30)
+    val userId: String,
+
     @Schema(description = "이메일", example = "bell@bellsoft.net")
     @field:Email
     val email: String,

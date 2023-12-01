@@ -3,6 +3,7 @@ import { SingleResponse } from "src/schema/response";
 import { User } from "src/schema/user";
 
 export type RegisterParams = {
+  userId: string;
   email: string;
   name: string;
   password: string;
@@ -17,7 +18,7 @@ export async function postRegister(params: RegisterParams) {
 }
 
 export type LoginParams = {
-  email: string;
+  username: string;
   password: string;
 };
 
