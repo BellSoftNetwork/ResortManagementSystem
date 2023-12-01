@@ -8,10 +8,10 @@ data class UserSummaryDto(
     val id: Long,
 
     @Schema(description = "사용자 ID", example = "bell")
-    val userId: String?, // TODO: Not Null 로 변경 예정
+    val userId: String,
 
     @Schema(description = "사용자 이메일", example = "bell@softbell.net")
-    val email: String,
+    val email: String?,
 
     @Schema(description = "사용자 이름", example = "방울")
     val name: String,

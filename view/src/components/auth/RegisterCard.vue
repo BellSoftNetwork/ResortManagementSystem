@@ -14,7 +14,7 @@
       <q-card-section>
         <q-input
           v-model="formData.userId"
-          label="이메일"
+          label="계정 ID"
           :rules="userStaticRules.userId"
           :disabled="status.isProgress"
           required
@@ -27,7 +27,6 @@
           :rules="userStaticRules.email"
           :disabled="status.isProgress"
           required
-          autofocus
         ></q-input>
 
         <q-input

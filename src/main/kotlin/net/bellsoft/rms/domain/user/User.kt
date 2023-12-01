@@ -26,13 +26,11 @@ import java.io.Serializable
 @SQLDelete(sql = "UPDATE user SET deleted_at = NOW() WHERE id = ?")
 @Where(clause = BaseTimeEntity.SOFT_DELETE_CONDITION)
 class User(
-    // TODO: 2차 배포 시 Not Null 로 변경
-    @Column(name = "user_id", nullable = true, length = 30)
-    var userId: String?,
+    @Column(name = "user_id", nullable = false, length = 30)
+    var userId: String,
 
-    // TODO: 2차 배포 시 Nullable 로 변경
-    @Column(name = "email", nullable = false, length = 100)
-    var email: String,
+    @Column(name = "email", nullable = true, length = 100)
+    var email: String?,
 
     @Column(name = "name", nullable = false, length = 20)
     var name: String,
@@ -60,7 +58,7 @@ class User(
     }
 
     override fun getUsername(): String {
-        return email
+        return userId
     }
 
     @ExcludeFromJacocoGeneratedReport

@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 data class UserCreateDto(
     val name: String,
     val userId: String,
-    val email: String,
+    val email: String?,
     val password: String,
     val status: UserStatus = UserStatus.ACTIVE,
     val role: UserRole = UserRole.NORMAL,

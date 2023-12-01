@@ -9,7 +9,7 @@ import org.openapitools.jackson.nullable.JsonNullable
 data class MyPatchRequest(
     @Schema(description = "이메일", example = "bell@bellsoft.net")
     @field:Email
-    val email: JsonNullable<String> = JsonNullable.undefined(),
+    val email: JsonNullable<String?> = JsonNullable.undefined(),
 
     @Schema(description = "비밀번호", example = "password!@#")
     @field:Size(min = 8, max = 20)

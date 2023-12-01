@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1701395643170-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropNotNullConstraint:
+            columnDataType: varchar(100)
+            columnName: email
+            tableName: user
+  - changeSet:
+      id: 1701395643170-2
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: VARCHAR(30)
+            columnName: user_id
+            tableName: user
+            validate: true
+
