@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.Expressions
 import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import net.bellsoft.rms.domain.reservation.QReservation
+import net.bellsoft.rms.domain.reservation.QReservationRoom
 import net.bellsoft.rms.service.room.dto.RoomFilterDto
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -53,13 +54,19 @@ class RoomCustomRepositoryImpl(
 
         return QRoom.room.id.notIn(
             JPAExpressions
-                .select(QReservation.reservation.room.id)
-                .from(QReservation.reservation)
+                .select(QReservationRoom.reservationRoom.room.id)
+                .from(QReservationRoom.reservationRoom)
                 .where(
-                    QReservation.reservation.room.isNotNull,
-                    beforeDateFilterExpressions(filter)
-                        ?.or(afterDateFilterExpressions(filter))
-                        ?.or(wrapDateFilterExpressions(filter)),
+                    QReservationRoom.reservationRoom.reservation.id.`in`(
+                        JPAExpressions
+                            .select(QReservation.reservation.id)
+                            .from(QReservation.reservation)
+                            .where(
+                                beforeDateFilterExpressions(filter)
+                                    ?.or(afterDateFilterExpressions(filter))
+                                    ?.or(wrapDateFilterExpressions(filter)),
+                            ),
+                    ),
                 )
                 .distinct(),
         )

@@ -35,15 +35,15 @@
       :done="formStatus.step > 2"
       title="객실 배정"
       :caption="
-        selectedRoom[0] && Object.keys(selectedRoom[0]).includes('number')
-          ? selectedRoom[0].number
+        selectedRooms.length !== 0
+          ? selectedRooms.map((room) => room.number).join(', ')
           : '추후 배정'
       "
       icon="create_new_folder"
     >
       <RoomSelectTable
-        v-model:selected="selectedRoom"
-        :first-value="entity.room"
+        v-model:selected="selectedRooms"
+        :first-values="entity.rooms"
         :stay-start-at="formModel.stayDate.from"
         :stay-end-at="formModel.stayDate.to"
       />
@@ -274,7 +274,7 @@ const formModel = ref({
   note: "",
   status: "NORMAL",
 });
-const selectedRoom = ref<Room[]>([]);
+const selectedRooms = ref<Room[]>([]);
 const status = ref({
   isProgress: false,
 });
@@ -379,10 +379,7 @@ function getFormData(): ReservationPatchParams {
   const formData: Partial<typeof formModel.value> & ReservationPatchParams = {
     ...formModel.value,
     reservationMethodId: formModel.value.reservationMethod.id,
-    roomId:
-      selectedRoom.value[0] && Object.keys(selectedRoom.value[0]).includes("id")
-        ? selectedRoom.value[0].id
-        : null,
+    rooms: selectedRooms.value,
     stayStartAt: formModel.value.stayDate?.from,
     stayEndAt: formModel.value.stayDate?.to,
   };
@@ -414,7 +411,7 @@ onBeforeMount(() => {
     if (entity.value === undefined) return;
 
     resetForm();
-    if (entity.value.room) selectedRoom.value = [entity.value.room];
+    if (entity.value.rooms) selectedRooms.value = entity.value.rooms;
     loadReservationMethods().then(() => {
       formModel.value.reservationMethod = reservationMethods.value.values.find(
         (item) => item.id === entity.value.reservationMethod.id,

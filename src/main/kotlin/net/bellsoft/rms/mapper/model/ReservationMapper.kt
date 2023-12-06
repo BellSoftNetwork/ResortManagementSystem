@@ -7,10 +7,13 @@ import net.bellsoft.rms.mapper.common.ReferenceMapper
 import net.bellsoft.rms.service.reservation.dto.ReservationCreateDto
 import net.bellsoft.rms.service.reservation.dto.ReservationDetailDto
 import net.bellsoft.rms.service.reservation.dto.ReservationPatchDto
+import org.mapstruct.DecoratedWith
+import org.mapstruct.IterableMapping
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
 import org.mapstruct.Mappings
+import org.mapstruct.NullValueMappingStrategy
 import org.mapstruct.NullValuePropertyMappingStrategy
 
 @Mapper(
@@ -24,18 +27,20 @@ import org.mapstruct.NullValuePropertyMappingStrategy
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
     componentModel = "spring",
 )
+@DecoratedWith(ReservationMapperDecorator::class)
 interface ReservationMapper {
     fun toDto(entity: Reservation): ReservationDetailDto
 
+    @IterableMapping(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
     @Mappings(
         Mapping(target = "reservationMethod", source = "reservationMethodId", qualifiedBy = [IdToReference::class]),
-        Mapping(target = "room", source = "roomId", qualifiedBy = [IdToReference::class]),
+        Mapping(target = "rooms", ignore = true),
     )
     fun toEntity(dto: ReservationCreateDto): Reservation
 
     @Mappings(
         Mapping(target = "reservationMethod", source = "reservationMethodId", qualifiedBy = [IdToReference::class]),
-        Mapping(target = "room", source = "roomId", qualifiedBy = [IdToReference::class]),
+        Mapping(target = "rooms", ignore = true),
     )
     fun updateEntity(dto: ReservationPatchDto, @MappingTarget entity: Reservation)
 }

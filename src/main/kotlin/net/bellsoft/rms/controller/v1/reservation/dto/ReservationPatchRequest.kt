@@ -2,6 +2,7 @@ package net.bellsoft.rms.controller.v1.reservation.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Size
+import net.bellsoft.rms.controller.common.dto.EntityReferenceRequest
 import net.bellsoft.rms.domain.reservation.ReservationStatus
 import org.hibernate.validator.constraints.Range
 import org.openapitools.jackson.nullable.JsonNullable
@@ -14,7 +15,7 @@ data class ReservationPatchRequest(
     val reservationMethodId: JsonNullable<Long> = JsonNullable.undefined(),
 
     @Schema(description = "객실 ID", example = "1")
-    val roomId: JsonNullable<Long?> = JsonNullable.undefined(),
+    val rooms: JsonNullable<Set<EntityReferenceRequest>> = JsonNullable.undefined(),
 
     @Schema(description = "예약자명", example = "홍길동")
     @field:Size(min = 2, max = 30)

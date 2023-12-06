@@ -2,6 +2,7 @@ package net.bellsoft.rms.fixture.config
 
 import net.bellsoft.rms.fixture.controller.v1.auth.UserRegistrationRequestFixture
 import net.bellsoft.rms.fixture.domain.reservation.ReservationFixture
+import net.bellsoft.rms.fixture.domain.reservation.ReservationRoomFixture
 import net.bellsoft.rms.fixture.domain.reservation.method.ReservationMethodFixture
 import net.bellsoft.rms.fixture.domain.room.RoomFixture
 import net.bellsoft.rms.fixture.domain.user.UserFixture
@@ -15,6 +16,7 @@ private val domainConfigurations = listOf(
     UserFixture.BASE_CONFIGURATION,
     RoomFixture.BASE_CONFIGURATION,
     ReservationFixture.BASE_CONFIGURATION,
+    ReservationRoomFixture.BASE_CONFIGURATION,
     ReservationMethodFixture.BASE_CONFIGURATION,
 )
 

@@ -17,13 +17,12 @@ data class UserPatchDto(
     val role: JsonNullable<UserRole> = JsonNullable.undefined(),
 ) {
     fun updateEntity(entity: User, passwordEncoder: PasswordEncoder) {
-        password.orElse(null)?.let { entity.changePassword(passwordEncoder, it) }
-        name.orElse(null)?.let { entity.name = it }
-        userId.orElse(null)?.let { entity.userId = it }
-        if (email.isPresent)
-            entity.email = email.get()
-        isLock.orElse(null)?.let { entity.status = if (it) UserStatus.INACTIVE else UserStatus.ACTIVE }
-        role.orElse(null)?.let { entity.role = it }
+        if (password.isPresent) entity.changePassword(passwordEncoder, password.get())
+        if (name.isPresent) entity.name = name.get()
+        if (userId.isPresent) entity.userId = userId.get()
+        if (email.isPresent) entity.email = email.get()
+        if (isLock.isPresent) entity.status = if (isLock.get()) UserStatus.INACTIVE else UserStatus.ACTIVE
+        if (role.isPresent) entity.role = role.get()
     }
 
     companion object {

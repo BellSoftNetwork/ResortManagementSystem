@@ -26,6 +26,7 @@ class ReservationCreateDtoFixture {
 
         val BASE_CONFIGURATION = fixtureConfig {
             property(ReservationCreateDto::name) { "name-${FAKER.random().hex(10)}" }
+            property(ReservationCreateDto::rooms) { emptySet() }
             property(ReservationCreateDto::phone) { FAKER.phoneNumber().phoneNumber() }
         }
     }

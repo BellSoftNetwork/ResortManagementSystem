@@ -1,0 +1,150 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1701500888909-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_reservation_room
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: reservation_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: room_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_by
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updated_by
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: deleted_at
+                  type: DATETIME
+            tableName: reservation_room
+        - addForeignKeyConstraint:
+            baseColumnNames: room_id
+            baseTableName: reservation_room
+            constraintName: FK_RESERVATION_ROOM_ON_ROOM
+            referencedColumnNames: id
+            referencedTableName: room
+        - addForeignKeyConstraint:
+            baseColumnNames: reservation_id
+            baseTableName: reservation_room
+            constraintName: FK_RESERVATION_ROOM_ON_RESERVATION
+            referencedColumnNames: id
+            referencedTableName: reservation
+        - addForeignKeyConstraint:
+            baseColumnNames: created_by
+            baseTableName: reservation_room
+            constraintName: FK_RESERVATION_ROOM_ON_CREATED_BY
+            referencedColumnNames: id
+            referencedTableName: user
+        - addForeignKeyConstraint:
+            baseColumnNames: updated_by
+            baseTableName: reservation_room
+            constraintName: FK_RESERVATION_ROOM_ON_UPDATED_BY
+            referencedColumnNames: id
+            referencedTableName: user
+        - addUniqueConstraint:
+            columnNames: reservation_id, room_id, deleted_at
+            constraintName: uc_reservation_room_reservation_id_and_room_id
+            tableName: reservation_room
+  - changeSet:
+      id: 1701500888909-2
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_reservation_room_history
+                  name: rev
+                  type: BIGINT
+              - column:
+                  name: created_by
+                  type: BIGINT
+              - column:
+                  name: created_by_mod
+                  type: BOOLEAN
+              - column:
+                  name: updated_by
+                  type: BIGINT
+              - column:
+                  name: updated_by_mod
+                  type: BOOLEAN
+              - column:
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: deleted_at
+                  type: DATETIME
+              - column:
+                  name: revtype
+                  type: TINYINT
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_reservation_room_history
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: reservation_id
+                  type: BIGINT
+              - column:
+                  name: room_id
+                  type: BIGINT
+            tableName: reservation_room_history
+        - addForeignKeyConstraint:
+            baseColumnNames: rev
+            baseTableName: reservation_room_history
+            constraintName: FK_RESERVATION_ROOM_HISTORY_ON_REV
+            referencedColumnNames: id
+            referencedTableName: revision_info
+  - changeSet:
+      id: 1701500888909-3
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: rooms_mod
+                  type: BOOLEAN
+            tableName: reservation_history
+

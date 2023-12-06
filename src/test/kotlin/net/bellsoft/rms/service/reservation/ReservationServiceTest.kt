@@ -8,12 +8,15 @@ import io.kotest.matchers.shouldNotBe
 import net.bellsoft.rms.component.history.type.HistoryType
 import net.bellsoft.rms.domain.reservation.Reservation
 import net.bellsoft.rms.domain.reservation.ReservationRepository
+import net.bellsoft.rms.domain.reservation.ReservationRoom
+import net.bellsoft.rms.domain.reservation.ReservationRoomRepository
 import net.bellsoft.rms.domain.reservation.method.ReservationMethodRepository
 import net.bellsoft.rms.domain.room.RoomRepository
 import net.bellsoft.rms.domain.user.User
 import net.bellsoft.rms.exception.DataNotFoundException
 import net.bellsoft.rms.exception.UserNotFoundException
 import net.bellsoft.rms.fixture.baseFixture
+import net.bellsoft.rms.service.common.dto.EntityReferenceDto
 import net.bellsoft.rms.service.reservation.dto.ReservationCreateDto
 import net.bellsoft.rms.service.reservation.dto.ReservationFilterDto
 import net.bellsoft.rms.service.reservation.dto.ReservationPatchDto
@@ -33,6 +36,7 @@ internal class ReservationServiceTest(
     private val securityTestSupport: SecurityTestSupport,
     private val reservationService: ReservationService,
     private val reservationRepository: ReservationRepository,
+    private val reservationRoomRepository: ReservationRoomRepository,
     private val reservationMethodRepository: ReservationMethodRepository,
     private val roomRepository: RoomRepository,
 ) : BehaviorSpec(
@@ -40,9 +44,7 @@ internal class ReservationServiceTest(
         val reservationMethod = reservationMethodRepository.save(baseFixture())
         val fixture = baseFixture.new {
             property(Reservation::reservationMethod) { reservationMethod }
-            property(Reservation::room) { null }
             property(ReservationCreateDto::reservationMethodId) { reservationMethod.id }
-            property(ReservationCreateDto::roomId) { null }
         }
         val loginUser: User = fixture()
 
@@ -123,20 +125,20 @@ internal class ReservationServiceTest(
 
         Given("객실이 배정된 예약이 등록된 상황에서") {
             val room = roomRepository.save(fixture())
-            val reservation = reservationRepository.save(
-                fixture { property(Reservation::room) { room } },
-            )
+            val reservation = reservationRepository.save(fixture())
+
+            reservationRoomRepository.saveAll(listOf(ReservationRoom(reservation, room)))
 
             When("객실 배정을 해제를 요청하면") {
                 val result = reservationService.update(
                     reservation.id,
                     ReservationPatchDto(
-                        roomId = JsonNullable.of(null),
+                        rooms = JsonNullable.of(setOf()),
                     ),
                 )
 
                 Then("정상적으로 객실 배정이 해제된다") {
-                    result.room shouldBe null
+                    result.rooms.size shouldBe 0
                 }
             }
 
@@ -146,9 +148,9 @@ internal class ReservationServiceTest(
                     ReservationPatchDto(),
                 )
 
-                Then("정상적으로 객실 배정이 해제된다") {
-                    result.room shouldNotBe null
-                    result.room!!.id shouldBe room.id
+                Then("객실 배정이 유지된다") {
+                    result.rooms.size shouldBe 1
+                    result.rooms.first().id shouldBe room.id
                 }
             }
         }
@@ -192,7 +194,7 @@ internal class ReservationServiceTest(
                 val result = reservationService.update(
                     reservation.id,
                     ReservationPatchDto(
-                        roomId = JsonNullable.of(newRoom.id),
+                        rooms = JsonNullable.of(setOf(EntityReferenceDto(newRoom.id))),
                         name = JsonNullable.of("UPDATED"),
                     ),
                 )
@@ -201,8 +203,8 @@ internal class ReservationServiceTest(
 
                 Then("예약 정보가 정상적으로 수정된다") {
                     result.name shouldBe "UPDATED"
-                    result.room shouldNotBe null
-                    result.room!!.id shouldBe newRoom.id
+                    result.rooms.size shouldBe 1
+                    result.rooms.first().id shouldBe newRoom.id
                 }
 
                 Then("수정 이력이 등록된다") {
@@ -212,9 +214,9 @@ internal class ReservationServiceTest(
                     entityListDto.values.toList().let {
                         it[0].historyType shouldBe HistoryType.CREATED
                         it[1].historyType shouldBe HistoryType.UPDATED
-                        it[1].updatedFields shouldBe setOf("updatedBy", "room", "name")
+                        it[1].updatedFields shouldBe setOf("updatedBy", "rooms", "name")
                         it[1].entity.name shouldBe "UPDATED"
-                        it[1].entity.room!!.id shouldBe newRoom.id
+                        it[1].entity.rooms.first().id shouldBe newRoom.id
                         it[1].entity.updatedBy.id shouldBe newLoginUser.id
                     }
                 }

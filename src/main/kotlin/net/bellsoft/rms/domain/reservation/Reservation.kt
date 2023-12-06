@@ -5,6 +5,8 @@ import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToMany
+import jakarta.persistence.OrderBy
 import jakarta.persistence.Table
 import net.bellsoft.rms.domain.base.BaseMustAuditEntity
 import net.bellsoft.rms.domain.base.BaseTimeEntity
@@ -41,9 +43,14 @@ class Reservation(
         modifiedColumnName = "room_id_mod",
         targetAuditMode = RelationTargetAuditMode.NOT_AUDITED,
     )
+    @Deprecated("rooms 로 마이그레이션 예정")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
     var room: Room? = null,
+
+    @OneToMany(mappedBy = "reservation", fetch = FetchType.LAZY)
+    @OrderBy("id ASC")
+    var rooms: MutableList<ReservationRoom> = mutableListOf(),
 
     @Column(name = "name", nullable = false, length = 30)
     var name: String,
@@ -87,6 +94,19 @@ class Reservation(
     @Column(name = "status", nullable = false, columnDefinition = "TINYINT")
     var status: ReservationStatus = ReservationStatus.PENDING,
 ) : Serializable, BaseMustAuditEntity() {
+    fun addRoom(room: Room) {
+        rooms.add(ReservationRoom(reservation = this, room = room))
+    }
+
+    fun removeRoom(room: Room) {
+        rooms.removeIf { it.room == room }
+    }
+
+    fun updateRooms(rooms: List<Room>) {
+        this.rooms.clear()
+        this.rooms.addAll(rooms.map { ReservationRoom(reservation = this, room = it) })
+    }
+
     companion object {
         @Serial
         private const val serialVersionUID: Long = 737436737363715200L

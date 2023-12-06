@@ -9,6 +9,8 @@ import io.kotest.matchers.shouldNotBe
 import net.bellsoft.rms.component.history.type.HistoryType
 import net.bellsoft.rms.domain.reservation.Reservation
 import net.bellsoft.rms.domain.reservation.ReservationRepository
+import net.bellsoft.rms.domain.reservation.ReservationRoom
+import net.bellsoft.rms.domain.reservation.ReservationRoomRepository
 import net.bellsoft.rms.domain.reservation.method.ReservationMethodRepository
 import net.bellsoft.rms.domain.room.Room
 import net.bellsoft.rms.domain.room.RoomRepository
@@ -38,6 +40,7 @@ internal class RoomServiceTest(
     private val roomService: RoomService,
     private val roomRepository: RoomRepository,
     private val reservationRepository: ReservationRepository,
+    private val reservationRoomRepository: ReservationRoomRepository,
     private val reservationMethodRepository: ReservationMethodRepository,
 ) : BehaviorSpec(
     {
@@ -297,28 +300,32 @@ internal class RoomServiceTest(
                 ),
             )
 
-            reservationRepository.saveAll(
+            val reservations = reservationRepository.saveAll(
                 listOf(
                     customFixture {
-                        property(Reservation::room) { availableRooms[0] }
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 9) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 10) }
                     },
                     customFixture {
-                        property(Reservation::room) { availableRooms[1] }
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 11) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 12) }
                     },
                     customFixture {
-                        property(Reservation::room) { availableRooms[2] }
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 9) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 10) }
                     },
                     customFixture {
-                        property(Reservation::room) { availableRooms[2] }
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 11) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 12) }
                     },
+                ),
+            )
+            reservationRoomRepository.saveAll(
+                setOf(
+                    ReservationRoom(reservation = reservations[0], room = availableRooms[0]),
+                    ReservationRoom(reservation = reservations[1], room = availableRooms[1]),
+                    ReservationRoom(reservation = reservations[2], room = availableRooms[2]),
+                    ReservationRoom(reservation = reservations[3], room = availableRooms[2]),
                 ),
             )
 
@@ -406,43 +413,47 @@ internal class RoomServiceTest(
                 ),
             )
 
-            reservationRepository.saveAll(
+            val reservations = reservationRepository.saveAll(
                 listOf(
                     customFixture {
-                        property(Reservation::room) { reservedRooms[0] }
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 9) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 11) }
                     },
                     customFixture {
-                        property(Reservation::room) { reservedRooms[1] }
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 10) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 20) }
                     },
                     customFixture {
-                        property(Reservation::room) { reservedRooms[2] }
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 10) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 11) }
                     },
                     customFixture {
-                        property(Reservation::room) { reservedRooms[3] }
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 11) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 19) }
                     },
                     customFixture {
-                        property(Reservation::room) { reservedRooms[4] }
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 19) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 20) }
                     },
                     customFixture {
-                        property(Reservation::room) { reservedRooms[5] }
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 19) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 21) }
                     },
                     customFixture {
-                        property(Reservation::room) { reservedRooms[6] }
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 1) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 30) }
                     },
+                ),
+            )
+            reservationRoomRepository.saveAll(
+                setOf(
+                    ReservationRoom(reservation = reservations[0], room = reservedRooms[0]),
+                    ReservationRoom(reservation = reservations[1], room = reservedRooms[1]),
+                    ReservationRoom(reservation = reservations[2], room = reservedRooms[2]),
+                    ReservationRoom(reservation = reservations[3], room = reservedRooms[3]),
+                    ReservationRoom(reservation = reservations[4], room = reservedRooms[4]),
+                    ReservationRoom(reservation = reservations[5], room = reservedRooms[5]),
+                    ReservationRoom(reservation = reservations[6], room = reservedRooms[6]),
                 ),
             )
 
@@ -474,7 +485,6 @@ internal class RoomServiceTest(
             reservationRepository.saveAll(
                 listOf(
                     customFixture {
-                        property(Reservation::room) { null }
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 1) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 30) }
                     },

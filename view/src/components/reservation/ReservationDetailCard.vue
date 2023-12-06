@@ -23,15 +23,17 @@
           <div class="q-py-sm">
             <div class="text-caption">객실 번호</div>
             <div class="text-body1">
-              <div v-if="entity?.room">
-                <q-btn
-                  :to="{ name: 'Room', params: { id: entity?.room.id } }"
-                  color="primary"
-                  flat
-                  dense
-                >
-                  {{ entity?.room.number }}
-                </q-btn>
+              <div v-if="entity?.rooms.length !== 0">
+                <span v-for="room in entity?.rooms" :key="room.id">
+                  <q-btn
+                    :to="{ name: 'Room', params: { id: room.id } }"
+                    color="primary"
+                    flat
+                    dense
+                  >
+                    {{ room.number }}
+                  </q-btn>
+                </span>
               </div>
               <div v-else class="text-grey">미배정</div>
             </div>
