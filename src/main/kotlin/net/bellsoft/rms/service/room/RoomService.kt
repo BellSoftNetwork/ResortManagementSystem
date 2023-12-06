@@ -73,7 +73,7 @@ class RoomService(
     }
 
     fun findHistory(id: Long, pageable: Pageable): EntityListDto<EntityHistoryDto<RoomDetailDto>> = EntityListDto
-        .of(entityHistoryComponent.findAllHistory(Room::class, roomMapper::toDto, id, pageable))
+        .of(entityHistoryComponent.findAllHistory<Room, RoomDetailDto>(Room::class, roomMapper::toDto, id, pageable))
 
     companion object : KLogging()
 }

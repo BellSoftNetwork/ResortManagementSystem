@@ -30,7 +30,7 @@ export function reservationStatusValueToName(role: ReservationStatus) {
 export type Reservation = {
   id: number;
   reservationMethod: ReservationMethod;
-  room: Room;
+  rooms: Room[];
   name: string;
   phone: string;
   peopleCount: number;
@@ -54,9 +54,17 @@ const ReservationFieldMap: FieldMap = {
     label: "예약 수단",
     format: (value) => value.name,
   } as const,
+  // NOTE: 히스토리 조회 시 하위 호환을 위해 유지 필요
   room: {
     label: "객실",
     format: (value: Room) => (value ? value.number : "미배정"),
+  } as const,
+  rooms: {
+    label: "객실",
+    format: (value: Room[]) =>
+      value.length !== 0
+        ? value.map((room) => room.number).join(", ")
+        : "미배정",
   } as const,
   name: { label: "예약자명" } as const,
   phone: {

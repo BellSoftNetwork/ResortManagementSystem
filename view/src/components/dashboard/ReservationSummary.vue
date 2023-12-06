@@ -29,26 +29,27 @@
                 flat
                 bordered
               >
-                <template #body-cell-room="props">
-                  <q-td key="room" :props="props">
-                    <div v-if="props.row.room">
-                      <div v-if="authStore.isAdminRole">
-                        <q-btn
-                          :to="{
-                            name: 'Room',
-                            params: { id: props.row.room.id },
-                          }"
-                          class="full-width"
-                          align="left"
-                          color="primary"
-                          dense
-                          flat
-                          >{{ props.row.room.number }}
-                        </q-btn>
-                      </div>
-                      <div v-else>
-                        {{ props.row.room.number }}
-                      </div>
+                <template #body-cell-rooms="props">
+                  <q-td key="rooms" :props="props">
+                    <div v-if="props.row.rooms.length !== 0">
+                      <span v-for="room in props.row.rooms" :key="room.id">
+                        <div v-if="authStore.isAdminRole">
+                          <q-btn
+                            :to="{
+                              name: 'Room',
+                              params: { id: room.id },
+                            }"
+                            align="left"
+                            color="primary"
+                            dense
+                            flat
+                            >{{ room.number }}
+                          </q-btn>
+                        </div>
+                        <div v-else>
+                          {{ room.number }}
+                        </div>
+                      </span>
                     </div>
                     <div v-else class="text-grey">미배정</div>
                   </q-td>
@@ -162,7 +163,7 @@ const columns = [
     sortable: true,
   },
   {
-    ...getColumnDef("room"),
+    ...getColumnDef("rooms"),
     align: "left",
     required: true,
     sortable: true,

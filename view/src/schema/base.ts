@@ -17,6 +17,10 @@ export type BaseAudit = {
   updatedBy: UserSummary;
 };
 
+export type EntityReference = {
+  id: number;
+};
+
 export const BASE_AUDIT_FIELD_MAP: FieldMap = {
   createdBy: { label: "등록자", format: (value: User) => value.name } as const,
   updatedBy: { label: "수정자", format: (value: User) => value.name } as const,

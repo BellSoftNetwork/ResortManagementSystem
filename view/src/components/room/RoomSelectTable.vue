@@ -8,7 +8,7 @@
     :rows="rooms"
     :filter="filter"
     row-key="id"
-    selection="single"
+    selection="multiple"
     v-model:selected="selected"
     flat
     bordered
@@ -25,7 +25,7 @@ import { formatSortParam } from "src/util/query-string-util";
 
 const props = defineProps<{
   selected: Room[];
-  firstValue?: Room;
+  firstValues?: Room[];
   stayStartAt: string;
   stayEndAt: string;
 }>();
@@ -106,7 +106,12 @@ function onRequest(tableProps) {
   })
     .then((response) => {
       rooms.value = response.values;
-      if (props.firstValue) rooms.value.push(props.firstValue);
+
+      if (props.firstValues) {
+        for (const room of props.firstValues) {
+          rooms.value.push(room);
+        }
+      }
 
       const page = response.page;
 

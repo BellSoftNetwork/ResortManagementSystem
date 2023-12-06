@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 data class ReservationDetailDto(
     val id: Long,
     val reservationMethod: ReservationMethodDetailDto,
-    val room: RoomDetailDto?,
+    val rooms: List<RoomDetailDto>,
     val name: String,
     val phone: String,
     val peopleCount: Int,

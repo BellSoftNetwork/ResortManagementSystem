@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1701509795401-1
+      author: Bell
+      changes:
+        - customChange: {
+          "class": "net.bellsoft.rms.migration.change.ReservationRoomMigration"
+        }

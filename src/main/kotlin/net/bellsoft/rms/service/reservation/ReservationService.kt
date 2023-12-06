@@ -5,6 +5,8 @@ import net.bellsoft.rms.component.history.EntityHistoryComponent
 import net.bellsoft.rms.component.history.dto.EntityHistoryDto
 import net.bellsoft.rms.domain.reservation.Reservation
 import net.bellsoft.rms.domain.reservation.ReservationRepository
+import net.bellsoft.rms.domain.reservation.ReservationRoomRepository
+import net.bellsoft.rms.domain.room.RoomRepository
 import net.bellsoft.rms.exception.DataNotFoundException
 import net.bellsoft.rms.exception.UserNotFoundException
 import net.bellsoft.rms.mapper.model.ReservationMapper
@@ -24,9 +26,12 @@ class ReservationService(
     private val securitySupport: SecuritySupport,
     private val entityHistoryComponent: EntityHistoryComponent,
     private val reservationRepository: ReservationRepository,
+    private val reservationRoomRepository: ReservationRoomRepository,
+    private val roomRepository: RoomRepository,
     private val reservationMapper: ReservationMapper,
 ) {
     fun findAll(pageable: Pageable, filter: ReservationFilterDto): EntityListDto<ReservationDetailDto> {
+        // TODO: N + 1 쿼리 해결 필요
         return EntityListDto.of(
             reservationRepository.getFilteredReservations(pageable, filter),
             reservationMapper::toDto,
@@ -42,7 +47,14 @@ class ReservationService(
 
     @Transactional
     fun create(reservationCreateDto: ReservationCreateDto): ReservationDetailDto {
-        return reservationMapper.toDto(reservationRepository.save(reservationMapper.toEntity(reservationCreateDto)))
+        val reservation = reservationRepository.save(
+            reservationMapper.toEntity(reservationCreateDto).apply { rooms = mutableListOf() },
+        )
+        val requestRoomIds = reservationCreateDto.rooms.map { it.id }.toSet()
+
+        updateReservationRooms(reservation, requestRoomIds)
+
+        return reservationMapper.toDto(reservationRepository.saveAndFlush(reservation))
     }
 
     @Transactional
@@ -51,8 +63,24 @@ class ReservationService(
             ?: throw DataNotFoundException("존재하지 않는 예약")
 
         reservationMapper.updateEntity(reservationPatchDto, reservation)
+        if (reservationPatchDto.rooms.isPresent) {
+            val requestRoomIds = reservationPatchDto.rooms.get().map { it.id }.toSet()
+            updateReservationRooms(reservation, requestRoomIds)
+        }
 
-        return reservationMapper.toDto(reservationRepository.save(reservation))
+        return reservationMapper.toDto(reservationRepository.saveAndFlush(reservation))
+    }
+
+    @Transactional
+    fun updateReservationRooms(reservation: Reservation, requestRoomIds: Set<Long>) {
+        reservationRoomRepository.deleteAllByReservation(reservation)
+        reservationRoomRepository.flush()
+
+        val requiredRooms = roomRepository.findByIdInOrderByNumberAsc(requestRoomIds)
+
+        reservation.updateRooms(requiredRooms)
+
+        reservationRoomRepository.saveAll(reservation.rooms)
     }
 
     @Transactional

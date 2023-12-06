@@ -7,6 +7,7 @@ import {
 } from "src/schema/response";
 import { Reservation, ReservationStatus } from "src/schema/reservation";
 import { Revision } from "src/schema/revision";
+import { EntityReference } from "src/schema/base";
 
 export type FetchReservationsRequestParams = Partial<
   {
@@ -39,7 +40,7 @@ export async function fetchReservation(id: number) {
 
 type ReservationParams = {
   reservationMethodId: number;
-  roomId: number | null;
+  rooms: EntityReference[];
   name: string;
   phone: string;
   peopleCount: number;

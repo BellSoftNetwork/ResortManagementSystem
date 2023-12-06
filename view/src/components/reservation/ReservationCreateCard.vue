@@ -38,14 +38,14 @@
       :done="formModel.status.step > 2"
       title="객실 배정"
       :caption="
-        selectedRoom[0] && Object.keys(selectedRoom[0]).includes('number')
-          ? selectedRoom[0].number
+        selectedRooms.length !== 0
+          ? selectedRooms.map((room) => room.number).join(', ')
           : '추후 배정'
       "
       icon="create_new_folder"
     >
       <RoomSelectTable
-        v-model:selected="selectedRoom"
+        v-model:selected="selectedRooms"
         :stay-start-at="formModel.value.stayDate.from"
         :stay-end-at="formModel.value.stayDate.to"
       />
@@ -259,7 +259,7 @@ const formModel = ref({
     status: "NORMAL",
   },
 });
-const selectedRoom = ref<Room[]>([]);
+const selectedRooms = ref<Room[]>([]);
 const status = ref({
   isProgress: false,
 });
@@ -332,10 +332,7 @@ function create() {
 function formData() {
   return {
     reservationMethodId: formModel.value.value.reservationMethod.id,
-    roomId:
-      selectedRoom.value[0] && Object.keys(selectedRoom.value[0]).includes("id")
-        ? selectedRoom.value[0].id
-        : null,
+    rooms: selectedRooms.value,
     name: formModel.value.value.name,
     phone: formModel.value.value.phone,
     peopleCount: formModel.value.value.peopleCount,

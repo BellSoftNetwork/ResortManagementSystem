@@ -2,13 +2,15 @@ package net.bellsoft.rms.service.reservation.dto
 
 import net.bellsoft.rms.controller.v1.reservation.dto.ReservationPatchRequest
 import net.bellsoft.rms.domain.reservation.ReservationStatus
+import net.bellsoft.rms.service.common.dto.EntityReferenceDto
+import net.bellsoft.rms.util.convert
 import org.openapitools.jackson.nullable.JsonNullable
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class ReservationPatchDto(
     val reservationMethodId: JsonNullable<Long> = JsonNullable.undefined(),
-    val roomId: JsonNullable<Long?> = JsonNullable.undefined(),
+    val rooms: JsonNullable<Set<EntityReferenceDto>> = JsonNullable.undefined(),
     val name: JsonNullable<String> = JsonNullable.undefined(),
     val phone: JsonNullable<String> = JsonNullable.undefined(),
     val peopleCount: JsonNullable<Int> = JsonNullable.undefined(),
@@ -27,7 +29,7 @@ data class ReservationPatchDto(
     companion object {
         fun of(dto: ReservationPatchRequest) = ReservationPatchDto(
             reservationMethodId = dto.reservationMethodId,
-            roomId = dto.roomId,
+            rooms = dto.rooms.convert(EntityReferenceDto::of),
             name = dto.name,
             phone = dto.phone,
             peopleCount = dto.peopleCount,

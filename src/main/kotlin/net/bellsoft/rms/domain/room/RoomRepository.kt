@@ -6,5 +6,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface RoomRepository : JpaRepository<Room, Long>, RevisionRepository<Room, Long, Long>, RoomCustomRepository {
+    fun findByIdInOrderByNumberAsc(ids: Collection<Long>): List<Room>
+
     fun findByNumber(name: String): Room?
 }

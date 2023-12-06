@@ -2,12 +2,13 @@ package net.bellsoft.rms.service.reservation.dto
 
 import net.bellsoft.rms.controller.v1.reservation.dto.ReservationCreateRequest
 import net.bellsoft.rms.domain.reservation.ReservationStatus
+import net.bellsoft.rms.service.common.dto.EntityReferenceDto
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class ReservationCreateDto(
     val reservationMethodId: Long,
-    val roomId: Long? = null,
+    val rooms: Set<EntityReferenceDto> = emptySet(),
     val name: String,
     val phone: String = "",
     val peopleCount: Int = 0,
@@ -26,7 +27,7 @@ data class ReservationCreateDto(
     companion object {
         fun of(dto: ReservationCreateRequest) = ReservationCreateDto(
             reservationMethodId = dto.reservationMethodId,
-            roomId = dto.roomId,
+            rooms = EntityReferenceDto.of(dto.rooms),
             name = dto.name,
             phone = dto.phone,
             peopleCount = dto.peopleCount,
