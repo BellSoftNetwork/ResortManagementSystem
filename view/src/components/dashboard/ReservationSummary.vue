@@ -193,7 +193,7 @@ function formatReservations(reservations: Reservation[]) {
   reservations.forEach((reservation) => {
     reservation.missPrice = reservation.price - reservation.paymentAmount;
 
-    for (let [index, date] of getDateArray(reservation.stayStartAt, reservation.stayEndAt).entries()) {
+    for (const [index, date] of getDateArray(reservation.stayStartAt, reservation.stayEndAt).entries()) {
       if (!Object.keys(reservationMap).includes(date)) reservationMap[date] = [];
 
       const reservationCopy = { ...reservation, type: "N/A" };

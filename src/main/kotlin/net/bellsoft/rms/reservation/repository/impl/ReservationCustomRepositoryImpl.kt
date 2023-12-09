@@ -44,8 +44,8 @@ class ReservationCustomRepositoryImpl(
     private fun getFilteredReservationsBaseQuery(filter: ReservationFilterDto) = jpaQueryFactory
         .from(QReservation.reservation)
         .where(
-            goeStayStartAt(filter.stayStartAt),
-            loeStayStartAt(filter.stayEndAt),
+            goeStayStartAt(filter.stayStartAt)?.or(goeStayEndAt(filter.stayStartAt)),
+            loeStayStartAt(filter.stayEndAt)?.or(loeStayEndAt(filter.stayEndAt)),
             likeSearchText(filter.searchText),
             eqStatus(filter.status),
         )
@@ -55,6 +55,12 @@ class ReservationCustomRepositoryImpl(
 
     private fun loeStayStartAt(stayStartAt: LocalDate?) =
         stayStartAt?.let { QReservation.reservation.stayStartAt.loe(it) }
+
+    private fun goeStayEndAt(stayEndAt: LocalDate?) =
+        stayEndAt?.let { QReservation.reservation.stayEndAt.goe(it) }
+
+    private fun loeStayEndAt(stayEndAt: LocalDate?) =
+        stayEndAt?.let { QReservation.reservation.stayEndAt.loe(it) }
 
     private fun likeSearchText(searchText: String?) =
         searchText?.let {
