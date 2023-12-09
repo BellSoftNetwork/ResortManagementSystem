@@ -1,16 +1,8 @@
 <template>
-  <q-stepper
-    v-model="formStatus.step"
-    ref="stepper"
-    color="primary"
-    animated
-    vertical
-  >
+  <q-stepper v-model="formStatus.step" ref="stepper" color="primary" animated vertical>
     <q-step
       :name="1"
-      :caption="
-        formatStayCaption(formModel.stayDate?.from, formModel.stayDate?.to)
-      "
+      :caption="formatStayCaption(formModel.stayDate?.from, formModel.stayDate?.to)"
       :error="stayDateDiff <= 0"
       :done="formStatus.step > 1"
       title="숙박 기간"
@@ -34,11 +26,7 @@
       :name="2"
       :done="formStatus.step > 2"
       title="객실 배정"
-      :caption="
-        selectedRooms.length !== 0
-          ? selectedRooms.map((room) => room.number).join(', ')
-          : '추후 배정'
-      "
+      :caption="selectedRooms.length !== 0 ? selectedRooms.map((room) => room.number).join(', ') : '추후 배정'"
       icon="create_new_folder"
     >
       <RoomSelectTable
@@ -50,13 +38,7 @@
 
       <q-stepper-navigation>
         <q-btn @click="$refs.stepper.next()" label="다음" color="primary" />
-        <q-btn
-          @click="$refs.stepper.previous()"
-          color="primary"
-          label="이전"
-          class="q-ml-sm"
-          flat
-        />
+        <q-btn @click="$refs.stepper.previous()" color="primary" label="이전" class="q-ml-sm" flat />
       </q-stepper-navigation>
     </q-step>
 
@@ -117,13 +99,7 @@
 
         <q-stepper-navigation>
           <q-btn type="submit" label="다음" color="primary" />
-          <q-btn
-            @click="$refs.stepper.previous()"
-            color="primary"
-            label="이전"
-            class="q-ml-sm"
-            flat
-          />
+          <q-btn @click="$refs.stepper.previous()" color="primary" label="이전" class="q-ml-sm" flat />
         </q-stepper-navigation>
       </q-form>
     </q-step>
@@ -181,31 +157,17 @@
 
         <q-stepper-navigation>
           <q-btn label="다음" type="submit" color="primary" />
-          <q-btn
-            @click="$refs.stepper.previous()"
-            color="primary"
-            label="이전"
-            class="q-ml-sm"
-            flat
-          />
+          <q-btn @click="$refs.stepper.previous()" color="primary" label="이전" class="q-ml-sm" flat />
         </q-stepper-navigation>
       </q-form>
     </q-step>
 
     <q-step :name="5" title="수정" icon="add_comment">
-      <div>
-        {{ Object.keys(patchedData()).length }}개 항목이 변경되었습니다.
-      </div>
+      <div>{{ Object.keys(patchedData()).length }}개 항목이 변경되었습니다.</div>
 
       <q-stepper-navigation>
         <q-btn @click="update" label="수정" color="primary" />
-        <q-btn
-          @click="$refs.stepper.previous()"
-          color="primary"
-          label="이전"
-          class="q-ml-sm"
-          flat
-        />
+        <q-btn @click="$refs.stepper.previous()" color="primary" label="이전" class="q-ml-sm" flat />
       </q-stepper-navigation>
     </q-step>
   </q-stepper>
@@ -216,23 +178,9 @@ import { computed, onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import RoomSelectTable from "components/room/RoomSelectTable.vue";
-import {
-  formatDate,
-  formatDiffDays,
-  formatPrice,
-  formatStayCaption,
-  formatStayTitle,
-} from "src/util/format-util";
-import {
-  Reservation,
-  reservationDynamicRules,
-  reservationStaticRules,
-} from "src/schema/reservation";
-import {
-  fetchReservation,
-  patchReservation,
-  ReservationPatchParams,
-} from "src/api/v1/reservation";
+import { formatDate, formatDiffDays, formatPrice, formatStayCaption, formatStayTitle } from "src/util/format-util";
+import { Reservation, reservationDynamicRules, reservationStaticRules } from "src/schema/reservation";
+import { fetchReservation, patchReservation, ReservationPatchParams } from "src/api/v1/reservation";
 import { fetchPaymentMethods } from "src/api/v1/payment-method";
 import { formatSortParam } from "src/util/query-string-util";
 import { Room } from "src/schema/room";
@@ -245,12 +193,7 @@ const props = defineProps<{
   id: number;
 }>();
 const id = props.id;
-const entity = ref<
-  {
-    paymentMethodId: number;
-    roomId: number | null;
-  } & Reservation
->();
+const entity = ref<Reservation>();
 const formStatus = ref({
   step: 1,
   isProgress: false,
@@ -286,9 +229,7 @@ const options = {
     { label: "환불 완료", value: "REFUND" },
   ],
 };
-const stayDateDiff = computed(() =>
-  formatDiffDays(formModel.value.stayDate?.from, formModel.value.stayDate?.to),
-);
+const stayDateDiff = computed(() => formatDiffDays(formModel.value.stayDate?.from, formModel.value.stayDate?.to));
 const paymentMethods = ref({
   status: {
     isLoading: false,
@@ -305,20 +246,12 @@ const paymentMethods = ref({
   ],
 });
 
-function setReservation(reservation: Reservation) {
-  entity.value = {
-    ...reservation,
-    paymentMethodId: reservation.paymentMethod.id,
-    roomId: reservation.room?.id,
-  };
-}
-
 function fetchData() {
   status.value.isProgress = true;
 
   return fetchReservation(id)
     .then((response) => {
-      setReservation(response.value);
+      entity.value = response.value;
     })
     .catch((error) => {
       if (error.response.status === 404) router.push({ name: "ErrorNotFound" });
@@ -378,14 +311,12 @@ function update() {
 function getFormData(): ReservationPatchParams {
   const formData: Partial<typeof formModel.value> & ReservationPatchParams = {
     ...formModel.value,
-    paymentMethodId: formModel.value.paymentMethod.id,
     rooms: selectedRooms.value,
     stayStartAt: formModel.value.stayDate?.from,
     stayEndAt: formModel.value.stayDate?.to,
   };
 
   delete formData.id;
-  delete formData.paymentMethod;
   delete formData.stayDate;
 
   return formData;
@@ -396,8 +327,7 @@ function patchedData(): ReservationPatchParams {
 }
 
 function changePrice() {
-  formModel.value.brokerFee =
-    formModel.value.price * formModel.value.paymentMethod.commissionRate;
+  formModel.value.brokerFee = formModel.value.price * formModel.value.paymentMethod.commissionRate;
 }
 
 function resetForm() {

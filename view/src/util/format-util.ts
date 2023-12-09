@@ -23,10 +23,7 @@ export function formatTime(value: string | undefined = undefined) {
   return dayjs(value).format("HH:mm:ss");
 }
 
-export function formatDiffDays(
-  startDate: string | null,
-  endDate: string | null,
-): number {
+export function formatDiffDays(startDate: string | null, endDate: string | null): number {
   if (startDate === null || endDate === null) return 0;
 
   try {
@@ -40,13 +37,8 @@ export function formatStayTitle(dateDiff: number) {
   return `${dateDiff}박 ${dateDiff + 1}일`;
 }
 
-export function formatStayCaption(
-  startDate: string | null,
-  endDate: string | null,
-) {
+export function formatStayCaption(startDate: string | null, endDate: string | null) {
   if (startDate === null || endDate === null) return null;
 
-  return formatDiffDays(startDate, endDate) > 0
-    ? `${startDate} ~ ${endDate}`
-    : null;
+  return formatDiffDays(startDate, endDate) > 0 ? `${startDate} ~ ${endDate}` : null;
 }

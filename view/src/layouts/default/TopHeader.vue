@@ -1,21 +1,9 @@
 <template>
   <q-header elevated class="bg-white text-grey-8" height-hint="64">
     <q-toolbar>
-      <q-btn
-        @click="emit('toggleLeftDrawer')"
-        icon="menu"
-        class="q-mr-sm"
-        flat
-        dense
-        round
-        aria-label="Menu"
-      />
+      <q-btn @click="emit('toggleLeftDrawer')" icon="menu" class="q-mr-sm" flat dense round aria-label="Menu" />
 
-      <q-toolbar-title
-        v-if="$q.screen.gt.xs"
-        shrink
-        class="row items-center no-wrap"
-      >
+      <q-toolbar-title v-if="$q.screen.gt.xs" shrink class="row items-center no-wrap">
         <span class="q-ml-sm">Resort Management System</span>
       </q-toolbar-title>
 

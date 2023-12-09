@@ -1,23 +1,14 @@
 <template>
   <q-card>
-    <q-card-section class="text-h6"> 내 정보</q-card-section>
+    <q-card-section class="text-h6">내 정보</q-card-section>
 
     <q-form @submit="update">
       <q-card-section>
         <q-input v-model="user.name" label="이름" :readonly="true"></q-input>
 
-        <q-input
-          v-model="user.userId"
-          :readonly="true"
-          label="계정 ID"
-        ></q-input>
+        <q-input v-model="user.userId" :readonly="true" label="계정 ID"></q-input>
 
-        <q-input
-          v-model="formData.email"
-          :rules="userStaticRules.email"
-          label="이메일"
-          required
-        ></q-input>
+        <q-input v-model="formData.email" :rules="userStaticRules.email" label="이메일" required></q-input>
 
         <q-input
           v-model="formData.password"
@@ -35,13 +26,7 @@
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn
-          :loading="status.isProgress"
-          type="submit"
-          color="red"
-          label="수정"
-          flat
-        />
+        <q-btn :loading="status.isProgress" type="submit" color="red" label="수정" flat />
       </q-card-actions>
     </q-form>
   </q-card>
@@ -119,19 +104,15 @@ function update() {
 }
 
 function isChanged() {
-  return (
-    formData.value.email !== user.email || formData.value.password.length > 0
-  );
+  return formData.value.email !== user.email || formData.value.password.length > 0;
 }
 
 function patchedData() {
   const patchData: MyPatchParams = {};
 
-  if (formData.value.email !== user.email)
-    patchData.email = formData.value.email;
+  if (formData.value.email !== user.email) patchData.email = formData.value.email;
 
-  if (formData.value.password.length > 0)
-    patchData.password = formData.value.password;
+  if (formData.value.password.length > 0) patchData.password = formData.value.password;
 
   return patchData;
 }

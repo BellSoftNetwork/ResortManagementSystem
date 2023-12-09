@@ -7,7 +7,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class ReservationCreateDto(
-    val paymentMethodId: Long,
+    val paymentMethod: EntityReferenceDto,
     val rooms: Set<EntityReferenceDto> = emptySet(),
     val name: String,
     val phone: String = "",
@@ -26,7 +26,7 @@ data class ReservationCreateDto(
 ) {
     companion object {
         fun of(dto: ReservationCreateRequest) = ReservationCreateDto(
-            paymentMethodId = dto.paymentMethodId,
+            paymentMethod = dto.paymentMethod,
             rooms = EntityReferenceDto.of(dto.rooms),
             name = dto.name,
             phone = dto.phone,

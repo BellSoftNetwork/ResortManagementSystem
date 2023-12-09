@@ -1,11 +1,5 @@
 <template>
-  <q-card
-    :loading="status.isProgress"
-    class="q-pa-lg shadow-1"
-    style="min-width: 400px"
-    square
-    bordered
-  >
+  <q-card :loading="status.isProgress" class="q-pa-lg shadow-1" style="min-width: 400px" square bordered>
     <q-card-section>
       <div class="text-h5 text-center">Login</div>
     </q-card-section>
@@ -43,17 +37,8 @@
         </q-btn>
       </q-card-section>
 
-      <q-card-section
-        v-if="appConfigStore.config.isAvailableRegistration"
-        class="text-center q-py-none"
-      >
-        <q-btn
-          :to="{ name: 'Register' }"
-          class="text-grey-6 mt-2 full-width"
-          flat
-        >
-          회원 가입
-        </q-btn>
+      <q-card-section v-if="appConfigStore.config.isAvailableRegistration" class="text-center q-py-none">
+        <q-btn :to="{ name: 'Register' }" class="text-grey-6 mt-2 full-width" flat>회원 가입</q-btn>
       </q-card-section>
     </q-form>
   </q-card>

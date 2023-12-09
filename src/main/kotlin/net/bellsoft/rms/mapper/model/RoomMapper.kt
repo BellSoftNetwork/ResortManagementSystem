@@ -10,6 +10,7 @@ import org.mapstruct.BeanMapping
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
+import org.mapstruct.Mappings
 import org.mapstruct.NullValuePropertyMappingStrategy
 
 @Mapper(
@@ -23,7 +24,13 @@ interface RoomMapper {
     fun toDto(entity: ReservationRoom): RoomDetailDto
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_DEFAULT)
+    @Mappings(
+        Mapping(target = "updatedBy", ignore = true),
+    )
     fun toEntity(dto: RoomCreateDto): Room
 
+    @Mappings(
+        Mapping(target = "updatedBy", ignore = true),
+    )
     fun updateEntity(dto: RoomPatchDto, @MappingTarget entity: Room)
 }

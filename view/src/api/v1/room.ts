@@ -1,10 +1,5 @@
 import { api } from "boot/axios";
-import {
-  ListResponse,
-  PageRequestParams,
-  SingleResponse,
-  SortRequestParams,
-} from "src/schema/response";
+import { ListResponse, PageRequestParams, SingleResponse, SortRequestParams } from "src/schema/response";
 import { Room, RoomStatus } from "src/schema/room";
 import { Revision } from "src/schema/revision";
 
@@ -44,10 +39,7 @@ export async function createRoom(params: RoomParams) {
 }
 
 export async function patchRoom(id: number, params: Partial<RoomParams>) {
-  const result = await api.patch<SingleResponse<Room>>(
-    `/api/v1/rooms/${id}`,
-    params,
-  );
+  const result = await api.patch<SingleResponse<Room>>(`/api/v1/rooms/${id}`, params);
   return result.data;
 }
 
@@ -56,19 +48,11 @@ export async function deleteRoom(id: number) {
   return result.data;
 }
 
-type FetchRoomHistoriesRequestParams = Partial<
-  PageRequestParams & SortRequestParams
->;
+type FetchRoomHistoriesRequestParams = Partial<PageRequestParams & SortRequestParams>;
 
-export async function fetchRoomHistories(
-  id: number,
-  params: FetchRoomHistoriesRequestParams,
-) {
-  const result = await api.get<ListResponse<Revision<Room>>>(
-    `/api/v1/rooms/${id}/histories`,
-    {
-      params,
-    },
-  );
+export async function fetchRoomHistories(id: number, params: FetchRoomHistoriesRequestParams) {
+  const result = await api.get<ListResponse<Revision<Room>>>(`/api/v1/rooms/${id}/histories`, {
+    params,
+  });
   return result.data;
 }

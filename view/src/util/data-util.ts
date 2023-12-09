@@ -12,7 +12,17 @@ export function getPatchedFormData(source: any, formData: any) {
   if (source === undefined || formData === undefined) return patchedData;
 
   return Object.keys(formData)
-    .filter((key: string) => source[key] !== formData[key])
+    .filter((key: string) => {
+      const sourceValue = source[key];
+      const formValue = formData[key];
+      const isObject = formValue !== null && typeof formValue === "object" && !Array.isArray(formValue);
+
+      if (isObject && sourceValue.hasOwnProperty("id")) {
+        return sourceValue.id !== formValue.id;
+      } else {
+        return sourceValue !== formValue;
+      }
+    })
     .reduce((result, key: string) => {
       result[key] = formData[key];
       return result;

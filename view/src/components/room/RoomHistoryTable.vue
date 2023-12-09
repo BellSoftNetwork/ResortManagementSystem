@@ -28,11 +28,7 @@
     <template #body-cell-updatedValue="props">
       <q-td key="updatedValue" :props="props">
         <div class="row q-gutter-sm">
-          <q-card
-            v-for="field in props.row.updatedFields"
-            v-bind:key="field"
-            bordered
-          >
+          <q-card v-for="field in props.row.updatedFields" v-bind:key="field" bordered>
             <q-card-section horizontal>
               <q-card-section class="bg-blue-3 q-pa-xs">
                 {{ formatRoomFieldToLabel(field) }}

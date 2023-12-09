@@ -7,9 +7,7 @@ type TableColumnDefinition = {
   format?: (value: string | number | null) => string;
 };
 
-export function convertTableColumnDef(
-  fieldDetail: FieldDetail | null,
-): TableColumnDefinition | null {
+export function convertTableColumnDef(fieldDetail: FieldDetail | null): TableColumnDefinition | null {
   return fieldDetail
     ? ({
         ...fieldDetail,

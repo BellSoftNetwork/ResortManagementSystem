@@ -9,7 +9,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class ReservationPatchDto(
-    val paymentMethodId: JsonNullable<Long> = JsonNullable.undefined(),
+    val paymentMethod: JsonNullable<EntityReferenceDto> = JsonNullable.undefined(),
     val rooms: JsonNullable<Set<EntityReferenceDto>> = JsonNullable.undefined(),
     val name: JsonNullable<String> = JsonNullable.undefined(),
     val phone: JsonNullable<String> = JsonNullable.undefined(),
@@ -28,7 +28,7 @@ data class ReservationPatchDto(
 ) {
     companion object {
         fun of(dto: ReservationPatchRequest) = ReservationPatchDto(
-            paymentMethodId = dto.paymentMethodId,
+            paymentMethod = dto.paymentMethod,
             rooms = dto.rooms.convert(EntityReferenceDto::of),
             name = dto.name,
             phone = dto.phone,

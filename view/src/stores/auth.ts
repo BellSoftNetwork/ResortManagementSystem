@@ -23,8 +23,7 @@ export const useAuthStore = defineStore("auth", {
   getters: {
     isFirstRequest: (state) => state.status.isFirstRequest,
     isLoggedIn: (state) => state.user !== null,
-    isNormalRole: (state) =>
-      ["NORMAL", "ADMIN", "SUPER_ADMIN"].includes(state.user?.role),
+    isNormalRole: (state) => ["NORMAL", "ADMIN", "SUPER_ADMIN"].includes(state.user?.role),
     isAdminRole: (state) => ["ADMIN", "SUPER_ADMIN"].includes(state.user?.role),
     isSuperAdminRole: (state) => ["SUPER_ADMIN"].includes(state.user?.role),
   },

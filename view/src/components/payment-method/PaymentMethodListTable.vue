@@ -17,14 +17,7 @@
     <template v-slot:top-right>
       <div class="row q-gutter-sm">
         <PaymentMethodCreateDialog v-slot="{ dialog }" @complete="reloadData">
-          <q-btn
-            @click="dialog.isOpen = true"
-            icon="add"
-            color="grey"
-            dense
-            round
-            flat
-          />
+          <q-btn @click="dialog.isOpen = true" icon="add" color="grey" dense round flat />
         </PaymentMethodCreateDialog>
       </div>
     </template>
@@ -32,11 +25,7 @@
     <template #body-cell-name="props">
       <q-td key="name" :props="props">
         {{ props.row.name }}
-        <q-popup-edit
-          v-slot="scope"
-          :model-value="props.row.name"
-          :persistent="status.isPatching"
-        >
+        <q-popup-edit v-slot="scope" :model-value="props.row.name" :persistent="status.isPatching">
           <q-input
             v-model="scope.value"
             @keyup.enter="updateScope(props.row, scope, 'name')"
@@ -55,21 +44,10 @@
     <template #body-cell-commissionRate="props">
       <q-td key="commissionRate" :props="props">
         {{ formatCommissionRate(props.row.commissionRate) }}
-        <q-popup-edit
-          v-slot="scope"
-          :model-value="props.row.commissionRate * 100"
-          :persistent="status.isPatching"
-        >
+        <q-popup-edit v-slot="scope" :model-value="props.row.commissionRate * 100" :persistent="status.isPatching">
           <q-input
             v-model.number="scope.value"
-            @keyup.enter="
-              updateScope(
-                props.row,
-                scope,
-                'commissionRate',
-                (value) => value / 100,
-              )
-            "
+            @keyup.enter="updateScope(props.row, scope, 'commissionRate', (value) => value / 100)"
             :loading="status.isPatching"
             :disable="status.isPatching"
             :rules="paymentMethodStaticRules.commissionRatePercent"
@@ -89,16 +67,10 @@
     <template #body-cell-requireUnpaidAmountCheck="props">
       <q-td key="requireUnpaidAmountCheck" :props="props">
         {{ props.row.requireUnpaidAmountCheck ? "활성" : "비활성" }}
-        <q-popup-edit
-          v-slot="scope"
-          :model-value="props.row.requireUnpaidAmountCheck"
-          :persistent="status.isPatching"
-        >
+        <q-popup-edit v-slot="scope" :model-value="props.row.requireUnpaidAmountCheck" :persistent="status.isPatching">
           <q-checkbox
             v-model="scope.value"
-            @update:model-value="
-              updateScope(props.row, scope, 'requireUnpaidAmountCheck')
-            "
+            @update:model-value="updateScope(props.row, scope, 'requireUnpaidAmountCheck')"
             :loading="status.isPatching"
             :disable="status.isPatching"
             label="미수금 금액 알림"
@@ -110,14 +82,7 @@
 
     <template #body-cell-actions="props">
       <q-td key="actions" :props="props">
-        <q-btn
-          dense
-          round
-          flat
-          color="grey"
-          icon="delete"
-          @click="deleteItem(props.row)"
-        ></q-btn>
+        <q-btn dense round flat color="grey" icon="delete" @click="deleteItem(props.row)"></q-btn>
       </q-td>
     </template>
   </q-table>
@@ -127,18 +92,10 @@
 import { onMounted, ref } from "vue";
 import { useQuasar } from "quasar";
 import PaymentMethodCreateDialog from "components/payment-method/PaymentMethodCreateDialog.vue";
-import {
-  getPaymentMethodFieldDetail,
-  PaymentMethod,
-  paymentMethodStaticRules,
-} from "src/schema/payment-method";
+import { getPaymentMethodFieldDetail, PaymentMethod, paymentMethodStaticRules } from "src/schema/payment-method";
 import { convertTableColumnDef } from "src/util/table-util";
 import { formatCommissionRate } from "src/util/format-util";
-import {
-  deletePaymentMethod,
-  fetchPaymentMethods,
-  patchPaymentMethod,
-} from "src/api/v1/payment-method";
+import { deletePaymentMethod, fetchPaymentMethods, patchPaymentMethod } from "src/api/v1/payment-method";
 import { formatSortParam } from "src/util/query-string-util";
 
 const $q = useQuasar();
@@ -238,11 +195,7 @@ function reloadData() {
 }
 
 function updateScope(row, scope, key, formatter) {
-  if (
-    (inputRef.value && !inputRef.value.validate()) ||
-    row[key] === scope.value
-  )
-    return;
+  if ((inputRef.value && !inputRef.value.validate()) || row[key] === scope.value) return;
 
   const patchData = {};
   patchData[key] = formatter ? formatter(scope.value) : scope.value;
