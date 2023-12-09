@@ -1,11 +1,5 @@
 <template>
-  <q-card
-    :loading="status.isProgress"
-    class="q-pa-lg shadow-1"
-    style="min-width: 400px"
-    square
-    bordered
-  >
+  <q-card :loading="status.isProgress" class="q-pa-lg shadow-1" style="min-width: 400px" square bordered>
     <q-card-section>
       <div class="text-h5 text-center">Register</div>
     </q-card-section>
@@ -69,9 +63,7 @@
       </q-card-section>
 
       <q-card-section class="text-center q-py-none">
-        <q-btn :to="{ name: 'Login' }" class="text-grey-6 mt-2 full-width" flat>
-          로그인
-        </q-btn>
+        <q-btn :to="{ name: 'Login' }" class="text-grey-6 mt-2 full-width" flat>로그인</q-btn>
       </q-card-section>
     </q-form>
   </q-card>

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Size
 import net.bellsoft.rms.controller.common.dto.EntityReferenceRequest
 import net.bellsoft.rms.domain.reservation.ReservationStatus
+import net.bellsoft.rms.service.common.dto.EntityReferenceDto
 import org.hibernate.validator.constraints.Range
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -11,7 +12,7 @@ import java.time.LocalDateTime
 @Schema(description = "예약 생성 요청 정보")
 data class ReservationCreateRequest(
     @Schema(description = "결제 수단 ID", example = "1")
-    val paymentMethodId: Long,
+    val paymentMethod: EntityReferenceDto,
 
     @Schema(description = "객실 ID", example = "1")
     val rooms: Set<EntityReferenceRequest> = emptySet(),

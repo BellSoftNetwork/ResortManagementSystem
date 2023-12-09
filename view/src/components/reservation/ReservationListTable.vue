@@ -29,27 +29,13 @@
             </div>
 
             <div class="row no-wrap q-pa-md">
-              <q-input
-                v-model="filter.stayStartAt"
-                mask="####-##-##"
-                :readonly="true"
-                outlined
-              >
+              <q-input v-model="filter.stayStartAt" mask="####-##-##" :readonly="true" outlined>
                 <template v-slot:append>
                   <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy
-                      cover
-                      transition-show="scale"
-                      transition-hide="scale"
-                    >
+                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
                       <q-date v-model="filter.stayStartAt" mask="YYYY-MM-DD">
                         <div class="row items-center justify-end">
-                          <q-btn
-                            v-close-popup
-                            label="Close"
-                            color="primary"
-                            flat
-                          />
+                          <q-btn v-close-popup label="Close" color="primary" flat />
                         </div>
                       </q-date>
                     </q-popup-proxy>
@@ -57,27 +43,13 @@
                 </template>
               </q-input>
               <span class="self-center q-mx-sm">~</span>
-              <q-input
-                v-model="filter.stayEndAt"
-                mask="####-##-##"
-                :readonly="true"
-                outlined
-              >
+              <q-input v-model="filter.stayEndAt" mask="####-##-##" :readonly="true" outlined>
                 <template v-slot:append>
                   <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy
-                      cover
-                      transition-show="scale"
-                      transition-hide="scale"
-                    >
+                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
                       <q-date v-model="filter.stayEndAt" mask="YYYY-MM-DD">
                         <div class="row items-center justify-end">
-                          <q-btn
-                            v-close-popup
-                            label="Close"
-                            color="primary"
-                            flat
-                          />
+                          <q-btn v-close-popup label="Close" color="primary" flat />
                         </div>
                       </q-date>
                     </q-popup-proxy>
@@ -88,14 +60,7 @@
           </q-menu>
         </q-btn>
 
-        <q-btn
-          :to="{ name: 'CreateReservation' }"
-          icon="add"
-          color="grey"
-          dense
-          round
-          flat
-        />
+        <q-btn :to="{ name: 'CreateReservation' }" icon="add" color="grey" dense round flat />
       </div>
     </template>
 
@@ -103,13 +68,7 @@
       <q-td key="rooms" :props="props">
         <div v-if="props.row.rooms.length !== 0">
           <span v-for="room in props.row.rooms" :key="room.id">
-            <q-btn
-              :to="{ name: 'Room', params: { id: room.id } }"
-              align="left"
-              color="primary"
-              dense
-              flat
-            >
+            <q-btn :to="{ name: 'Room', params: { id: room.id } }" align="left" color="primary" dense flat>
               {{ room.number }}
             </q-btn>
           </span>
@@ -142,14 +101,7 @@
           icon="edit"
           :to="{ name: 'EditReservation', params: { id: props.row.id } }"
         ></q-btn>
-        <q-btn
-          dense
-          round
-          flat
-          color="grey"
-          icon="delete"
-          @click="deleteItem(props.row)"
-        ></q-btn>
+        <q-btn dense round flat color="grey" icon="delete" @click="deleteItem(props.row)"></q-btn>
       </q-td>
     </template>
   </q-table>

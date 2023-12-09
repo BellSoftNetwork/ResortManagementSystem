@@ -35,21 +35,12 @@ export function formatPaymentMethodFieldToLabel(field: string) {
   return getPaymentMethodFieldDetail(field)?.label ?? field;
 }
 
-export function formatPaymentMethodValue(
-  field: string,
-  value: string | number | null,
-) {
+export function formatPaymentMethodValue(field: string, value: string | number | null) {
   const fieldDetail = getPaymentMethodFieldDetail(field);
   return fieldDetail?.format ? fieldDetail.format(value) : value;
 }
 
 export const paymentMethodStaticRules: StaticRuleMap = {
-  name: [
-    (value: string) =>
-      (value.length >= 2 && value.length <= 20) || "2~20 글자가 필요합니다",
-  ] as const,
-  commissionRatePercent: [
-    (value: number) =>
-      (value >= 0 && value <= 100) || "수수료율이 유효하지 않습니다.",
-  ] as const,
+  name: [(value: string) => (value.length >= 2 && value.length <= 20) || "2~20 글자가 필요합니다"] as const,
+  commissionRatePercent: [(value: number) => (value >= 0 && value <= 100) || "수수료율이 유효하지 않습니다."] as const,
 } as const;

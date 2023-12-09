@@ -1,37 +1,19 @@
 <template>
   <slot :dialog="dialog">
-    <q-btn @click="dialog.isOpen = true"> 추가</q-btn>
+    <q-btn @click="dialog.isOpen = true">추가</q-btn>
   </slot>
 
-  <q-dialog
-    v-model="dialog.isOpen"
-    :persistent="status.isProgress"
-    @beforeShow="resetForm"
-  >
+  <q-dialog v-model="dialog.isOpen" :persistent="status.isProgress" @beforeShow="resetForm">
     <q-card style="width: 500px">
-      <q-card-section class="text-h6"> 계정 수정</q-card-section>
+      <q-card-section class="text-h6">계정 수정</q-card-section>
 
       <q-form @submit="update">
         <q-card-section>
-          <q-input
-            v-model="formData.userId"
-            :rules="userStaticRules.userId"
-            label="계정 ID"
-            required
-          ></q-input>
+          <q-input v-model="formData.userId" :rules="userStaticRules.userId" label="계정 ID" required></q-input>
 
-          <q-input
-            v-model="formData.email"
-            :rules="userStaticRules.email"
-            label="이메일"
-          ></q-input>
+          <q-input v-model="formData.email" :rules="userStaticRules.email" label="이메일"></q-input>
 
-          <q-input
-            v-model="formData.name"
-            :rules="userStaticRules.name"
-            label="이름"
-            required
-          ></q-input>
+          <q-input v-model="formData.name" :rules="userStaticRules.name" label="이름" required></q-input>
 
           <q-input
             v-model="formData.password"
@@ -51,20 +33,8 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn
-            v-close-popup
-            :disable="status.isProgress"
-            color="primary"
-            label="취소"
-            flat
-          />
-          <q-btn
-            :loading="status.isProgress"
-            type="submit"
-            color="red"
-            label="수정"
-            flat
-          />
+          <q-btn v-close-popup :disable="status.isProgress" color="primary" label="취소" flat />
+          <q-btn :loading="status.isProgress" type="submit" color="red" label="수정" flat />
         </q-card-actions>
       </q-form>
     </q-card>
@@ -76,10 +46,7 @@ import { ref } from "vue";
 import { useAuthStore } from "stores/auth";
 import { useQuasar } from "quasar";
 import { User, userStaticRules } from "src/schema/user";
-import {
-  AdminAccountPatchParams,
-  patchAdminAccount,
-} from "src/api/v1/admin/account";
+import { AdminAccountPatchParams, patchAdminAccount } from "src/api/v1/admin/account";
 
 const authStore = useAuthStore();
 const $q = useQuasar();
@@ -164,18 +131,14 @@ function isChanged() {
 function patchedData() {
   const patchData: AdminAccountPatchParams = {};
 
-  if (props.entity.userId !== formData.value.userId)
-    patchData.userId = formData.value.userId;
+  if (props.entity.userId !== formData.value.userId) patchData.userId = formData.value.userId;
   if (props.entity.email !== formData.value.email) {
     const email = formData.value.email ? formData.value.email : null;
     patchData.email = email;
   }
-  if (props.entity.name !== formData.value.name)
-    patchData.name = formData.value.name;
-  if (props.entity.role !== formData.value.role)
-    patchData.role = formData.value.role;
-  if (formData.value.password.length > 0)
-    patchData.password = formData.value.password;
+  if (props.entity.name !== formData.value.name) patchData.name = formData.value.name;
+  if (props.entity.role !== formData.value.role) patchData.role = formData.value.role;
+  if (formData.value.password.length > 0) patchData.password = formData.value.password;
 
   return patchData;
 }

@@ -1,10 +1,4 @@
-import {
-  DynamicRuleMap,
-  EnumMap,
-  FieldDetail,
-  FieldMap,
-  StaticRuleMap,
-} from "src/types/map";
+import { DynamicRuleMap, EnumMap, FieldDetail, FieldMap, StaticRuleMap } from "src/types/map";
 import { BASE_TIME_FIELD_MAP, BaseTime } from "src/schema/base";
 
 const USER_ROLE_MAP: EnumMap = {
@@ -74,20 +68,13 @@ export function formatUserValue(field: string, value: string | number | null) {
 }
 
 export const userStaticRules: StaticRuleMap = {
-  name: [
-    (value: string) =>
-      (value.length >= 2 && value.length <= 20) || "2~20 글자가 필요합니다",
-  ] as const,
+  name: [(value: string) => (value.length >= 2 && value.length <= 20) || "2~20 글자가 필요합니다"] as const,
   email: [
     (value: string) =>
-      value.length <= 0 ||
-      /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
-      "이메일이 유효하지 않습니다.",
+      value.length <= 0 || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) || "이메일이 유효하지 않습니다.",
   ] as const,
   userId: [
-    (value: string) =>
-      (value.length >= 4 && value.length <= 30) ||
-      "아이디는 4글자 이상 30글자가 필요합니다.",
+    (value: string) => (value.length >= 4 && value.length <= 30) || "아이디는 4글자 이상 30글자가 필요합니다.",
   ] as const,
   username: [
     (value: string) =>
@@ -95,21 +82,15 @@ export const userStaticRules: StaticRuleMap = {
       /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
       "이메일이 유효하지 않습니다.",
     (value: string) =>
-      value.includes("@") ||
-      (value.length >= 3 && value.length <= 30) ||
-      "아이디가 유효하지 않습니다.",
+      value.includes("@") || (value.length >= 3 && value.length <= 30) || "아이디가 유효하지 않습니다.",
   ] as const,
   password: [
     (value: string) =>
-      value.length === 0 ||
-      (value.length >= 8 && value.length <= 20) ||
-      "비밀번호는 8~20 글자가 필요합니다.",
+      value.length === 0 || (value.length >= 8 && value.length <= 20) || "비밀번호는 8~20 글자가 필요합니다.",
   ] as const,
 } as const;
 
 export const userDynamicRules: DynamicRuleMap = {
   passwordConfirm: (password: string) =>
-    [
-      (value: string) => password === value || "비밀번호가 일치하지 않습니다.",
-    ] as const,
+    [(value: string) => password === value || "비밀번호가 일치하지 않습니다."] as const,
 } as const;

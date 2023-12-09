@@ -16,14 +16,7 @@
   >
     <template v-slot:top-right>
       <div class="row q-gutter-sm">
-        <q-btn
-          :to="{ name: 'CreateRoom' }"
-          icon="add"
-          color="grey"
-          dense
-          round
-          flat
-        />
+        <q-btn :to="{ name: 'CreateRoom' }" icon="add" color="grey" dense round flat />
       </div>
     </template>
 
@@ -51,14 +44,7 @@
           icon="edit"
           :to="{ name: 'EditRoom', params: { id: props.row.id } }"
         ></q-btn>
-        <q-btn
-          dense
-          round
-          flat
-          color="grey"
-          icon="delete"
-          @click="deleteItem(props.row)"
-        ></q-btn>
+        <q-btn dense round flat color="grey" icon="delete" @click="deleteItem(props.row)"></q-btn>
       </q-td>
     </template>
   </q-table>

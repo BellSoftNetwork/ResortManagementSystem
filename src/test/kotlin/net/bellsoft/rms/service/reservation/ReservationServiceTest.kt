@@ -44,7 +44,7 @@ internal class ReservationServiceTest(
         val paymentMethod = paymentMethodRepository.save(baseFixture())
         val fixture = baseFixture.new {
             property(Reservation::paymentMethod) { paymentMethod }
-            property(ReservationCreateDto::paymentMethodId) { paymentMethod.id }
+            property(ReservationCreateDto::paymentMethod) { EntityReferenceDto(paymentMethod.id) }
         }
         val loginUser: User = fixture()
 

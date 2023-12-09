@@ -1,11 +1,5 @@
 <template>
-  <q-drawer
-    v-model="leftDrawerOpen"
-    show-if-above
-    bordered
-    class="bg-white"
-    :width="280"
-  >
+  <q-drawer v-model="leftDrawerOpen" show-if-above bordered class="bg-white" :width="280">
     <q-scroll-area class="fit">
       <q-list padding class="text-grey-8">
         <div v-for="links in allLinks" :key="links">
@@ -35,12 +29,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useAuthStore } from "stores/auth";
-import {
-  fasBook,
-  fasCommentDollar,
-  fasPersonShelter,
-  fasTableColumns,
-} from "@quasar/extras/fontawesome-v6";
+import { fasBook, fasCommentDollar, fasPersonShelter, fasTableColumns } from "@quasar/extras/fontawesome-v6";
 
 defineExpose({
   toggleLeftDrawer,

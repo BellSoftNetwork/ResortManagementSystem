@@ -28,11 +28,7 @@
     <template #body-cell-updatedValue="props">
       <q-td key="updatedValue" :props="props">
         <div class="row q-gutter-sm">
-          <q-card
-            v-for="field in props.row.updatedFields"
-            v-bind:key="field"
-            bordered
-          >
+          <q-card v-for="field in props.row.updatedFields" v-bind:key="field" bordered>
             <q-card-section horizontal>
               <q-card-section class="bg-blue-3 q-pa-xs">
                 {{ formatReservationFieldToLabel(field) }}
@@ -52,11 +48,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { formatDateTime } from "src/util/format-util";
-import {
-  formatReservationFieldToLabel,
-  formatReservationValue,
-  Reservation,
-} from "src/schema/reservation";
+import { formatReservationFieldToLabel, formatReservationValue, Reservation } from "src/schema/reservation";
 import { Revision, REVISION_TYPE_MAP } from "src/schema/revision";
 import { formatSortParam } from "src/util/query-string-util";
 import { fetchReservationHistories } from "src/api/v1/reservation";

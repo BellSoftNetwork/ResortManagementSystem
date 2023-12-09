@@ -1,37 +1,19 @@
 <template>
   <slot :dialog="dialog">
-    <q-btn @click="dialog.isOpen = true"> 추가</q-btn>
+    <q-btn @click="dialog.isOpen = true">추가</q-btn>
   </slot>
 
-  <q-dialog
-    v-model="dialog.isOpen"
-    :persistent="status.isProgress"
-    @beforeShow="resetForm"
-  >
+  <q-dialog v-model="dialog.isOpen" :persistent="status.isProgress" @beforeShow="resetForm">
     <q-card style="width: 500px">
-      <q-card-section class="text-h6"> 계정 추가</q-card-section>
+      <q-card-section class="text-h6">계정 추가</q-card-section>
 
       <q-form @submit="create">
         <q-card-section>
-          <q-input
-            v-model="formData.name"
-            :rules="userStaticRules.name"
-            label="이름"
-            required
-          ></q-input>
+          <q-input v-model="formData.name" :rules="userStaticRules.name" label="이름" required></q-input>
 
-          <q-input
-            v-model="formData.userId"
-            :rules="userStaticRules.userId"
-            label="계정 ID"
-            required
-          ></q-input>
+          <q-input v-model="formData.userId" :rules="userStaticRules.userId" label="계정 ID" required></q-input>
 
-          <q-input
-            v-model="formData.email"
-            :rules="userStaticRules.email"
-            label="이메일"
-          ></q-input>
+          <q-input v-model="formData.email" :rules="userStaticRules.email" label="이메일"></q-input>
 
           <q-input
             v-model="formData.password"
@@ -52,20 +34,8 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn
-            v-close-popup
-            :disable="status.isProgress"
-            color="primary"
-            label="취소"
-            flat
-          />
-          <q-btn
-            :loading="status.isProgress"
-            type="submit"
-            color="red"
-            label="추가"
-            flat
-          />
+          <q-btn v-close-popup :disable="status.isProgress" color="primary" label="취소" flat />
+          <q-btn :loading="status.isProgress" type="submit" color="red" label="추가" flat />
         </q-card-actions>
       </q-form>
     </q-card>

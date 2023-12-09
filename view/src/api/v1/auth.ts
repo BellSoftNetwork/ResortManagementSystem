@@ -10,10 +10,7 @@ export type RegisterParams = {
 };
 
 export async function postRegister(params: RegisterParams) {
-  const result = await api.post<SingleResponse<User>>(
-    "/api/v1/auth/register",
-    params,
-  );
+  const result = await api.post<SingleResponse<User>>("/api/v1/auth/register", params);
   return result.data;
 }
 
@@ -23,10 +20,7 @@ export type LoginParams = {
 };
 
 export async function postLogin(params: LoginParams) {
-  const result = await api.post<SingleResponse<User>>(
-    "/api/v1/auth/login",
-    params,
-  );
+  const result = await api.post<SingleResponse<User>>("/api/v1/auth/login", params);
   return result.data;
 }
 

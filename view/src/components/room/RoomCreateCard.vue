@@ -1,6 +1,6 @@
 <template>
   <q-card>
-    <q-card-section class="text-h6"> 객실 추가</q-card-section>
+    <q-card-section class="text-h6">객실 추가</q-card-section>
 
     <q-form @submit="create">
       <q-card-section>
@@ -59,20 +59,8 @@
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn
-          :disable="status.isProgress"
-          :to="{ name: 'Rooms' }"
-          color="primary"
-          label="취소"
-          flat
-        />
-        <q-btn
-          :loading="status.isProgress"
-          type="submit"
-          color="red"
-          label="추가"
-          flat
-        />
+        <q-btn :disable="status.isProgress" :to="{ name: 'Rooms' }" color="primary" label="취소" flat />
+        <q-btn :loading="status.isProgress" type="submit" color="red" label="추가" flat />
       </q-card-actions>
     </q-form>
   </q-card>

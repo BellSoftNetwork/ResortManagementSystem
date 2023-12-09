@@ -4,7 +4,7 @@
       <q-spinner-gears size="50px" color="primary" />
     </q-inner-loading>
 
-    <q-card-section class="text-h6"> 예약 정보</q-card-section>
+    <q-card-section class="text-h6">예약 정보</q-card-section>
 
     <q-card-section>
       <div class="row">
@@ -25,12 +25,7 @@
             <div class="text-body1">
               <div v-if="entity?.rooms.length !== 0">
                 <span v-for="room in entity?.rooms" :key="room.id">
-                  <q-btn
-                    :to="{ name: 'Room', params: { id: room.id } }"
-                    color="primary"
-                    flat
-                    dense
-                  >
+                  <q-btn :to="{ name: 'Room', params: { id: room.id } }" color="primary" flat dense>
                     {{ room.number }}
                   </q-btn>
                 </span>
@@ -116,16 +111,9 @@
 import { computed, onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
-import {
-  formatDiffDays,
-  formatPrice,
-  formatStayTitle,
-} from "src/util/format-util";
+import { formatDiffDays, formatPrice, formatStayTitle } from "src/util/format-util";
 import { deleteReservation, fetchReservation } from "src/api/v1/reservation";
-import {
-  Reservation,
-  reservationStatusValueToName,
-} from "src/schema/reservation";
+import { Reservation, reservationStatusValueToName } from "src/schema/reservation";
 
 const router = useRouter();
 const $q = useQuasar();
@@ -137,9 +125,7 @@ const status = ref({
   isProgress: false,
 });
 const entity = ref<Reservation>();
-const stayDateDiff = computed(() =>
-  formatDiffDays(entity.value?.stayStartAt, entity.value?.stayEndAt),
-);
+const stayDateDiff = computed(() => formatDiffDays(entity.value?.stayStartAt, entity.value?.stayEndAt));
 
 function fetchData() {
   status.value.isProgress = true;
@@ -166,9 +152,7 @@ function deleteItem() {
 
   $q.dialog({
     title: "삭제",
-    message: `정말로 ${itemName}님의 ${formatStayTitle(
-      stayDateDiff.value,
-    )} 예약 정보를 삭제하시겠습니까?`,
+    message: `정말로 ${itemName}님의 ${formatStayTitle(stayDateDiff.value)} 예약 정보를 삭제하시겠습니까?`,
     ok: {
       label: "삭제",
       flat: true,

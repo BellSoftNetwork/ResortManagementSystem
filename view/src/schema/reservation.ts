@@ -1,19 +1,8 @@
 import { Room } from "src/schema/room";
 import { PaymentMethod } from "src/schema/payment-method";
-import {
-  DynamicRuleMap,
-  EnumMap,
-  FieldDetail,
-  FieldMap,
-  StaticRuleMap,
-} from "src/types/map";
+import { DynamicRuleMap, EnumMap, FieldDetail, FieldMap, StaticRuleMap } from "src/types/map";
 import { formatDate, formatDateTime, formatPrice } from "src/util/format-util";
-import {
-  BASE_AUDIT_FIELD_MAP,
-  BASE_TIME_FIELD_MAP,
-  BaseAudit,
-  BaseTime,
-} from "src/schema/base";
+import { BASE_AUDIT_FIELD_MAP, BASE_TIME_FIELD_MAP, BaseAudit, BaseTime } from "src/schema/base";
 
 const RESERVATION_STATUS_MAP: EnumMap = {
   NORMAL: "예약 확정",
@@ -56,10 +45,7 @@ const ReservationFieldMap: FieldMap = {
   } as const,
   rooms: {
     label: "객실",
-    format: (value: Room[]) =>
-      value.length !== 0
-        ? value.map((room) => room.number).join(", ")
-        : "미배정",
+    format: (value: Room[]) => (value.length !== 0 ? value.map((room) => room.number).join(", ") : "미배정"),
   } as const,
   name: { label: "예약자명" } as const,
   phone: {
@@ -103,57 +89,30 @@ export function formatReservationFieldToLabel(field: string) {
   return getReservationFieldDetail(field)?.label ?? field;
 }
 
-export function formatReservationValue(
-  field: string,
-  value: string | number | null,
-) {
+export function formatReservationValue(field: string, value: string | number | null) {
   const fieldDetail = getReservationFieldDetail(field);
   return fieldDetail?.format ? fieldDetail.format(value) : value;
 }
 
 export const reservationStaticRules: StaticRuleMap = {
-  name: [
-    (value: string) =>
-      (value.length >= 2 && value.length <= 30) || "2~30 글자가 필요합니다",
-  ] as const,
-  phone: [
-    (value: string) => value.length <= 20 || "20 글자 이내로 입력 가능합니다",
-  ] as const,
-  peopleCount: [
-    (value: number) =>
-      (value >= 0 && value <= 1000) || "1000 명 이하만 입실 가능합니다",
-  ] as const,
+  name: [(value: string) => (value.length >= 2 && value.length <= 30) || "2~30 글자가 필요합니다"] as const,
+  phone: [(value: string) => value.length <= 20 || "20 글자 이내로 입력 가능합니다"] as const,
+  peopleCount: [(value: number) => (value >= 0 && value <= 1000) || "1000 명 이하만 입실 가능합니다"] as const,
   stayStartAt: [
-    (value: string) =>
-      /^-?[\d]+-[0-1]\d-[0-3]\d$/.test(value) ||
-      "####-##-## 형태의 날짜만 입력 가능합니다.",
+    (value: string) => /^-?[\d]+-[0-1]\d-[0-3]\d$/.test(value) || "####-##-## 형태의 날짜만 입력 가능합니다.",
   ] as const,
   stayEndAt: [
-    (value: string) =>
-      /^-?[\d]+-[0-1]\d-[0-3]\d$/.test(value) ||
-      "####-##-## 형태의 날짜만 입력 가능합니다.",
+    (value: string) => /^-?[\d]+-[0-1]\d-[0-3]\d$/.test(value) || "####-##-## 형태의 날짜만 입력 가능합니다.",
   ] as const,
-  price: [
-    (value: number) =>
-      (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다",
-  ] as const,
-  brokerFee: [
-    (value: number) =>
-      (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다",
-  ] as const,
-  note: [
-    (value: string) =>
-      (value.length >= 0 && value.length <= 200) ||
-      "200 글자까지 입력 가능합니다",
-  ] as const,
+  price: [(value: number) => (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다"] as const,
+  brokerFee: [(value: number) => (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다"] as const,
+  note: [(value: string) => (value.length >= 0 && value.length <= 200) || "200 글자까지 입력 가능합니다"] as const,
 } as const;
 
 export const reservationDynamicRules: DynamicRuleMap = {
   paymentAmount: (price: number) =>
     [
-      (value: number) =>
-        (value >= 0 && value <= 100000000) ||
-        "금액은 1억 미만 양수만 가능합니다",
+      (value: number) => (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다",
       (value: number) => value <= price || "판매 금액보다 클 수 없습니다",
     ] as const,
 } as const;

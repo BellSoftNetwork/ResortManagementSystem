@@ -1,9 +1,7 @@
 <template>
   <q-layout>
     <q-page-container>
-      <q-page
-        class="bg-primary window-height window-width row justify-center items-center"
-      >
+      <q-page class="bg-primary window-height window-width row justify-center items-center">
         <div class="column">
           <div class="row">
             <h5 class="text-h5 text-white q-my-md">Resort Management System</h5>
@@ -33,8 +31,7 @@ onBeforeMount(() => {
   if (authStore.isLoggedIn) router.push({ name: "Home" });
 
   appConfigStore.loadAppConfig(true).finally(() => {
-    if (!appConfigStore.config.isAvailableRegistration)
-      router.push({ name: "Login" });
+    if (!appConfigStore.config.isAvailableRegistration) router.push({ name: "Login" });
   });
 });
 </script>

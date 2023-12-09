@@ -1,16 +1,11 @@
 <template>
   <q-card flat bordered>
-    <q-card-section class="text-h6"> 입실 정보 요약</q-card-section>
+    <q-card-section class="text-h6">입실 정보 요약</q-card-section>
 
     <q-card-section>
       <div class="row">
         <div class="col-12 col-md-auto q-pa-sm">
-          <q-date
-            v-model="date"
-            @navigation="changeView"
-            :events="events"
-            mask="YYYY-MM-DD"
-          />
+          <q-date v-model="date" @navigation="changeView" :events="events" mask="YYYY-MM-DD" />
         </div>
 
         <div class="col-12 col-md q-pa-md-sm">
@@ -21,14 +16,7 @@
               :name="stayStartAt"
               class="q-px-none"
             >
-              <q-table
-                :columns="columns"
-                :rows="reservations"
-                row-key="id"
-                :title="stayStartAt"
-                flat
-                bordered
-              >
+              <q-table :columns="columns" :rows="reservations" row-key="id" :title="stayStartAt" flat bordered>
                 <template #body-cell-rooms="props">
                   <q-td key="rooms" :props="props">
                     <div v-if="props.row.rooms.length !== 0">
@@ -78,11 +66,7 @@
                 </template>
 
                 <template #body-cell-missPrice="props">
-                  <q-td
-                    :props="props"
-                    key="missPrice"
-                    :class="missPriceBackgroundColor(props.row)"
-                  >
+                  <q-td :props="props" key="missPrice" :class="missPriceBackgroundColor(props.row)">
                     {{ formatPrice(props.row.missPrice) }}
                   </q-td>
                 </template>
@@ -176,11 +160,7 @@ const columns = [
 ];
 const date = ref(formatDate());
 const reservationsOfDay = ref({});
-const events = computed(() =>
-  Object.keys(reservationsOfDay.value).map((date) =>
-    dayjs(date).format("YYYY/MM/DD"),
-  ),
-);
+const events = computed(() => Object.keys(reservationsOfDay.value).map((date) => dayjs(date).format("YYYY/MM/DD")));
 
 function getColumnDef(field: string) {
   return convertTableColumnDef(getReservationFieldDetail(field));
@@ -213,12 +193,8 @@ function formatReservations(reservations: Reservation[]) {
   reservations.forEach((reservation) => {
     reservation.missPrice = reservation.price - reservation.paymentAmount;
 
-    for (let [index, date] of getDateArray(
-      reservation.stayStartAt,
-      reservation.stayEndAt,
-    ).entries()) {
-      if (!Object.keys(reservationMap).includes(date))
-        reservationMap[date] = [];
+    for (let [index, date] of getDateArray(reservation.stayStartAt, reservation.stayEndAt).entries()) {
+      if (!Object.keys(reservationMap).includes(date)) reservationMap[date] = [];
 
       const reservationCopy = { ...reservation, type: "N/A" };
 
@@ -238,11 +214,7 @@ function getDateArray(startDate: string, endDate: string) {
   const stayEndAt = formatDate(endDate);
   const dateArray = [];
 
-  for (
-    let date = stayStartDate;
-    date <= stayEndAt;
-    date = dayjs(date).add(1, "day").format("YYYY-MM-DD")
-  ) {
+  for (let date = stayStartDate; date <= stayEndAt; date = dayjs(date).add(1, "day").format("YYYY-MM-DD")) {
     dateArray.push(date);
   }
 
@@ -253,12 +225,8 @@ function changeView(view) {
   const year = view.year;
   const month = view.month;
 
-  filter.value.stayStartAt = dayjs(`${year}-${month}-01`)
-    .startOf("month")
-    .format("YYYY-MM-DD");
-  filter.value.stayEndAt = dayjs(`${year}-${month}-01`)
-    .endOf("month")
-    .format("YYYY-MM-DD");
+  filter.value.stayStartAt = dayjs(`${year}-${month}-01`).startOf("month").format("YYYY-MM-DD");
+  filter.value.stayEndAt = dayjs(`${year}-${month}-01`).endOf("month").format("YYYY-MM-DD");
 
   fetchData();
 }

@@ -4,7 +4,7 @@
       <q-spinner-gears size="50px" color="primary" />
     </q-inner-loading>
 
-    <q-card-section class="text-h6"> 객실 수정</q-card-section>
+    <q-card-section class="text-h6">객실 수정</q-card-section>
 
     <q-form @submit="update">
       <q-card-section>
@@ -75,20 +75,8 @@
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn
-          :disable="status.isProgress"
-          :to="{ name: 'Rooms' }"
-          color="primary"
-          label="취소"
-          flat
-        />
-        <q-btn
-          :loading="status.isProgress"
-          type="submit"
-          color="red"
-          label="수정"
-          flat
-        />
+        <q-btn :disable="status.isProgress" :to="{ name: 'Rooms' }" color="primary" label="취소" flat />
+        <q-btn :loading="status.isProgress" type="submit" color="red" label="수정" flat />
       </q-card-actions>
     </q-form>
   </q-card>

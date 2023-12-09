@@ -1,10 +1,5 @@
 import { api } from "boot/axios";
-import {
-  ListResponse,
-  PageRequestParams,
-  SingleResponse,
-  SortRequestParams,
-} from "src/schema/response";
+import { ListResponse, PageRequestParams, SingleResponse, SortRequestParams } from "src/schema/response";
 import { Reservation, ReservationStatus } from "src/schema/reservation";
 import { Revision } from "src/schema/revision";
 import { EntityReference } from "src/schema/base";
@@ -19,27 +14,20 @@ export type FetchReservationsRequestParams = Partial<
     SortRequestParams
 >;
 
-export async function fetchReservations(
-  params: FetchReservationsRequestParams,
-) {
-  const result = await api.get<ListResponse<Reservation>>(
-    "/api/v1/reservations",
-    {
-      params,
-    },
-  );
+export async function fetchReservations(params: FetchReservationsRequestParams) {
+  const result = await api.get<ListResponse<Reservation>>("/api/v1/reservations", {
+    params,
+  });
   return result.data;
 }
 
 export async function fetchReservation(id: number) {
-  const result = await api.get<SingleResponse<Reservation>>(
-    `/api/v1/reservations/${id}`,
-  );
+  const result = await api.get<SingleResponse<Reservation>>(`/api/v1/reservations/${id}`);
   return result.data;
 }
 
 type ReservationParams = {
-  paymentMethodId: number;
+  paymentMethod: EntityReference;
   rooms: EntityReference[];
   name: string;
   phone: string;
@@ -56,23 +44,14 @@ type ReservationParams = {
 export type ReservationCreateParams = ReservationParams;
 
 export async function createReservation(params: ReservationCreateParams) {
-  const result = await api.post<SingleResponse<Reservation>>(
-    "/api/v1/reservations",
-    params,
-  );
+  const result = await api.post<SingleResponse<Reservation>>("/api/v1/reservations", params);
   return result.data;
 }
 
 export type ReservationPatchParams = Partial<ReservationParams>;
 
-export async function patchReservation(
-  id: number,
-  params: Partial<ReservationPatchParams>,
-) {
-  const result = await api.patch<SingleResponse<Reservation>>(
-    `/api/v1/reservations/${id}`,
-    params,
-  );
+export async function patchReservation(id: number, params: Partial<ReservationPatchParams>) {
+  const result = await api.patch<SingleResponse<Reservation>>(`/api/v1/reservations/${id}`, params);
   return result.data;
 }
 
@@ -81,19 +60,11 @@ export async function deleteReservation(id: number) {
   return result.data;
 }
 
-type FetchReservationHistoriesRequestParams = Partial<
-  PageRequestParams & SortRequestParams
->;
+type FetchReservationHistoriesRequestParams = Partial<PageRequestParams & SortRequestParams>;
 
-export async function fetchReservationHistories(
-  id: number,
-  params: FetchReservationHistoriesRequestParams,
-) {
-  const result = await api.get<ListResponse<Revision<Reservation>>>(
-    `/api/v1/reservations/${id}/histories`,
-    {
-      params,
-    },
-  );
+export async function fetchReservationHistories(id: number, params: FetchReservationHistoriesRequestParams) {
+  const result = await api.get<ListResponse<Revision<Reservation>>>(`/api/v1/reservations/${id}/histories`, {
+    params,
+  });
   return result.data;
 }

@@ -8,8 +8,7 @@ export default (router: Router) => {
 
     if (!Array.isArray(roles) || roles.length <= 0) return next();
 
-    if (!roles.includes(authStore.user?.role))
-      return next({ name: "ErrorForbidden" });
+    if (!roles.includes(authStore.user?.role)) return next({ name: "ErrorForbidden" });
 
     return next();
   });

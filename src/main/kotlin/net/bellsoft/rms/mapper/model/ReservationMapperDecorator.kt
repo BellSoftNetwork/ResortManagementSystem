@@ -15,8 +15,8 @@ abstract class ReservationMapperDecorator : ReservationMapper {
 
     override fun toEntity(dto: ReservationCreateDto): Reservation {
         return Reservation(
-            paymentMethod = referenceMapper.longIdToReference(
-                dto.paymentMethodId,
+            paymentMethod = referenceMapper.refIdToReference(
+                dto.paymentMethod,
                 PaymentMethod::class.java,
             ),
             name = dto.name,
