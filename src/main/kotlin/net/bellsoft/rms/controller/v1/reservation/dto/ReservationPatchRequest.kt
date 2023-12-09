@@ -11,8 +11,8 @@ import java.time.LocalDateTime
 
 @Schema(description = "예약 수정 요청 정보")
 data class ReservationPatchRequest(
-    @Schema(description = "예약 수단 ID", example = "1")
-    val reservationMethodId: JsonNullable<Long> = JsonNullable.undefined(),
+    @Schema(description = "결제 수단 ID", example = "1")
+    val paymentMethodId: JsonNullable<Long> = JsonNullable.undefined(),
 
     @Schema(description = "객실 ID", example = "1")
     val rooms: JsonNullable<Set<EntityReferenceRequest>> = JsonNullable.undefined(),

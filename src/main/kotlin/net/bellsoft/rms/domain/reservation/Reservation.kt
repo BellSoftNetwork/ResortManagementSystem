@@ -10,7 +10,7 @@ import jakarta.persistence.OrderBy
 import jakarta.persistence.Table
 import net.bellsoft.rms.domain.base.BaseMustAuditEntity
 import net.bellsoft.rms.domain.base.BaseTimeEntity
-import net.bellsoft.rms.domain.reservation.method.ReservationMethod
+import net.bellsoft.rms.domain.paymentmethod.PaymentMethod
 import net.bellsoft.rms.domain.room.Room
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
@@ -31,12 +31,12 @@ import java.time.LocalDateTime
 class Reservation(
     @Audited(
         withModifiedFlag = true,
-        modifiedColumnName = "reservation_method_id_mod",
+        modifiedColumnName = "payment_method_id_mod",
         targetAuditMode = RelationTargetAuditMode.NOT_AUDITED,
     )
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "reservation_method_id", nullable = false)
-    var reservationMethod: ReservationMethod,
+    @JoinColumn(name = "payment_method_id", nullable = false)
+    var paymentMethod: PaymentMethod,
 
     @OneToMany(mappedBy = "reservation", fetch = FetchType.LAZY)
     @OrderBy("id ASC")

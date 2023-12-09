@@ -45,7 +45,12 @@ class SessionSecurityContextRepository(
 
                 isGenerated = deferredSecurityContext.isGenerated
                 context.authentication?.let {
-                    context.authentication = reloadAuthenticationFromDB(it)
+                    try {
+                        context.authentication = reloadAuthenticationFromDB(it)
+                    } catch (ex: UserNotFoundException) {
+                        logger.warn("현재 세션의 사용자 정보가 DB에 존재하지 않아 인증 정보 무효화 (ID: ${context.authentication.name})")
+                        context.authentication.isAuthenticated = false
+                    }
                 }
 
                 securityContext = context

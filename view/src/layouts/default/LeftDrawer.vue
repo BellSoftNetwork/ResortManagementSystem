@@ -54,7 +54,7 @@ const normalLinks = [{ icon: fasTableColumns, text: "대시보드", to: "Home" }
 const adminLinks = [
   { icon: fasBook, text: "예약", to: "Reservations" },
   { icon: fasPersonShelter, text: "객실", to: "Rooms" },
-  { icon: fasCommentDollar, text: "예약 수단", to: "ReservationMethods" },
+  { icon: fasCommentDollar, text: "결제 수단", to: "PaymentMethods" },
   { icon: "person", text: "계정 관리", to: "AdminAccounts" },
 ];
 

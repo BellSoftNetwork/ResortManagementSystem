@@ -1,4 +1,4 @@
-package net.bellsoft.rms.domain.reservation.method
+package net.bellsoft.rms.domain.paymentmethod
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -12,14 +12,14 @@ import java.io.Serializable
 
 @Entity
 @Table(
-    name = "reservation_method",
+    name = "payment_method",
     uniqueConstraints = [
-        UniqueConstraint(name = "uc_reservation_method_name", columnNames = ["name", "deleted_at"]),
+        UniqueConstraint(name = "uc_payment_method_name", columnNames = ["name", "deleted_at"]),
     ],
 )
-@SQLDelete(sql = "UPDATE reservation_method SET deleted_at = NOW() WHERE id = ?")
+@SQLDelete(sql = "UPDATE payment_method SET deleted_at = NOW() WHERE id = ?")
 @Where(clause = BaseTimeEntity.SOFT_DELETE_CONDITION)
-class ReservationMethod(
+class PaymentMethod(
     @Column(name = "name", nullable = false, length = 20)
     var name: String,
 
@@ -34,7 +34,7 @@ class ReservationMethod(
         nullable = false,
         columnDefinition = "TINYINT",
     )
-    var status: ReservationMethodStatus = ReservationMethodStatus.INACTIVE,
+    var status: PaymentMethodStatus = PaymentMethodStatus.INACTIVE,
 ) : Serializable, BaseTimeEntity() {
     companion object {
         @Serial

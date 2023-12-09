@@ -10,8 +10,8 @@ import java.time.LocalDateTime
 
 @Schema(description = "예약 생성 요청 정보")
 data class ReservationCreateRequest(
-    @Schema(description = "예약 수단 ID", example = "1")
-    val reservationMethodId: Long,
+    @Schema(description = "결제 수단 ID", example = "1")
+    val paymentMethodId: Long,
 
     @Schema(description = "객실 ID", example = "1")
     val rooms: Set<EntityReferenceRequest> = emptySet(),

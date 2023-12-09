@@ -5,21 +5,18 @@
     v-model:pagination="pagination"
     :loading="status.isLoading"
     :columns="columns"
-    :rows="reservationMethods"
+    :rows="paymentMethods"
     :filter="filter"
     style="height: 90vh"
     row-key="id"
-    title="예약 수단"
+    title="결제 수단"
     flat
     bordered
     binary-state-sort
   >
     <template v-slot:top-right>
       <div class="row q-gutter-sm">
-        <ReservationMethodCreateDialog
-          v-slot="{ dialog }"
-          @complete="reloadData"
-        >
+        <PaymentMethodCreateDialog v-slot="{ dialog }" @complete="reloadData">
           <q-btn
             @click="dialog.isOpen = true"
             icon="add"
@@ -28,7 +25,7 @@
             round
             flat
           />
-        </ReservationMethodCreateDialog>
+        </PaymentMethodCreateDialog>
       </div>
     </template>
 
@@ -45,7 +42,7 @@
             @keyup.enter="updateScope(props.row, scope, 'name')"
             :loading="status.isPatching"
             :disable="status.isPatching"
-            :rules="reservationMethodStaticRules.name"
+            :rules="paymentMethodStaticRules.name"
             ref="inputRef"
             dense
             autofocus
@@ -75,7 +72,7 @@
             "
             :loading="status.isPatching"
             :disable="status.isPatching"
-            :rules="reservationMethodStaticRules.commissionRatePercent"
+            :rules="paymentMethodStaticRules.commissionRatePercent"
             ref="inputRef"
             type="number"
             dense
@@ -129,19 +126,19 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useQuasar } from "quasar";
-import ReservationMethodCreateDialog from "components/reservation-method/ReservationMethodCreateDialog.vue";
+import PaymentMethodCreateDialog from "components/payment-method/PaymentMethodCreateDialog.vue";
 import {
-  getReservationMethodFieldDetail,
-  ReservationMethod,
-  reservationMethodStaticRules,
-} from "src/schema/reservation-method";
+  getPaymentMethodFieldDetail,
+  PaymentMethod,
+  paymentMethodStaticRules,
+} from "src/schema/payment-method";
 import { convertTableColumnDef } from "src/util/table-util";
 import { formatCommissionRate } from "src/util/format-util";
 import {
-  deleteReservationMethod,
-  fetchReservationMethods,
-  patchReservationMethod,
-} from "src/api/v1/reservation-method";
+  deletePaymentMethod,
+  fetchPaymentMethods,
+  patchPaymentMethod,
+} from "src/api/v1/payment-method";
 import { formatSortParam } from "src/util/query-string-util";
 
 const $q = useQuasar();
@@ -202,10 +199,10 @@ const columns = [
     headerStyle: "width: 5%",
   },
 ];
-const reservationMethods = ref<ReservationMethod[]>();
+const paymentMethods = ref<PaymentMethod[]>();
 
 function getColumnDef(field: string) {
-  return convertTableColumnDef(getReservationMethodFieldDetail(field));
+  return convertTableColumnDef(getPaymentMethodFieldDetail(field));
 }
 
 function onRequest(props) {
@@ -214,13 +211,13 @@ function onRequest(props) {
   status.value.isLoading = true;
   status.value.isLoaded = false;
 
-  fetchReservationMethods({
+  fetchPaymentMethods({
     page: page - 1,
     size: rowsPerPage,
     sort: formatSortParam({ field: sortBy, isDescending: descending }),
   })
     .then((response) => {
-      reservationMethods.value = response.values;
+      paymentMethods.value = response.values;
       const page = response.page;
 
       pagination.value.rowsNumber = page.totalElements;
@@ -251,7 +248,7 @@ function updateScope(row, scope, key, formatter) {
   patchData[key] = formatter ? formatter(scope.value) : scope.value;
 
   status.value.isPatching = true;
-  patchReservationMethod(row.id, patchData)
+  patchPaymentMethod(row.id, patchData)
     .then((response) => {
       scope.set();
       row[key] = response.value[key];
@@ -274,7 +271,7 @@ function updateScope(row, scope, key, formatter) {
     });
 }
 
-function deleteItem(row: ReservationMethod) {
+function deleteItem(row: PaymentMethod) {
   const itemId = row.id;
   const itemName = row.name;
 
@@ -292,7 +289,7 @@ function deleteItem(row: ReservationMethod) {
     },
     focus: "cancel",
   }).onOk(() => {
-    deleteReservationMethod(itemId)
+    deletePaymentMethod(itemId)
       .then(() => {
         reloadData();
       })

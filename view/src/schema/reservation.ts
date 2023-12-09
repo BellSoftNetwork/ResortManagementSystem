@@ -1,5 +1,5 @@
 import { Room } from "src/schema/room";
-import { ReservationMethod } from "src/schema/reservation-method";
+import { PaymentMethod } from "src/schema/payment-method";
 import {
   DynamicRuleMap,
   EnumMap,
@@ -29,7 +29,7 @@ export function reservationStatusValueToName(role: ReservationStatus) {
 
 export type Reservation = {
   id: number;
-  reservationMethod: ReservationMethod;
+  paymentMethod: PaymentMethod;
   rooms: Room[];
   name: string;
   phone: string;
@@ -50,8 +50,8 @@ export type Reservation = {
 
 const ReservationFieldMap: FieldMap = {
   id: { label: "ID" } as const,
-  reservationMethod: {
-    label: "예약 수단",
+  paymentMethod: {
+    label: "결제 수단",
     format: (value) => value.name,
   } as const,
   rooms: {
@@ -80,7 +80,7 @@ const ReservationFieldMap: FieldMap = {
   price: { label: "판매 금액", format: formatPrice } as const,
   paymentAmount: { label: "누적 결제 금액", format: formatPrice } as const,
   refundAmount: { label: "환불 금액", format: formatPrice } as const,
-  brokerFee: { label: "예약 수단 수수료", format: formatPrice } as const,
+  brokerFee: { label: "결제 수단 수수료", format: formatPrice } as const,
   note: { label: "메모" } as const,
   canceledAt: { label: "취소 시각", format: formatDateTime } as const,
   status: { label: "상태", format: reservationStatusValueToName } as const,

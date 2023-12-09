@@ -9,20 +9,20 @@
     @beforeShow="resetForm"
   >
     <q-card style="width: 500px">
-      <q-card-section class="text-h6"> 예약 수단 추가</q-card-section>
+      <q-card-section class="text-h6">결제 수단 추가</q-card-section>
 
       <q-form @submit="create">
         <q-card-section>
           <q-input
             v-model="formData.name"
-            :rules="reservationMethodStaticRules.name"
+            :rules="paymentMethodStaticRules.name"
             label="이름"
             required
           ></q-input>
 
           <q-input
             v-model.number="formData.commissionRatePercent"
-            :rules="reservationMethodStaticRules.commissionRatePercent"
+            :rules="paymentMethodStaticRules.commissionRatePercent"
             label="수수료율"
             type="number"
             min="0"
@@ -64,8 +64,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useQuasar } from "quasar";
-import { reservationMethodStaticRules } from "src/schema/reservation-method";
-import { createReservationMethod } from "src/api/v1/reservation-method";
+import { paymentMethodStaticRules } from "src/schema/payment-method";
+import { createPaymentMethod } from "src/api/v1/payment-method";
 
 const $q = useQuasar();
 
@@ -85,7 +85,7 @@ const formData = ref({
 function create() {
   status.value.isProgress = true;
 
-  createReservationMethod({
+  createPaymentMethod({
     name: formData.value.name,
     commissionRate: formData.value.commissionRatePercent / 100,
     requireUnpaidAmountCheck: formData.value.requireUnpaidAmountCheck,
