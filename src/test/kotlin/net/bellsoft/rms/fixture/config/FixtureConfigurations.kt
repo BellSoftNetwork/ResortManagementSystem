@@ -1,14 +1,14 @@
 package net.bellsoft.rms.fixture.config
 
-import net.bellsoft.rms.fixture.controller.v1.auth.UserRegistrationRequestFixture
-import net.bellsoft.rms.fixture.domain.paymentmethod.PaymentMethodFixture
-import net.bellsoft.rms.fixture.domain.reservation.ReservationFixture
-import net.bellsoft.rms.fixture.domain.reservation.ReservationRoomFixture
-import net.bellsoft.rms.fixture.domain.room.RoomFixture
-import net.bellsoft.rms.fixture.domain.user.UserFixture
-import net.bellsoft.rms.fixture.service.admin.UserCreateDtoFixture
-import net.bellsoft.rms.fixture.service.reservation.ReservationCreateDtoFixture
-import net.bellsoft.rms.fixture.service.room.RoomCreateDtoFixture
+import net.bellsoft.rms.payment.fixture.PaymentMethodFixture
+import net.bellsoft.rms.reservation.fixture.ReservationCreateDtoFixture
+import net.bellsoft.rms.reservation.fixture.ReservationFixture
+import net.bellsoft.rms.reservation.fixture.ReservationRoomFixture
+import net.bellsoft.rms.room.fixture.RoomCreateDtoFixture
+import net.bellsoft.rms.room.fixture.RoomFixture
+import net.bellsoft.rms.user.fixture.UserCreateDtoFixture
+import net.bellsoft.rms.user.fixture.UserFixture
+import net.bellsoft.rms.user.fixture.UserRegistrationRequestFixture
 
 // NOTE: 신규 도메인 추가 시 해당 도메인 Configuration 생성 후 아래에 등록 필요
 @Suppress("ktlint:experimental:property-naming")
