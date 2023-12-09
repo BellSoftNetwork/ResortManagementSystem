@@ -39,7 +39,7 @@ export async function fetchReservation(id: number) {
 }
 
 type ReservationParams = {
-  reservationMethodId: number;
+  paymentMethodId: number;
   rooms: EntityReference[];
   name: string;
   phone: string;

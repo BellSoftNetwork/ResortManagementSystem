@@ -52,12 +52,12 @@
           </div>
 
           <div class="q-py-sm">
-            <div class="text-caption">예약 수단</div>
-            <div class="text-body1">{{ entity?.reservationMethod.name }}</div>
+            <div class="text-caption">결제 수단</div>
+            <div class="text-body1">{{ entity?.paymentMethod.name }}</div>
           </div>
 
           <div class="q-py-sm">
-            <div class="text-caption">예약 수단 수수료</div>
+            <div class="text-caption">결제 수단 수수료</div>
             <div class="text-body1">{{ formatPrice(entity?.brokerFee) }}</div>
           </div>
         </div>

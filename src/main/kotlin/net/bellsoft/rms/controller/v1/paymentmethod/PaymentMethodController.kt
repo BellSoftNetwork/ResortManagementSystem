@@ -1,4 +1,4 @@
-package net.bellsoft.rms.controller.v1.reservation
+package net.bellsoft.rms.controller.v1.paymentmethod
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -8,9 +8,9 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import net.bellsoft.rms.controller.common.dto.ListResponse
 import net.bellsoft.rms.controller.common.dto.SingleResponse
-import net.bellsoft.rms.controller.v1.reservation.dto.ReservationMethodCreateRequest
-import net.bellsoft.rms.controller.v1.reservation.dto.ReservationMethodPatchRequest
-import net.bellsoft.rms.service.reservation.dto.ReservationMethodDetailDto
+import net.bellsoft.rms.controller.v1.paymentmethod.dto.PaymentMethodCreateRequest
+import net.bellsoft.rms.controller.v1.paymentmethod.dto.PaymentMethodPatchRequest
+import net.bellsoft.rms.service.paymentmethod.dto.PaymentMethodDetailDto
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -26,31 +26,31 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = "예약 수단", description = "예약 수단 API")
+@Tag(name = "결제 수단", description = "결제 수단 API")
 @SecurityRequirement(name = "basicAuth")
 @Validated
 @RestController
-@RequestMapping("/api/v1/reservation-methods")
-interface ReservationMethodController {
-    @Operation(summary = "예약 수단 리스트", description = "예약 수단 리스트 조회")
+@RequestMapping("/api/v1/payment-methods")
+interface PaymentMethodController {
+    @Operation(summary = "결제 수단 리스트", description = "결제 수단 리스트 조회")
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200"),
         ],
     )
     @GetMapping
-    fun getReservations(pageable: Pageable): ResponseEntity<ListResponse<ReservationMethodDetailDto>>
+    fun getPaymentMethods(pageable: Pageable): ResponseEntity<ListResponse<PaymentMethodDetailDto>>
 
-    @Operation(summary = "예약 수단 조회", description = "예약 수단 단건 조회")
+    @Operation(summary = "결제 수단 조회", description = "결제 수단 단건 조회")
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200"),
         ],
     )
     @GetMapping("/{id}")
-    fun getReservation(@PathVariable("id") id: Long): ResponseEntity<SingleResponse<ReservationMethodDetailDto>>
+    fun getPaymentMethod(@PathVariable("id") id: Long): ResponseEntity<SingleResponse<PaymentMethodDetailDto>>
 
-    @Operation(summary = "예약 수단 생성", description = "예약 수단 생성")
+    @Operation(summary = "결제 수단 생성", description = "결제 수단 생성")
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "201"),
@@ -58,12 +58,12 @@ interface ReservationMethodController {
     )
     @Secured("ADMIN", "SUPER_ADMIN")
     @PostMapping
-    fun createReservation(
+    fun createPaymentMethod(
         @RequestBody @Valid
-        request: ReservationMethodCreateRequest,
-    ): ResponseEntity<SingleResponse<ReservationMethodDetailDto>>
+        request: PaymentMethodCreateRequest,
+    ): ResponseEntity<SingleResponse<PaymentMethodDetailDto>>
 
-    @Operation(summary = "예약 수단 수정", description = "기존 예약 수단 정보 수정")
+    @Operation(summary = "결제 수단 수정", description = "기존 결제 수단 정보 수정")
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "201"),
@@ -71,13 +71,13 @@ interface ReservationMethodController {
     )
     @Secured("ADMIN", "SUPER_ADMIN")
     @PatchMapping("/{id}")
-    fun updateReservation(
+    fun updatePaymentMethod(
         @PathVariable("id") id: Long,
         @RequestBody @Valid
-        request: ReservationMethodPatchRequest,
-    ): ResponseEntity<SingleResponse<ReservationMethodDetailDto>>
+        request: PaymentMethodPatchRequest,
+    ): ResponseEntity<SingleResponse<PaymentMethodDetailDto>>
 
-    @Operation(summary = "예약 수단 삭제", description = "기존 예약 수단 삭제")
+    @Operation(summary = "결제 수단 삭제", description = "기존 결제 수단 삭제")
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "204"),
@@ -86,5 +86,5 @@ interface ReservationMethodController {
     @Secured("ADMIN", "SUPER_ADMIN")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteReservation(@PathVariable("id") id: Long)
+    fun deletePaymentMethod(@PathVariable("id") id: Long)
 }

@@ -19,7 +19,7 @@ import org.mapstruct.NullValueMappingStrategy
     uses = [
         UserMapper::class,
         RoomMapper::class,
-        ReservationMethodMapper::class,
+        PaymentMethodMapper::class,
     ],
 )
 @DecoratedWith(ReservationMapperDecorator::class)
@@ -28,14 +28,14 @@ interface ReservationMapper {
 
     @IterableMapping(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
     @Mappings(
-        Mapping(target = "reservationMethod", source = "reservationMethodId", qualifiedBy = [IdToReference::class]),
+        Mapping(target = "paymentMethod", source = "paymentMethodId", qualifiedBy = [IdToReference::class]),
         Mapping(target = "rooms", ignore = true),
         Mapping(target = "updatedBy", ignore = true),
     )
     fun toEntity(dto: ReservationCreateDto): Reservation
 
     @Mappings(
-        Mapping(target = "reservationMethod", source = "reservationMethodId", qualifiedBy = [IdToReference::class]),
+        Mapping(target = "paymentMethod", source = "paymentMethodId", qualifiedBy = [IdToReference::class]),
         Mapping(target = "rooms", ignore = true),
         Mapping(target = "updatedBy", ignore = true),
     )

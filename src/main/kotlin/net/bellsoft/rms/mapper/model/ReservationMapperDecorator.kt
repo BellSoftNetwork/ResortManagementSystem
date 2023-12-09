@@ -1,7 +1,7 @@
 package net.bellsoft.rms.mapper.model
 
+import net.bellsoft.rms.domain.paymentmethod.PaymentMethod
 import net.bellsoft.rms.domain.reservation.Reservation
-import net.bellsoft.rms.domain.reservation.method.ReservationMethod
 import net.bellsoft.rms.mapper.common.ReferenceMapper
 import net.bellsoft.rms.service.reservation.dto.ReservationCreateDto
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,9 +15,9 @@ abstract class ReservationMapperDecorator : ReservationMapper {
 
     override fun toEntity(dto: ReservationCreateDto): Reservation {
         return Reservation(
-            reservationMethod = referenceMapper.longIdToReference(
-                dto.reservationMethodId,
-                ReservationMethod::class.java,
+            paymentMethod = referenceMapper.longIdToReference(
+                dto.paymentMethodId,
+                PaymentMethod::class.java,
             ),
             name = dto.name,
             phone = dto.phone,

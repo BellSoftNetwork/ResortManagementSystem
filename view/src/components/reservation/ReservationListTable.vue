@@ -186,7 +186,7 @@ const pagination = ref({
 });
 const columns = [
   {
-    ...getColumnDef("reservationMethod"),
+    ...getColumnDef("paymentMethod"),
     align: "left",
     required: true,
     sortable: true,

@@ -7,11 +7,11 @@ import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import net.bellsoft.rms.component.history.type.HistoryType
+import net.bellsoft.rms.domain.paymentmethod.PaymentMethodRepository
 import net.bellsoft.rms.domain.reservation.Reservation
 import net.bellsoft.rms.domain.reservation.ReservationRepository
 import net.bellsoft.rms.domain.reservation.ReservationRoom
 import net.bellsoft.rms.domain.reservation.ReservationRoomRepository
-import net.bellsoft.rms.domain.reservation.method.ReservationMethodRepository
 import net.bellsoft.rms.domain.room.Room
 import net.bellsoft.rms.domain.room.RoomRepository
 import net.bellsoft.rms.domain.room.RoomStatus
@@ -41,7 +41,7 @@ internal class RoomServiceTest(
     private val roomRepository: RoomRepository,
     private val reservationRepository: ReservationRepository,
     private val reservationRoomRepository: ReservationRoomRepository,
-    private val reservationMethodRepository: ReservationMethodRepository,
+    private val paymentMethodRepository: PaymentMethodRepository,
 ) : BehaviorSpec(
     {
         val fixture = baseFixture
@@ -260,7 +260,7 @@ internal class RoomServiceTest(
 
         Given("희망 기간 외 예약이 잡혀있어 예약이 가능한 객실이 4개있을 때") {
             val customFixture = fixture.new {
-                property(Reservation::reservationMethod) { reservationMethodRepository.save(fixture()) }
+                property(Reservation::paymentMethod) { paymentMethodRepository.save(fixture()) }
             }
 
             val availableRooms = roomRepository.saveAll(
@@ -349,7 +349,7 @@ internal class RoomServiceTest(
 
         Given("희망 기간 내 연박 예약이 잡혀있어 예약이 불가능한 객실이 7개있을 때") {
             val customFixture = fixture.new {
-                property(Reservation::reservationMethod) { reservationMethodRepository.save(fixture()) }
+                property(Reservation::paymentMethod) { paymentMethodRepository.save(fixture()) }
             }
 
             val reservedRooms = roomRepository.saveAll(
@@ -477,7 +477,7 @@ internal class RoomServiceTest(
 
         Given("객실이 배정되지 않은 예약만 잡혀있어 희망 기간 내 예약 가능한 객실이 1개있을 때") {
             val customFixture = fixture.new {
-                property(Reservation::reservationMethod) { reservationMethodRepository.save(fixture()) }
+                property(Reservation::paymentMethod) { paymentMethodRepository.save(fixture()) }
             }
 
             val reservedRoom = roomRepository.save(fixture())

@@ -157,7 +157,7 @@ const columns = [
     required: true,
   },
   {
-    ...getColumnDef("reservationMethod"),
+    ...getColumnDef("paymentMethod"),
     align: "left",
     required: true,
     sortable: true,
@@ -264,7 +264,7 @@ function changeView(view) {
 }
 
 function missPriceBackgroundColor(value) {
-  if (value.reservationMethod.requireUnpaidAmountCheck === false) return "";
+  if (value.paymentMethod.requireUnpaidAmountCheck === false) return "";
 
   if (value.missPrice > 0) return "bg-warning";
 

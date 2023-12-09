@@ -1,8 +1,8 @@
-package net.bellsoft.rms.service.reservation.dto
+package net.bellsoft.rms.service.paymentmethod.dto
 
 import java.time.LocalDateTime
 
-data class ReservationMethodDetailDto(
+data class PaymentMethodDetailDto(
     val id: Long,
     val name: String,
     val commissionRate: Double,

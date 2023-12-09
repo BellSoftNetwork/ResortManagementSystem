@@ -2,13 +2,14 @@ package net.bellsoft.rms.service.reservation.dto
 
 import net.bellsoft.rms.domain.reservation.ReservationStatus
 import net.bellsoft.rms.service.auth.dto.UserSummaryDto
+import net.bellsoft.rms.service.paymentmethod.dto.PaymentMethodDetailDto
 import net.bellsoft.rms.service.room.dto.RoomDetailDto
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class ReservationDetailDto(
     val id: Long,
-    val reservationMethod: ReservationMethodDetailDto,
+    val paymentMethod: PaymentMethodDetailDto,
     val rooms: List<RoomDetailDto>,
     val name: String,
     val phone: String,

@@ -3,7 +3,7 @@ package net.bellsoft.rms.domain.reservation
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.mockkStatic
-import net.bellsoft.rms.domain.reservation.method.ReservationMethodRepository
+import net.bellsoft.rms.domain.paymentmethod.PaymentMethodRepository
 import net.bellsoft.rms.domain.user.User
 import net.bellsoft.rms.fixture.baseFixture
 import net.bellsoft.rms.util.SecurityTestSupport
@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 internal class ReservationRepositoryTest(
     private val testDatabaseSupport: TestDatabaseSupport,
     private val securityTestSupport: SecurityTestSupport,
-    private val reservationMethodRepository: ReservationMethodRepository,
+    private val paymentMethodRepository: PaymentMethodRepository,
     private val reservationRepository: ReservationRepository,
 ) : BehaviorSpec(
     {
@@ -33,10 +33,10 @@ internal class ReservationRepositoryTest(
         }
 
         Given("예약 정보가 생성된 상황에서") {
-            val reservationMethod = reservationMethodRepository.save(fixture())
+            val paymentMethod = paymentMethodRepository.save(fixture())
             val reservation = reservationRepository.save(
                 fixture {
-                    property(Reservation::reservationMethod) { reservationMethod }
+                    property(Reservation::paymentMethod) { paymentMethod }
                 },
             )
 

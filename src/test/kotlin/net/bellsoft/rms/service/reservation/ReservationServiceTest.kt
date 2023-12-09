@@ -6,11 +6,11 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import net.bellsoft.rms.component.history.type.HistoryType
+import net.bellsoft.rms.domain.paymentmethod.PaymentMethodRepository
 import net.bellsoft.rms.domain.reservation.Reservation
 import net.bellsoft.rms.domain.reservation.ReservationRepository
 import net.bellsoft.rms.domain.reservation.ReservationRoom
 import net.bellsoft.rms.domain.reservation.ReservationRoomRepository
-import net.bellsoft.rms.domain.reservation.method.ReservationMethodRepository
 import net.bellsoft.rms.domain.room.RoomRepository
 import net.bellsoft.rms.domain.user.User
 import net.bellsoft.rms.exception.DataNotFoundException
@@ -37,14 +37,14 @@ internal class ReservationServiceTest(
     private val reservationService: ReservationService,
     private val reservationRepository: ReservationRepository,
     private val reservationRoomRepository: ReservationRoomRepository,
-    private val reservationMethodRepository: ReservationMethodRepository,
+    private val paymentMethodRepository: PaymentMethodRepository,
     private val roomRepository: RoomRepository,
 ) : BehaviorSpec(
     {
-        val reservationMethod = reservationMethodRepository.save(baseFixture())
+        val paymentMethod = paymentMethodRepository.save(baseFixture())
         val fixture = baseFixture.new {
-            property(Reservation::reservationMethod) { reservationMethod }
-            property(ReservationCreateDto::reservationMethodId) { reservationMethod.id }
+            property(Reservation::paymentMethod) { paymentMethod }
+            property(ReservationCreateDto::paymentMethodId) { paymentMethod.id }
         }
         val loginUser: User = fixture()
 

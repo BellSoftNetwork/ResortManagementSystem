@@ -92,13 +92,13 @@
         ></q-input>
 
         <q-select
-          v-model="formModel.reservationMethod"
+          v-model="formModel.paymentMethod"
           @update:model-value="changePrice()"
-          :loading="reservationMethods.status.isLoading"
-          :disable="!reservationMethods.status.isLoaded"
-          :options="reservationMethods.values"
+          :loading="paymentMethods.status.isLoading"
+          :disable="!paymentMethods.status.isLoaded"
+          :options="paymentMethods.values"
           option-label="name"
-          label="예약 수단"
+          label="결제 수단"
           required
           map-options
         ></q-select>
@@ -107,7 +107,7 @@
           v-model.number="formModel.brokerFee"
           :rules="reservationStaticRules.brokerFee"
           :readonly="true"
-          label="예약 수단 수수료"
+          label="결제 수단 수수료"
           placeholder="5000"
           type="number"
           min="0"
@@ -233,7 +233,7 @@ import {
   patchReservation,
   ReservationPatchParams,
 } from "src/api/v1/reservation";
-import { fetchReservationMethods } from "src/api/v1/reservation-method";
+import { fetchPaymentMethods } from "src/api/v1/payment-method";
 import { formatSortParam } from "src/util/query-string-util";
 import { Room } from "src/schema/room";
 import { getPatchedFormData } from "src/util/data-util";
@@ -247,7 +247,7 @@ const props = defineProps<{
 const id = props.id;
 const entity = ref<
   {
-    reservationMethodId: number;
+    paymentMethodId: number;
     roomId: number | null;
   } & Reservation
 >();
@@ -257,7 +257,7 @@ const formStatus = ref({
 });
 const formModel = ref({
   id: props.id,
-  reservationMethod: {
+  paymentMethod: {
     id: -1,
     name: "네이버",
     commissionRate: 0.1,
@@ -289,7 +289,7 @@ const options = {
 const stayDateDiff = computed(() =>
   formatDiffDays(formModel.value.stayDate?.from, formModel.value.stayDate?.to),
 );
-const reservationMethods = ref({
+const paymentMethods = ref({
   status: {
     isLoading: false,
     isLoaded: false,
@@ -308,7 +308,7 @@ const reservationMethods = ref({
 function setReservation(reservation: Reservation) {
   entity.value = {
     ...reservation,
-    reservationMethodId: reservation.reservationMethod.id,
+    paymentMethodId: reservation.paymentMethod.id,
     roomId: reservation.room?.id,
   };
 }
@@ -330,21 +330,21 @@ function fetchData() {
     });
 }
 
-function loadReservationMethods() {
-  reservationMethods.value.status.isLoading = true;
-  reservationMethods.value.status.isLoaded = false;
-  reservationMethods.value.values = [];
+function loadPaymentMethods() {
+  paymentMethods.value.status.isLoading = true;
+  paymentMethods.value.status.isLoaded = false;
+  paymentMethods.value.values = [];
 
-  return fetchReservationMethods({
+  return fetchPaymentMethods({
     sort: formatSortParam({ field: "name" }),
   })
     .then((response) => {
-      reservationMethods.value.values = response.values;
+      paymentMethods.value.values = response.values;
 
-      reservationMethods.value.status.isLoaded = true;
+      paymentMethods.value.status.isLoaded = true;
     })
     .finally(() => {
-      reservationMethods.value.status.isLoading = false;
+      paymentMethods.value.status.isLoading = false;
     });
 }
 
@@ -378,14 +378,14 @@ function update() {
 function getFormData(): ReservationPatchParams {
   const formData: Partial<typeof formModel.value> & ReservationPatchParams = {
     ...formModel.value,
-    reservationMethodId: formModel.value.reservationMethod.id,
+    paymentMethodId: formModel.value.paymentMethod.id,
     rooms: selectedRooms.value,
     stayStartAt: formModel.value.stayDate?.from,
     stayEndAt: formModel.value.stayDate?.to,
   };
 
   delete formData.id;
-  delete formData.reservationMethod;
+  delete formData.paymentMethod;
   delete formData.stayDate;
 
   return formData;
@@ -397,7 +397,7 @@ function patchedData(): ReservationPatchParams {
 
 function changePrice() {
   formModel.value.brokerFee =
-    formModel.value.price * formModel.value.reservationMethod.commissionRate;
+    formModel.value.price * formModel.value.paymentMethod.commissionRate;
 }
 
 function resetForm() {
@@ -412,9 +412,9 @@ onBeforeMount(() => {
 
     resetForm();
     if (entity.value.rooms) selectedRooms.value = entity.value.rooms;
-    loadReservationMethods().then(() => {
-      formModel.value.reservationMethod = reservationMethods.value.values.find(
-        (item) => item.id === entity.value.reservationMethod.id,
+    loadPaymentMethods().then(() => {
+      formModel.value.paymentMethod = paymentMethods.value.values.find(
+        (item) => item.id === entity.value.paymentMethod.id,
       );
     });
   });

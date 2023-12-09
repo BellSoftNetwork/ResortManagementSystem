@@ -1,0 +1,56 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1702124529066-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      preConditions:
+        - onFail: CONTINUE
+        - dbms:
+            type: mysql
+      changes:
+        - dropIndex:
+            indexName: uc_reservation_method_name
+            tableName: reservation_method
+  - changeSet:
+      id: 1702124529066-2
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - renameTable:
+            newTableName: payment_method
+            oldTableName: reservation_method
+        - renameColumn:
+            columnDataType: BIGINT
+            newColumnName: payment_method_id
+            oldColumnName: reservation_method_id
+            tableName: reservation
+  - changeSet:
+      id: 1702124529066-3
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: BIGINT
+            columnName: payment_method_id
+            tableName: reservation
+            validate: true
+        - addUniqueConstraint:
+            columnNames: name, deleted_at
+            constraintName: uc_payment_method_name
+            tableName: payment_method
+  - changeSet:
+      id: 1702124529066-4
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - renameColumn:
+            columnDataType: BIGINT
+            newColumnName: payment_method_id
+            oldColumnName: reservation_method_id
+            tableName: reservation_history
+        - renameColumn:
+            columnDataType: BOOLEAN
+            newColumnName: payment_method_id_mod
+            oldColumnName: reservation_method_id_mod
+            tableName: reservation_history
+

@@ -1,12 +1,12 @@
-package net.bellsoft.rms.controller.v1.reservation.dto
+package net.bellsoft.rms.controller.v1.paymentmethod.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Size
 import org.hibernate.validator.constraints.Range
 
-@Schema(description = "예약 수단 생성 요청 정보")
-data class ReservationMethodCreateRequest(
-    @Schema(description = "예약 수단명", example = "네이버")
+@Schema(description = "결제 수단 생성 요청 정보")
+data class PaymentMethodCreateRequest(
+    @Schema(description = "결제 수단명", example = "네이버")
     @field:Size(min = 2, max = 20)
     val name: String,
 

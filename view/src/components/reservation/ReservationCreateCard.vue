@@ -94,13 +94,13 @@
         ></q-input>
 
         <q-select
-          v-model="formModel.value.reservationMethod"
+          v-model="formModel.value.paymentMethod"
           @update:model-value="changePrice()"
-          :loading="reservationMethodStatus.isLoading"
-          :disable="!reservationMethodStatus.isLoaded"
-          :options="reservationMethods"
+          :loading="paymentMethodStatus.isLoading"
+          :disable="!paymentMethodStatus.isLoaded"
+          :options="paymentMethods"
           option-label="name"
-          label="예약 수단"
+          label="결제 수단"
           required
           map-options
         ></q-select>
@@ -109,7 +109,7 @@
           v-model.number="formModel.value.brokerFee"
           :rules="reservationStaticRules.brokerFee"
           :readonly="true"
-          label="예약 수단 수수료"
+          label="결제 수단 수수료"
           placeholder="5000"
           type="number"
           min="0"
@@ -227,9 +227,9 @@ import {
   reservationStaticRules,
 } from "src/schema/reservation";
 import { createReservation } from "src/api/v1/reservation";
-import { fetchReservationMethods } from "src/api/v1/reservation-method";
+import { fetchPaymentMethods } from "src/api/v1/payment-method";
 import { formatSortParam } from "src/util/query-string-util";
-import { ReservationMethod } from "src/schema/reservation-method";
+import { PaymentMethod } from "src/schema/payment-method";
 import { Room } from "src/schema/room";
 
 const router = useRouter();
@@ -241,7 +241,7 @@ const formModel = ref({
     isProgress: false,
   },
   value: {
-    reservationMethod: {
+    paymentMethod: {
       id: -1,
       name: "네이버",
       commissionRate: 0.1,
@@ -277,28 +277,28 @@ const stayDateDiff = computed(() =>
     formModel.value.value.stayDate.to,
   ),
 );
-const reservationMethodStatus = ref({
+const paymentMethodStatus = ref({
   isLoading: false,
   isLoaded: false,
 });
-const reservationMethods = ref<ReservationMethod[]>();
+const paymentMethods = ref<PaymentMethod[]>();
 
-function loadReservationMethods() {
-  reservationMethodStatus.value.isLoading = true;
-  reservationMethodStatus.value.isLoaded = false;
-  reservationMethods.value = [];
+function loadPaymentMethods() {
+  paymentMethodStatus.value.isLoading = true;
+  paymentMethodStatus.value.isLoaded = false;
+  paymentMethods.value = [];
 
-  fetchReservationMethods({
+  fetchPaymentMethods({
     sort: formatSortParam({ field: "name" }),
   })
     .then((response) => {
-      reservationMethods.value = response.values;
-      formModel.value.value.reservationMethod = response.values[0];
+      paymentMethods.value = response.values;
+      formModel.value.value.paymentMethod = response.values[0];
 
-      reservationMethodStatus.value.isLoaded = true;
+      paymentMethodStatus.value.isLoaded = true;
     })
     .finally(() => {
-      reservationMethodStatus.value.isLoading = false;
+      paymentMethodStatus.value.isLoading = false;
     });
 }
 
@@ -331,7 +331,7 @@ function create() {
 
 function formData() {
   return {
-    reservationMethodId: formModel.value.value.reservationMethod.id,
+    paymentMethodId: formModel.value.value.paymentMethod.id,
     rooms: selectedRooms.value,
     name: formModel.value.value.name,
     phone: formModel.value.value.phone,
@@ -349,7 +349,7 @@ function formData() {
 function changePrice() {
   formModel.value.value.brokerFee =
     formModel.value.value.price *
-    formModel.value.value.reservationMethod.commissionRate;
+    formModel.value.value.paymentMethod.commissionRate;
 }
 
 function resetForm() {
@@ -367,6 +367,6 @@ function resetForm() {
 
 onBeforeMount(() => {
   resetForm();
-  loadReservationMethods();
+  loadPaymentMethods();
 });
 </script>

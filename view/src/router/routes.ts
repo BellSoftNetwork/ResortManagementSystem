@@ -91,7 +91,7 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: "/reservation-methods",
+    path: "/payment-methods",
     component: DefaultLayout,
     meta: {
       isAuthenticated: true,
@@ -100,9 +100,8 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: "",
-        name: "ReservationMethods",
-        component: () =>
-          import("pages/reservation-method/ReservationMethodList.vue"),
+        name: "PaymentMethods",
+        component: () => import("pages/payment-method/PaymentMethodList.vue"),
       },
     ],
   },
