@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1701884204583-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: reservation
+            constraintName: FK_RESERVATION_ON_ROOM
+        - dropColumn:
+            columnName: room_id
+            tableName: reservation
+  - changeSet:
+      id: 1701884204583-2
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropColumn:
+            columnName: room_id
+            tableName: reservation_history
+        - dropColumn:
+            columnName: room_id_mod
+            tableName: reservation_history
+

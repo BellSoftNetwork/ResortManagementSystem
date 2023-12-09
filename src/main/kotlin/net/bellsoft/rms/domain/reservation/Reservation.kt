@@ -38,16 +38,6 @@ class Reservation(
     @JoinColumn(name = "reservation_method_id", nullable = false)
     var reservationMethod: ReservationMethod,
 
-    @Audited(
-        withModifiedFlag = true,
-        modifiedColumnName = "room_id_mod",
-        targetAuditMode = RelationTargetAuditMode.NOT_AUDITED,
-    )
-    @Deprecated("rooms 로 마이그레이션 예정")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id")
-    var room: Room? = null,
-
     @OneToMany(mappedBy = "reservation", fetch = FetchType.LAZY)
     @OrderBy("id ASC")
     var rooms: MutableList<ReservationRoom> = mutableListOf(),

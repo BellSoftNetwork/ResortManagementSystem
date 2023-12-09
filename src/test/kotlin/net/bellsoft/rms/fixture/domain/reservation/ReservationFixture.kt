@@ -27,7 +27,6 @@ class ReservationFixture {
 
         val BASE_CONFIGURATION = fixtureConfig {
             property(Reservation::reservationMethod) { baseFixture() }
-            property(Reservation::room) { null }
             property(Reservation::rooms) { mutableListOf() }
             property(Reservation::name) { "name-${FAKER.random().hex(10)}" }
             property(Reservation::phone) { FAKER.phoneNumber().phoneNumber() }
