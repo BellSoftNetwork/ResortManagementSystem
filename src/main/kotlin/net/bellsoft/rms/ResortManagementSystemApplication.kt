@@ -1,6 +1,6 @@
 package net.bellsoft.rms
 
-import net.bellsoft.rms.annotation.ExcludeFromJacocoGeneratedReport
+import net.bellsoft.rms.common.annotation.ExcludeFromJacocoGeneratedReport
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.data.envers.repository.support.EnversRevisionRepositoryFactoryBean
