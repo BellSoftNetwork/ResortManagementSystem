@@ -274,10 +274,22 @@ internal class ReservationServiceTest(
         Given("각각 입실일이 다른 예약이 4개 등록된 상황에서") {
             reservationRepository.saveAll(
                 listOf(
-                    fixture { property(Reservation::stayStartAt) { LocalDate.of(2023, 10, 31) } },
-                    fixture { property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 1) } },
-                    fixture { property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 30) } },
-                    fixture { property(Reservation::stayStartAt) { LocalDate.of(2023, 12, 1) } },
+                    fixture {
+                        property(Reservation::stayStartAt) { LocalDate.of(2023, 10, 31) }
+                        property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 1) }
+                    },
+                    fixture {
+                        property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 1) }
+                        property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 5) }
+                    },
+                    fixture {
+                        property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 30) }
+                        property(Reservation::stayEndAt) { LocalDate.of(2023, 12, 5) }
+                    },
+                    fixture {
+                        property(Reservation::stayStartAt) { LocalDate.of(2023, 12, 1) }
+                        property(Reservation::stayEndAt) { LocalDate.of(2023, 12, 5) }
+                    },
                 ),
             )
 
@@ -290,8 +302,8 @@ internal class ReservationServiceTest(
                     ),
                 )
 
-                Then("2개의 예약 정보가 반환 된다") {
-                    entityListDto.page.totalElements shouldBe 2
+                Then("3개의 예약 정보가 반환 된다") {
+                    entityListDto.page.totalElements shouldBe 3
                 }
             }
         }
