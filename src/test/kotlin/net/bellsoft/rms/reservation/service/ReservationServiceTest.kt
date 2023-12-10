@@ -5,6 +5,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.kotest.matchers.string.shouldContain
 import net.bellsoft.rms.authentication.exception.UserNotFoundException
 import net.bellsoft.rms.common.dto.service.EntityReferenceDto
 import net.bellsoft.rms.common.exception.DataNotFoundException
@@ -17,6 +18,7 @@ import net.bellsoft.rms.reservation.dto.service.ReservationCreateDto
 import net.bellsoft.rms.reservation.dto.service.ReservationPatchDto
 import net.bellsoft.rms.reservation.entity.Reservation
 import net.bellsoft.rms.reservation.entity.ReservationRoom
+import net.bellsoft.rms.reservation.exception.UnavailableRoomException
 import net.bellsoft.rms.reservation.repository.ReservationRepository
 import net.bellsoft.rms.reservation.repository.ReservationRoomRepository
 import net.bellsoft.rms.revision.type.HistoryType
@@ -41,7 +43,7 @@ internal class ReservationServiceTest(
     private val roomRepository: RoomRepository,
 ) : BehaviorSpec(
     {
-        val paymentMethod = paymentMethodRepository.save(net.bellsoft.rms.fixture.baseFixture())
+        val paymentMethod = paymentMethodRepository.save(baseFixture())
         val fixture = baseFixture.new {
             property(Reservation::paymentMethod) { paymentMethod }
             property(ReservationCreateDto::paymentMethod) { EntityReferenceDto(paymentMethod.id) }
@@ -151,6 +153,18 @@ internal class ReservationServiceTest(
                 Then("객실 배정이 유지된다") {
                     result.rooms.size shouldBe 1
                     result.rooms.first().id shouldBe room.id
+                }
+            }
+
+            When("숙박 기간을 연장하면") {
+                val extendStayEndAt = reservation.stayEndAt.plusDays(1)
+                val result = reservationService.update(
+                    reservation.id,
+                    ReservationPatchDto(stayEndAt = JsonNullable.of(extendStayEndAt)),
+                )
+
+                Then("정상적으로 연장된다") {
+                    result.stayEndAt shouldBe extendStayEndAt
                 }
             }
         }
@@ -271,8 +285,9 @@ internal class ReservationServiceTest(
             }
         }
 
-        Given("각각 입실일이 다른 예약이 4개 등록된 상황에서") {
-            reservationRepository.saveAll(
+        Given("객실이 배정되고 각각 입실일이 다른 예약이 4개 등록된 상황에서") {
+            val room = roomRepository.save(fixture())
+            val reservations = reservationRepository.saveAll(
                 listOf(
                     fixture {
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 10, 31) }
@@ -292,6 +307,14 @@ internal class ReservationServiceTest(
                     },
                 ),
             )
+            reservationRoomRepository.saveAll(
+                listOf(
+                    ReservationRoom(reservations[0], room),
+                    ReservationRoom(reservations[1], room),
+                    ReservationRoom(reservations[2], room),
+                    ReservationRoom(reservations[3], roomRepository.save(fixture())),
+                ),
+            )
 
             When("11월 예약 정보를 조회하면") {
                 val entityListDto = reservationService.findAll(
@@ -304,6 +327,39 @@ internal class ReservationServiceTest(
 
                 Then("3개의 예약 정보가 반환 된다") {
                     entityListDto.page.totalElements shouldBe 3
+                }
+            }
+
+            When("이미 객실이 배정된 기간에 추가 예약을 생성하려고 하면") {
+                val exception = shouldThrow<UnavailableRoomException> {
+                    reservationService.create(
+                        fixture {
+                            property(ReservationCreateDto::stayStartAt) { LocalDate.of(2023, 11, 1) }
+                            property(ReservationCreateDto::stayEndAt) { LocalDate.of(2023, 11, 2) }
+                            property(ReservationCreateDto::rooms) { setOf(EntityReferenceDto(room.id)) }
+                        },
+                    )
+                }
+
+                Then("중복 객실 배정 예외가 발생하면서 등록되지 않는다") {
+                    exception.message shouldContain "(${room.number})"
+                }
+            }
+
+            When("객실이 배정된 기존 예약을 이미 객실이 배정되어 배정 불가능한 기간으로 수정 요청 시") {
+                val exception = shouldThrow<UnavailableRoomException> {
+                    reservationService.update(
+                        reservations.first().id,
+                        ReservationPatchDto(
+                            stayStartAt = JsonNullable.of(LocalDate.of(2023, 11, 1)),
+                            stayEndAt = JsonNullable.of(LocalDate.of(2023, 11, 2)),
+                            rooms = JsonNullable.of(setOf(EntityReferenceDto(room.id))),
+                        ),
+                    )
+                }
+
+                Then("중복 객실 설정 예외가 발생하면서 수정되지 않는다") {
+                    exception.message shouldContain "(${room.number})"
                 }
             }
         }
