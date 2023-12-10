@@ -7,4 +7,6 @@ import org.springframework.data.domain.Pageable
 
 interface RoomCustomRepository {
     fun getFilteredRooms(pageable: Pageable, filter: RoomFilterDto): Page<Room>
+
+    fun getReservedRooms(filter: RoomFilterDto, roomIds: Set<Long>): Set<Room>
 }

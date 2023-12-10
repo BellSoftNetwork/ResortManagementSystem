@@ -8,6 +8,7 @@ type FetchRoomsRequestParams = Partial<
     stayStartAt: string;
     stayEndAt: string;
     status: RoomStatus;
+    excludeReservationId: number;
   } & PageRequestParams &
     SortRequestParams
 >;

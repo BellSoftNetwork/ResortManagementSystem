@@ -31,7 +31,7 @@
     >
       <RoomSelectTable
         v-model:selected="selectedRooms"
-        :first-values="entity.rooms"
+        :parent-reservation="entity"
         :stay-start-at="formModel.stayDate.from"
         :stay-end-at="formModel.stayDate.to"
       />
@@ -341,7 +341,6 @@ onBeforeMount(() => {
     if (entity.value === undefined) return;
 
     resetForm();
-    if (entity.value.rooms) selectedRooms.value = entity.value.rooms;
     loadPaymentMethods().then(() => {
       formModel.value.paymentMethod = paymentMethods.value.values.find(
         (item) => item.id === entity.value.paymentMethod.id,

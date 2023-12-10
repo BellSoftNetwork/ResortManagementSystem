@@ -45,6 +45,18 @@ class RoomCustomRepositoryImpl(
         }
     }
 
+    override fun getReservedRooms(filter: RoomFilterDto, roomIds: Set<Long>): Set<Room> {
+        return jpaQueryFactory
+            .from(QRoom.room)
+            .where(
+                eqStatus(filter.status),
+                duplicatedRooms(filter, roomIds),
+            )
+            .select(QRoom.room)
+            .fetch()
+            .toSet()
+    }
+
     private fun getFilteredRoomsBaseQuery(filter: RoomFilterDto) = jpaQueryFactory
         .from(QRoom.room)
         .where(
@@ -61,20 +73,40 @@ class RoomCustomRepositoryImpl(
                 .select(QReservationRoom.reservationRoom.room.id)
                 .from(QReservationRoom.reservationRoom)
                 .where(
-                    QReservationRoom.reservationRoom.reservation.id.`in`(
-                        JPAExpressions
-                            .select(QReservation.reservation.id)
-                            .from(QReservation.reservation)
-                            .where(
-                                beforeDateFilterExpressions(filter)
-                                    ?.or(afterDateFilterExpressions(filter))
-                                    ?.or(wrapDateFilterExpressions(filter)),
-                            ),
-                    ),
+                    filterReservationRooms(filter),
                 )
                 .distinct(),
         )
     }
+
+    private fun duplicatedRooms(filter: RoomFilterDto, roomIds: Set<Long>): BooleanExpression? {
+        if (filter.stayStartAt == null || filter.stayEndAt == null)
+            return null
+
+        return QRoom.room.id.`in`(
+            JPAExpressions
+                .select(QReservationRoom.reservationRoom.room.id)
+                .from(QReservationRoom.reservationRoom)
+                .where(
+                    QReservationRoom.reservationRoom.room.id.`in`(roomIds),
+                    filterReservationRooms(filter),
+                )
+                .distinct(),
+        )
+    }
+
+    private fun filterReservationRooms(filter: RoomFilterDto): BooleanExpression? =
+        QReservationRoom.reservationRoom.reservation.id.`in`(
+            JPAExpressions
+                .select(QReservation.reservation.id)
+                .from(QReservation.reservation)
+                .where(
+                    neReservationId(filter.excludeReservationId),
+                    beforeDateFilterExpressions(filter)
+                        ?.or(afterDateFilterExpressions(filter))
+                        ?.or(wrapDateFilterExpressions(filter)),
+                ),
+        )
 
     /**
      * 기존 예약 기간: ###=
@@ -117,4 +149,7 @@ class RoomCustomRepositoryImpl(
 
     private fun eqStatus(status: RoomStatus?) =
         status?.let { QRoom.room.status.eq(status) }
+
+    private fun neReservationId(reservationId: Long?) =
+        reservationId?.let { QReservation.reservation.id.ne(reservationId) }
 }

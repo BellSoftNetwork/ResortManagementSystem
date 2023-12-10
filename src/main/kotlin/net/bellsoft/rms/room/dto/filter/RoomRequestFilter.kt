@@ -7,4 +7,5 @@ data class RoomRequestFilter(
     val stayStartAt: LocalDate?,
     val stayEndAt: LocalDate?,
     val status: RoomStatus?,
+    val excludeReservationId: Long?,
 )

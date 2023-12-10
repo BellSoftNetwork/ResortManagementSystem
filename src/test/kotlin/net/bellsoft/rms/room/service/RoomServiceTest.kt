@@ -473,6 +473,21 @@ internal class RoomServiceTest(
                     }
                 }
             }
+
+            When("첫번째 예약을 수정할 경우 기간 내 예약 가능한 객실 정보를 조회하면") {
+                val entityListDto = roomService.findAll(
+                    PageRequest.of(0, 10),
+                    RoomFilterDto(
+                        stayStartAt = LocalDate.of(2023, 11, 10),
+                        stayEndAt = LocalDate.of(2023, 11, 20),
+                        excludeReservationId = reservations[0].id,
+                    ),
+                )
+
+                Then("1개의 객실 정보가 반환 된다") {
+                    entityListDto.page.totalElements shouldBe 1
+                }
+            }
         }
 
         Given("객실이 배정되지 않은 예약만 잡혀있어 희망 기간 내 예약 가능한 객실이 1개있을 때") {
