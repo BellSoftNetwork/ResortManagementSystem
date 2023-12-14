@@ -4,9 +4,9 @@
 
     <q-form @submit="update">
       <q-card-section>
-        <q-input v-model="user.name" label="이름" :readonly="true"></q-input>
+        <q-input :model-value="props.user.name" label="이름" :readonly="true"></q-input>
 
-        <q-input v-model="user.userId" :readonly="true" label="계정 ID"></q-input>
+        <q-input :model-value="props.user.userId" :readonly="true" label="계정 ID"></q-input>
 
         <q-input v-model="formData.email" :rules="userStaticRules.email" label="이메일" required></q-input>
 
@@ -34,20 +34,20 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useAuthStore } from "stores/auth";
 import { useQuasar } from "quasar";
 import { User, userDynamicRules, userStaticRules } from "src/schema/user";
 import { MyPatchParams, patchMy } from "src/api/v1/main";
 
-const authStore = useAuthStore();
 const $q = useQuasar();
 
+const props = defineProps<{
+  user: User;
+}>();
 const status = ref({
   isProgress: false,
 });
-const user = authStore.user as User;
 const formData = ref({
-  email: user.email,
+  email: props.user.email,
   password: "",
   passwordConfirm: "",
 });
@@ -104,13 +104,13 @@ function update() {
 }
 
 function isChanged() {
-  return formData.value.email !== user.email || formData.value.password.length > 0;
+  return formData.value.email !== props.user.email || formData.value.password.length > 0;
 }
 
 function patchedData() {
   const patchData: MyPatchParams = {};
 
-  if (formData.value.email !== user.email) patchData.email = formData.value.email;
+  if (formData.value.email !== props.user.email) patchData.email = formData.value.email;
 
   if (formData.value.password.length > 0) patchData.password = formData.value.password;
 

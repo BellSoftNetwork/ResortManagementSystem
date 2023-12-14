@@ -29,7 +29,7 @@
       :caption="selectedRooms.length !== 0 ? selectedRooms.map((room) => room.number).join(', ') : '추후 배정'"
       icon="create_new_folder"
     >
-      <RoomSelectTable
+      <RoomGroupSelector
         v-model:selected="selectedRooms"
         :stay-start-at="formModel.stayDate.from"
         :stay-end-at="formModel.stayDate.to"
@@ -175,7 +175,6 @@ import { computed, onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import dayjs from "dayjs";
-import RoomSelectTable from "components/room/RoomSelectTable.vue";
 import { formatDate, formatDiffDays, formatPrice, formatStayCaption, formatStayTitle } from "src/util/format-util";
 import { reservationDynamicRules, reservationStaticRules } from "src/schema/reservation";
 import { createReservation } from "src/api/v1/reservation";
@@ -183,6 +182,7 @@ import { fetchPaymentMethods } from "src/api/v1/payment-method";
 import { formatSortParam } from "src/util/query-string-util";
 import { PaymentMethod } from "src/schema/payment-method";
 import { Room } from "src/schema/room";
+import RoomGroupSelector from "components/room-group/RoomGroupSelector.vue";
 
 const router = useRouter();
 const $q = useQuasar();

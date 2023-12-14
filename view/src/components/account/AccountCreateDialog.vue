@@ -70,6 +70,7 @@ const options = {
   role: [
     { label: "일반", value: "NORMAL" },
     { label: "관리자", value: "ADMIN", disable: !authStore.isSuperAdminRole },
+    { label: "최고 관리자", value: "SUPER_ADMIN", disable: !authStore.isSuperAdminRole },
   ],
 };
 

@@ -7,6 +7,7 @@ import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import net.bellsoft.rms.authentication.exception.UserNotFoundException
+import net.bellsoft.rms.common.dto.service.EntityReferenceDto
 import net.bellsoft.rms.common.exception.DataNotFoundException
 import net.bellsoft.rms.common.exception.DuplicateDataException
 import net.bellsoft.rms.common.util.SecurityTestSupport
@@ -14,14 +15,13 @@ import net.bellsoft.rms.common.util.TestDatabaseSupport
 import net.bellsoft.rms.fixture.baseFixture
 import net.bellsoft.rms.payment.repository.PaymentMethodRepository
 import net.bellsoft.rms.reservation.entity.Reservation
-import net.bellsoft.rms.reservation.entity.ReservationRoom
 import net.bellsoft.rms.reservation.repository.ReservationRepository
-import net.bellsoft.rms.reservation.repository.ReservationRoomRepository
 import net.bellsoft.rms.revision.type.HistoryType
 import net.bellsoft.rms.room.dto.filter.RoomFilterDto
 import net.bellsoft.rms.room.dto.service.RoomCreateDto
 import net.bellsoft.rms.room.dto.service.RoomPatchDto
 import net.bellsoft.rms.room.entity.Room
+import net.bellsoft.rms.room.repository.RoomGroupRepository
 import net.bellsoft.rms.room.repository.RoomRepository
 import net.bellsoft.rms.room.type.RoomStatus
 import net.bellsoft.rms.user.entity.User
@@ -39,12 +39,14 @@ internal class RoomServiceTest(
     private val securityTestSupport: SecurityTestSupport,
     private val roomService: RoomService,
     private val roomRepository: RoomRepository,
+    private val roomGroupRepository: RoomGroupRepository,
     private val reservationRepository: ReservationRepository,
-    private val reservationRoomRepository: ReservationRoomRepository,
     private val paymentMethodRepository: PaymentMethodRepository,
 ) : BehaviorSpec(
     {
-        val fixture = baseFixture
+        val fixture = baseFixture.new {
+            property(Room::roomGroup) { roomGroupRepository.save(fixture()) }
+        }
         val loginUser: User = fixture()
 
         beforeContainer {
@@ -75,7 +77,10 @@ internal class RoomServiceTest(
             }
 
             When("신규 객실 정보를 등록하면") {
-                val roomCreateDto: RoomCreateDto = fixture()
+                val customFixture = fixture.new {
+                    property(RoomCreateDto::roomGroup) { EntityReferenceDto.of(roomGroupRepository.save(fixture())) }
+                }
+                val roomCreateDto: RoomCreateDto = customFixture()
                 val result = roomService.create(roomCreateDto)
 
                 Then("등록된 객실 정보가 반환 된다") {
@@ -123,6 +128,9 @@ internal class RoomServiceTest(
         }
 
         Given("객실이 10개 등록된 상황에서") {
+            val customFixture = fixture.new {
+                property(RoomCreateDto::roomGroup) { EntityReferenceDto.of(roomGroupRepository.save(fixture())) }
+            }
             val rooms = roomRepository.saveAll(fixture<List<Room>> { repeatCount { 10 } })
 
             When("전체 객실 정보를 조회하면") {
@@ -146,7 +154,7 @@ internal class RoomServiceTest(
             }
 
             When("신규 객실 정보를 등록하면") {
-                val roomCreateDto: RoomCreateDto = fixture()
+                val roomCreateDto: RoomCreateDto = customFixture()
                 val result = roomService.create(roomCreateDto)
 
                 Then("등록된 객실 정보가 반환 된다") {
@@ -156,7 +164,7 @@ internal class RoomServiceTest(
 
             When("동일한 객실 번호를 가진 객실 정보를 등록하면") {
                 val exception = shouldThrow<DuplicateDataException> {
-                    roomService.create(fixture { property(RoomCreateDto::number) { rooms[0].number } })
+                    roomService.create(customFixture { property(RoomCreateDto::number) { rooms[0].number } })
                 }
 
                 Then("중복된 객실 번호로 등록에 실패한다") {
@@ -300,32 +308,24 @@ internal class RoomServiceTest(
                 ),
             )
 
-            val reservations = reservationRepository.saveAll(
+            reservationRepository.saveAll(
                 listOf(
-                    customFixture {
+                    customFixture<Reservation> {
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 9) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 10) }
-                    },
-                    customFixture {
+                    }.apply { addRoom(availableRooms[0]) },
+                    customFixture<Reservation> {
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 11) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 12) }
-                    },
-                    customFixture {
+                    }.apply { addRoom(availableRooms[1]) },
+                    customFixture<Reservation> {
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 9) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 10) }
-                    },
-                    customFixture {
+                    }.apply { addRoom(availableRooms[2]) },
+                    customFixture<Reservation> {
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 11) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 12) }
-                    },
-                ),
-            )
-            reservationRoomRepository.saveAll(
-                setOf(
-                    ReservationRoom(reservation = reservations[0], room = availableRooms[0]),
-                    ReservationRoom(reservation = reservations[1], room = availableRooms[1]),
-                    ReservationRoom(reservation = reservations[2], room = availableRooms[2]),
-                    ReservationRoom(reservation = reservations[3], room = availableRooms[2]),
+                    }.apply { addRoom(availableRooms[2]) },
                 ),
             )
 
@@ -415,45 +415,34 @@ internal class RoomServiceTest(
 
             val reservations = reservationRepository.saveAll(
                 listOf(
-                    customFixture {
+                    customFixture<Reservation> {
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 9) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 11) }
-                    },
-                    customFixture {
+                    }.apply { addRoom(reservedRooms[0]) },
+                    customFixture<Reservation> {
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 10) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 20) }
-                    },
-                    customFixture {
+                    }.apply { addRoom(reservedRooms[1]) },
+                    customFixture<Reservation> {
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 10) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 11) }
-                    },
-                    customFixture {
+                    }.apply { addRoom(reservedRooms[2]) },
+                    customFixture<Reservation> {
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 11) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 19) }
-                    },
-                    customFixture {
+                    }.apply { addRoom(reservedRooms[3]) },
+                    customFixture<Reservation> {
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 19) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 20) }
-                    },
-                    customFixture {
+                    }.apply { addRoom(reservedRooms[4]) },
+                    customFixture<Reservation> {
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 19) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 21) }
-                    },
-                    customFixture {
+                    }.apply { addRoom(reservedRooms[5]) },
+                    customFixture<Reservation> {
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 1) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 30) }
-                    },
-                ),
-            )
-            reservationRoomRepository.saveAll(
-                setOf(
-                    ReservationRoom(reservation = reservations[0], room = reservedRooms[0]),
-                    ReservationRoom(reservation = reservations[1], room = reservedRooms[1]),
-                    ReservationRoom(reservation = reservations[2], room = reservedRooms[2]),
-                    ReservationRoom(reservation = reservations[3], room = reservedRooms[3]),
-                    ReservationRoom(reservation = reservations[4], room = reservedRooms[4]),
-                    ReservationRoom(reservation = reservations[5], room = reservedRooms[5]),
-                    ReservationRoom(reservation = reservations[6], room = reservedRooms[6]),
+                    }.apply { addRoom(reservedRooms[6]) },
                 ),
             )
 
@@ -497,13 +486,11 @@ internal class RoomServiceTest(
 
             val reservedRoom = roomRepository.save(fixture())
 
-            reservationRepository.saveAll(
-                listOf(
-                    customFixture {
-                        property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 1) }
-                        property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 30) }
-                    },
-                ),
+            reservationRepository.save(
+                customFixture {
+                    property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 1) }
+                    property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 30) }
+                },
             )
 
             When("기간 내 예약 가능한 객실 정보를 조회하면") {

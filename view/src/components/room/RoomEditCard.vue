@@ -1,13 +1,20 @@
 <template>
   <q-card>
-    <q-inner-loading :showing="status.isProgress">
-      <q-spinner-gears size="50px" color="primary" />
-    </q-inner-loading>
-
     <q-card-section class="text-h6">객실 수정</q-card-section>
 
     <q-form @submit="update">
       <q-card-section>
+        <q-select
+          v-model="formData.roomGroup"
+          :loading="status.isProgress || roomGroups === null"
+          :disable="status.isProgress || roomGroups === null"
+          :options="roomGroups"
+          option-label="name"
+          label="객실 그룹"
+          required
+          map-options
+        ></q-select>
+
         <q-input
           v-model="formData.number"
           :loading="status.isProgress"
@@ -16,40 +23,6 @@
           label="번호"
           placeholder="101호"
           required
-        ></q-input>
-
-        <q-input
-          v-model.number="formData.peekPrice"
-          :loading="status.isProgress"
-          :disable="status.isProgress"
-          :rules="roomStaticRules.peekPrice"
-          label="성수기 예약금"
-          type="number"
-          min="0"
-          max="100000000"
-          required
-        ></q-input>
-
-        <q-input
-          v-model.number="formData.offPeekPrice"
-          :loading="status.isProgress"
-          :disable="status.isProgress"
-          :rules="roomStaticRules.offPeekPrice"
-          label="비성수기 예약금"
-          type="number"
-          min="0"
-          max="100000000"
-          required
-        ></q-input>
-
-        <q-input
-          v-model="formData.description"
-          :loading="status.isProgress"
-          :disable="status.isProgress"
-          :rules="roomStaticRules.description"
-          type="textarea"
-          label="설명"
-          placeholder="와이파이 사용 가능"
         ></q-input>
 
         <q-input
@@ -84,25 +57,25 @@
 
 <script setup lang="ts">
 import { onBeforeMount, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import { Room, roomStaticRules } from "src/schema/room";
-import { fetchRoom, patchRoom } from "src/api/v1/room";
+import { patchRoom } from "src/api/v1/room";
 import { getPatchedFormData, isFormValueChanged } from "src/util/data-util";
+import { RoomGroup } from "src/schema/room-group";
+import { fetchRoomGroups } from "src/api/v1/room-group";
 
 const router = useRouter();
-const route = useRoute();
 const $q = useQuasar();
-const id = Number.parseInt(route.params.id as string);
+const props = defineProps<{
+  room: Room;
+}>();
 const status = ref({
   isProgress: false,
 });
-const entity = ref<Room | null>(null);
+const roomGroups = ref<RoomGroup[] | null>(null);
 const formData = ref<Partial<Room>>({
   number: "",
-  peekPrice: 0,
-  offPeekPrice: 0,
-  description: "",
   note: "",
   status: "NORMAL",
 });
@@ -115,25 +88,16 @@ const options = {
   ],
 };
 
-function fetchData() {
-  status.value.isProgress = true;
+function loadRoomGroups() {
+  roomGroups.value = null;
 
-  return fetchRoom(id)
-    .then((response) => {
-      entity.value = response.value;
-    })
-    .catch((error) => {
-      if (error.response.status === 404) router.push({ name: "ErrorNotFound" });
-
-      console.log(error);
-    })
-    .finally(() => {
-      status.value.isProgress = false;
-    });
+  return fetchRoomGroups().then((response) => {
+    roomGroups.value = response.values;
+  });
 }
 
 function update() {
-  if (!isFormValueChanged(entity.value, formData.value)) {
+  if (!isFormValueChanged(props.room, formData.value)) {
     $q.notify({
       message: "수정된 항목이 없습니다.",
       type: "info",
@@ -151,9 +115,9 @@ function update() {
 
   status.value.isProgress = true;
 
-  patchRoom(id, getPatchedFormData(entity.value, formData.value))
+  patchRoom(props.room.id, getPatchedFormData(props.room, formData.value))
     .then(() => {
-      router.push({ name: "Room", params: { id: id } });
+      router.push({ name: "Room", params: { id: props.room.id } });
     })
     .catch((error) => {
       $q.notify({
@@ -174,12 +138,13 @@ function update() {
 }
 
 function resetForm() {
-  Object.assign(formData.value, entity.value);
+  Object.assign(formData.value, props.room);
 }
 
 onBeforeMount(() => {
-  fetchData().then(() => {
-    resetForm();
+  resetForm();
+  loadRoomGroups().then(() => {
+    formData.value.roomGroup = roomGroups.value?.find((item) => item.id === props.room.roomGroup.id);
   });
 });
 </script>

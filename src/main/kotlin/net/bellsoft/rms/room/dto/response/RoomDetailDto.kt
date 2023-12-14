@@ -7,9 +7,8 @@ import java.time.LocalDateTime
 data class RoomDetailDto(
     val id: Long,
     val number: String,
-    val peekPrice: Int,
-    val offPeekPrice: Int,
-    val description: String,
+    // TODO: 추후 Not Null 로 변경 필요
+    val roomGroup: RoomGroupSummaryDto?,
     val note: String,
     val status: RoomStatus,
     val createdAt: LocalDateTime,

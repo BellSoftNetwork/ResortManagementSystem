@@ -22,6 +22,8 @@ import net.bellsoft.rms.reservation.exception.UnavailableRoomException
 import net.bellsoft.rms.reservation.repository.ReservationRepository
 import net.bellsoft.rms.reservation.repository.ReservationRoomRepository
 import net.bellsoft.rms.revision.type.HistoryType
+import net.bellsoft.rms.room.entity.Room
+import net.bellsoft.rms.room.repository.RoomGroupRepository
 import net.bellsoft.rms.room.repository.RoomRepository
 import net.bellsoft.rms.user.entity.User
 import org.openapitools.jackson.nullable.JsonNullable
@@ -41,12 +43,14 @@ internal class ReservationServiceTest(
     private val reservationRoomRepository: ReservationRoomRepository,
     private val paymentMethodRepository: PaymentMethodRepository,
     private val roomRepository: RoomRepository,
+    private val roomGroupRepository: RoomGroupRepository,
 ) : BehaviorSpec(
     {
         val paymentMethod = paymentMethodRepository.save(baseFixture())
         val fixture = baseFixture.new {
             property(Reservation::paymentMethod) { paymentMethod }
             property(ReservationCreateDto::paymentMethod) { EntityReferenceDto(paymentMethod.id) }
+            property(Room::roomGroup) { roomGroupRepository.save(fixture()) }
         }
         val loginUser: User = fixture()
 
@@ -126,8 +130,8 @@ internal class ReservationServiceTest(
         }
 
         Given("객실이 배정된 예약이 등록된 상황에서") {
-            val room = roomRepository.save(fixture())
             val reservation = reservationRepository.save(fixture())
+            val room: Room = roomRepository.save(fixture())
 
             reservationRoomRepository.saveAll(listOf(ReservationRoom(reservation, room)))
 
@@ -286,7 +290,8 @@ internal class ReservationServiceTest(
         }
 
         Given("객실이 배정되고 각각 입실일이 다른 예약이 4개 등록된 상황에서") {
-            val room = roomRepository.save(fixture())
+            val room: Room = roomRepository.save(fixture())
+
             val reservations = reservationRepository.saveAll(
                 listOf(
                     fixture {

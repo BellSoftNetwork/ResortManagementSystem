@@ -1,16 +1,12 @@
 <template>
   <q-card flat bordered>
-    <q-inner-loading :showing="status.isProgress">
-      <q-spinner-gears size="50px" color="primary" />
-    </q-inner-loading>
-
     <q-card-section class="text-h6">예약 정보</q-card-section>
 
     <q-card-section>
       <div class="row">
         <div class="col-12 col-md-auto q-px-sm">
           <q-date
-            :model-value="{ from: entity?.stayStartAt, to: entity?.stayEndAt }"
+            :model-value="{ from: props.reservation.stayStartAt, to: props.reservation.stayEndAt }"
             :title="formatStayTitle(stayDateDiff)"
             subtitle="숙박 기간"
             range
@@ -23,8 +19,8 @@
           <div class="q-py-sm">
             <div class="text-caption">객실 번호</div>
             <div class="text-body1">
-              <div v-if="entity?.rooms.length !== 0">
-                <span v-for="room in entity?.rooms" :key="room.id">
+              <div v-if="props.reservation.rooms.length !== 0">
+                <span v-for="room in props.reservation.rooms" :key="room.id">
                   <q-btn :to="{ name: 'Room', params: { id: room.id } }" color="primary" flat dense>
                     {{ room.number }}
                   </q-btn>
@@ -36,49 +32,49 @@
 
           <div class="q-py-sm">
             <div class="text-caption">판매 금액</div>
-            <div class="text-body1">{{ formatPrice(entity?.price) }}</div>
+            <div class="text-body1">{{ formatPrice(props.reservation.price) }}</div>
           </div>
 
           <div class="q-py-sm">
             <div class="text-caption">결제 금액</div>
             <div class="text-body1">
-              {{ formatPrice(entity?.paymentAmount) }}
+              {{ formatPrice(props.reservation.paymentAmount) }}
             </div>
           </div>
 
           <div class="q-py-sm">
             <div class="text-caption">결제 수단</div>
-            <div class="text-body1">{{ entity?.paymentMethod.name }}</div>
+            <div class="text-body1">{{ props.reservation.paymentMethod.name }}</div>
           </div>
 
           <div class="q-py-sm">
             <div class="text-caption">결제 수단 수수료</div>
-            <div class="text-body1">{{ formatPrice(entity?.brokerFee) }}</div>
+            <div class="text-body1">{{ formatPrice(props.reservation.brokerFee) }}</div>
           </div>
         </div>
 
         <div class="col-12 col-md-4 q-px-sm">
           <div class="q-py-sm">
             <div class="text-caption">예약자명</div>
-            <div class="text-body1">{{ entity?.name }}</div>
+            <div class="text-body1">{{ props.reservation.name }}</div>
           </div>
 
           <div class="q-py-sm">
             <div class="text-caption">예약자 연락처</div>
             <div class="text-body1">
-              <a :href="'tel:' + entity?.phone">{{ entity?.phone }}</a>
+              <a :href="'tel:' + props.reservation.phone">{{ props.reservation.phone }}</a>
             </div>
           </div>
 
           <div class="q-py-sm">
             <div class="text-caption">예약인원</div>
-            <div class="text-body1">{{ entity?.peopleCount }}</div>
+            <div class="text-body1">{{ props.reservation.peopleCount }}</div>
           </div>
 
           <div class="q-py-sm">
             <div class="text-caption">예약 상태</div>
             <div class="text-body1">
-              {{ entity ? reservationStatusValueToName(entity.status) : "" }}
+              {{ reservationStatusValueToName(props.reservation.status) }}
             </div>
           </div>
         </div>
@@ -88,7 +84,7 @@
         <div class="col">
           <div class="q-py-sm">
             <div class="text-caption">메모</div>
-            <div class="text-body1">{{ entity?.note }}</div>
+            <div class="text-body1">{{ props.reservation.note }}</div>
           </div>
         </div>
       </div>
@@ -97,8 +93,7 @@
     <q-card-actions align="right">
       <q-btn @click="deleteItem()" color="red" label="삭제" dense flat></q-btn>
       <q-btn
-        :disable="status.isProgress"
-        :to="{ name: 'EditReservation', params: { id: id } }"
+        :to="{ name: 'EditReservation', params: { id: props.reservation.id } }"
         color="primary"
         label="수정"
         flat
@@ -108,47 +103,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeMount, ref } from "vue";
+import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import { formatDiffDays, formatPrice, formatStayTitle } from "src/util/format-util";
-import { deleteReservation, fetchReservation } from "src/api/v1/reservation";
+import { deleteReservation } from "src/api/v1/reservation";
 import { Reservation, reservationStatusValueToName } from "src/schema/reservation";
 
 const router = useRouter();
 const $q = useQuasar();
 const props = defineProps<{
-  id: number;
+  reservation: Reservation;
 }>();
-const id = props.id;
-const status = ref({
-  isProgress: false,
-});
-const entity = ref<Reservation>();
-const stayDateDiff = computed(() => formatDiffDays(entity.value?.stayStartAt, entity.value?.stayEndAt));
-
-function fetchData() {
-  status.value.isProgress = true;
-
-  fetchReservation(id)
-    .then((response) => {
-      entity.value = response.value;
-    })
-    .catch((error) => {
-      if (error.response.status === 404) router.push({ name: "ErrorNotFound" });
-
-      console.log(error);
-    })
-    .finally(() => {
-      status.value.isProgress = false;
-    });
-}
+const stayDateDiff = computed(() => formatDiffDays(props.reservation.stayStartAt, props.reservation.stayEndAt));
 
 function deleteItem() {
-  if (entity.value === undefined) return;
-
-  const itemId = entity.value.id;
-  const itemName = entity.value.name;
+  const itemId = props.reservation.id;
+  const itemName = props.reservation.name;
 
   $q.dialog({
     title: "삭제",
@@ -183,8 +154,4 @@ function deleteItem() {
       });
   });
 }
-
-onBeforeMount(() => {
-  fetchData();
-});
 </script>

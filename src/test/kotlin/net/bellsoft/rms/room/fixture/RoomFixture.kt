@@ -1,6 +1,7 @@
 package net.bellsoft.rms.room.fixture
 
 import net.bellsoft.rms.fixture.FixtureFeature
+import net.bellsoft.rms.fixture.baseFixture
 import net.bellsoft.rms.fixture.util.fixtureConfig
 import net.bellsoft.rms.room.entity.Room
 import net.bellsoft.rms.room.type.RoomStatus
@@ -26,6 +27,7 @@ class RoomFixture {
 
         val BASE_CONFIGURATION = fixtureConfig {
             property(Room::number) { FAKER.random().hex(10) }
+            property(Room::roomGroup) { baseFixture() }
         }
     }
 }

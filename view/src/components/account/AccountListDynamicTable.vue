@@ -24,7 +24,7 @@
 
     <template #body-cell-actions="props">
       <q-td key="actions" :props="props">
-        <AccountEditDialog v-slot="{ dialog }" @complete="reloadData" :entity="props.row">
+        <AccountEditDialog v-slot="{ dialog }" @complete="reloadData" :user="props.row">
           <q-btn @click="dialog.isOpen = true" icon="edit" color="grey" dense round flat />
         </AccountEditDialog>
         <q-btn @click="deleteItem(props.row)" :disable="true" icon="delete" color="grey" dense round flat>

@@ -4,7 +4,7 @@ import { User } from "src/schema/user";
 import { ServerConfig, ServerEnv } from "src/schema/server-config";
 
 type MyParams = {
-  email: string;
+  email: string | null;
   password: string;
 };
 

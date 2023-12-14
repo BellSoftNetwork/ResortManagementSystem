@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import net.bellsoft.rms.common.util.SecurityTestSupport
 import net.bellsoft.rms.common.util.TestDatabaseSupport
 import net.bellsoft.rms.fixture.baseFixture
+import net.bellsoft.rms.room.entity.Room
 import net.bellsoft.rms.user.entity.User
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
@@ -16,9 +17,12 @@ internal class RoomRepositoryTest(
     private val testDatabaseSupport: TestDatabaseSupport,
     private val securityTestSupport: SecurityTestSupport,
     private val roomRepository: RoomRepository,
+    private val roomGroupRepository: RoomGroupRepository,
 ) : BehaviorSpec(
     {
-        val fixture = baseFixture
+        val fixture = baseFixture.new {
+            property(Room::roomGroup) { roomGroupRepository.save(fixture()) }
+        }
         val loginUser: User = fixture()
 
         beforeContainer {

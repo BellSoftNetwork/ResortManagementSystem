@@ -6,6 +6,8 @@ import net.bellsoft.rms.reservation.fixture.ReservationFixture
 import net.bellsoft.rms.reservation.fixture.ReservationRoomFixture
 import net.bellsoft.rms.room.fixture.RoomCreateDtoFixture
 import net.bellsoft.rms.room.fixture.RoomFixture
+import net.bellsoft.rms.room.fixture.RoomGroupCreateDtoFixture
+import net.bellsoft.rms.room.fixture.RoomGroupFixture
 import net.bellsoft.rms.user.fixture.UserCreateDtoFixture
 import net.bellsoft.rms.user.fixture.UserFixture
 import net.bellsoft.rms.user.fixture.UserRegistrationRequestFixture
@@ -15,6 +17,7 @@ import net.bellsoft.rms.user.fixture.UserRegistrationRequestFixture
 private val domainConfigurations = listOf(
     UserFixture.BASE_CONFIGURATION,
     RoomFixture.BASE_CONFIGURATION,
+    RoomGroupFixture.BASE_CONFIGURATION,
     ReservationFixture.BASE_CONFIGURATION,
     ReservationRoomFixture.BASE_CONFIGURATION,
     PaymentMethodFixture.BASE_CONFIGURATION,
@@ -27,6 +30,7 @@ private val dtoFixtureConfigurations = listOf(
     UserCreateDtoFixture.BASE_CONFIGURATION,
     ReservationCreateDtoFixture.BASE_CONFIGURATION,
     RoomCreateDtoFixture.BASE_CONFIGURATION,
+    RoomGroupCreateDtoFixture.BASE_CONFIGURATION,
 )
 
 // NOTE: 신규 설정 리스트 생성 시 해당 설정 리스트를 아래에 등록 필요

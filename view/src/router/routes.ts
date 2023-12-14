@@ -61,6 +61,36 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: "/room-groups",
+    component: DefaultLayout,
+    meta: {
+      isAuthenticated: true,
+      roles: ["ADMIN", "SUPER_ADMIN"],
+    },
+    children: [
+      {
+        path: "",
+        name: "RoomGroups",
+        component: () => import("pages/room-group/RoomGroupList.vue"),
+      },
+      {
+        path: ":id",
+        name: "RoomGroup",
+        component: () => import("pages/room-group/RoomGroupDetail.vue"),
+      },
+      {
+        path: ":id/edit",
+        name: "EditRoomGroup",
+        component: () => import("pages/room-group/RoomGroupEdit.vue"),
+      },
+      {
+        path: "create",
+        name: "CreateRoomGroup",
+        component: () => import("pages/room-group/RoomGroupCreate.vue"),
+      },
+    ],
+  },
+  {
     path: "/reservations",
     component: DefaultLayout,
     meta: {

@@ -3,6 +3,7 @@ package net.bellsoft.rms.room.mapper
 import net.bellsoft.rms.common.config.BaseMapperConfig
 import net.bellsoft.rms.reservation.entity.ReservationRoom
 import net.bellsoft.rms.room.dto.response.RoomDetailDto
+import net.bellsoft.rms.room.dto.response.RoomSummaryDto
 import net.bellsoft.rms.room.dto.service.RoomCreateDto
 import net.bellsoft.rms.room.dto.service.RoomPatchDto
 import net.bellsoft.rms.room.entity.Room
@@ -16,9 +17,10 @@ import org.mapstruct.NullValuePropertyMappingStrategy
 
 @Mapper(
     config = BaseMapperConfig::class,
-    uses = [UserMapper::class],
+    uses = [UserMapper::class, RoomGroupMapper::class],
 )
 interface RoomMapper {
+    fun toSummaryDto(entity: Room): RoomSummaryDto
     fun toDto(entity: Room): RoomDetailDto
 
     @Mapping(source = "room", target = ".")

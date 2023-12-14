@@ -4,40 +4,23 @@
 
     <q-form @submit="create">
       <q-card-section>
+        <q-select
+          v-model="formData.roomGroup"
+          :loading="status.isProgress || roomGroups === null"
+          :disable="status.isProgress || roomGroups === null"
+          :options="roomGroups"
+          option-label="name"
+          label="객실 그룹"
+          required
+          map-options
+        ></q-select>
+
         <q-input
           v-model="formData.number"
           :rules="roomStaticRules.number"
           label="번호"
           placeholder="101호"
           required
-        ></q-input>
-
-        <q-input
-          v-model.number="formData.peekPrice"
-          :rules="roomStaticRules.peekPrice"
-          label="성수기 예약금"
-          type="number"
-          min="0"
-          max="100000000"
-          required
-        ></q-input>
-
-        <q-input
-          v-model.number="formData.offPeekPrice"
-          :rules="roomStaticRules.offPeekPrice"
-          label="비성수기 예약금"
-          type="number"
-          min="0"
-          max="100000000"
-          required
-        ></q-input>
-
-        <q-input
-          v-model="formData.description"
-          :rules="roomStaticRules.description"
-          type="textarea"
-          label="설명"
-          placeholder="와이파이 사용 가능"
         ></q-input>
 
         <q-input
@@ -70,8 +53,10 @@
 import { onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
-import { roomStaticRules } from "src/schema/room";
+import { Room, roomStaticRules } from "src/schema/room";
 import { createRoom } from "src/api/v1/room";
+import { fetchRoomGroups } from "src/api/v1/room-group";
+import { RoomGroup } from "src/schema/room-group";
 
 const router = useRouter();
 const $q = useQuasar();
@@ -79,11 +64,9 @@ const $q = useQuasar();
 const status = ref({
   isProgress: false,
 });
-const formData = ref({
+const roomGroups = ref<RoomGroup[] | null>(null);
+const formData = ref<Partial<Room>>({
   number: "",
-  peekPrice: 0,
-  offPeekPrice: 0,
-  description: "",
   note: "",
   status: "NORMAL",
 });
@@ -123,15 +106,23 @@ function create() {
     });
 }
 
+function loadRoomGroups() {
+  roomGroups.value = null;
+
+  return fetchRoomGroups().then((response) => {
+    roomGroups.value = response.values;
+  });
+}
+
 function resetForm() {
   formData.value.number = "";
-  formData.value.peekPrice = 0;
-  formData.value.offPeekPrice = 0;
-  formData.value.description = "";
   formData.value.status = "NORMAL";
 }
 
 onBeforeMount(() => {
   resetForm();
+  loadRoomGroups().then(() => {
+    formData.value.roomGroup = roomGroups.value?.[0];
+  });
 });
 </script>

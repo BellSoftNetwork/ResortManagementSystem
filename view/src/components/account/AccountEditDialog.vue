@@ -53,9 +53,8 @@ const $q = useQuasar();
 
 const emit = defineEmits(["complete"]);
 const props = defineProps<{
-  entity: User;
+  user: User;
 }>();
-const id = props.entity.id;
 const dialog = ref({
   isOpen: false,
 });
@@ -63,16 +62,17 @@ const status = ref({
   isProgress: false,
 });
 const formData = ref({
-  userId: props.entity.userId,
-  email: props.entity.email,
-  name: props.entity.name,
+  userId: props.user.userId,
+  email: props.user.email,
+  name: props.user.name,
   password: "",
-  role: props.entity.role,
+  role: props.user.role,
 });
 const options = {
   role: [
     { label: "일반", value: "NORMAL" },
     { label: "관리자", value: "ADMIN", disable: !authStore.isSuperAdminRole },
+    { label: "최고 관리자", value: "SUPER_ADMIN", disable: !authStore.isSuperAdminRole },
   ],
 };
 
@@ -95,7 +95,7 @@ function update() {
 
   status.value.isProgress = true;
 
-  patchAdminAccount(id, patchedData())
+  patchAdminAccount(props.user.id, patchedData())
     .then(() => {
       emit("complete");
       dialog.value.isOpen = false;
@@ -120,10 +120,10 @@ function update() {
 
 function isChanged() {
   return (
-    formData.value.userId !== props.entity.userId ||
-    formData.value.email !== props.entity.email ||
-    formData.value.name !== props.entity.name ||
-    formData.value.role !== props.entity.role ||
+    formData.value.userId !== props.user.userId ||
+    formData.value.email !== props.user.email ||
+    formData.value.name !== props.user.name ||
+    formData.value.role !== props.user.role ||
     formData.value.password.length > 0
   );
 }
@@ -131,23 +131,23 @@ function isChanged() {
 function patchedData() {
   const patchData: AdminAccountPatchParams = {};
 
-  if (props.entity.userId !== formData.value.userId) patchData.userId = formData.value.userId;
-  if (props.entity.email !== formData.value.email) {
+  if (props.user.userId !== formData.value.userId) patchData.userId = formData.value.userId;
+  if (props.user.email !== formData.value.email) {
     const email = formData.value.email ? formData.value.email : null;
     patchData.email = email;
   }
-  if (props.entity.name !== formData.value.name) patchData.name = formData.value.name;
-  if (props.entity.role !== formData.value.role) patchData.role = formData.value.role;
+  if (props.user.name !== formData.value.name) patchData.name = formData.value.name;
+  if (props.user.role !== formData.value.role) patchData.role = formData.value.role;
   if (formData.value.password.length > 0) patchData.password = formData.value.password;
 
   return patchData;
 }
 
 function resetForm() {
-  formData.value.userId = props.entity.userId;
-  formData.value.email = props.entity.email;
-  formData.value.name = props.entity.name;
+  formData.value.userId = props.user.userId;
+  formData.value.email = props.user.email;
+  formData.value.name = props.user.name;
   formData.value.password = "";
-  formData.value.role = props.entity.role;
+  formData.value.role = props.user.role;
 }
 </script>

@@ -6,10 +6,10 @@ import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.core.types.dsl.Expressions
 import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
-import net.bellsoft.rms.reservation.entity.QReservation
-import net.bellsoft.rms.reservation.entity.QReservationRoom
+import net.bellsoft.rms.reservation.entity.QReservation.reservation
+import net.bellsoft.rms.reservation.entity.QReservationRoom.reservationRoom
 import net.bellsoft.rms.room.dto.filter.RoomFilterDto
-import net.bellsoft.rms.room.entity.QRoom
+import net.bellsoft.rms.room.entity.QRoom.room
 import net.bellsoft.rms.room.entity.Room
 import net.bellsoft.rms.room.repository.RoomCustomRepository
 import net.bellsoft.rms.room.type.RoomStatus
@@ -25,12 +25,12 @@ class RoomCustomRepositoryImpl(
 ) : RoomCustomRepository {
     override fun getFilteredRooms(pageable: Pageable, filter: RoomFilterDto): Page<Room> {
         val result = getFilteredRoomsBaseQuery(filter)
-            .select(QRoom.room)
+            .select(room)
             .orderBy(
                 *pageable.sort.map {
                     OrderSpecifier(
                         if (it.isAscending) Order.ASC else Order.DESC,
-                        Expressions.path(String::class.java, QRoom.room, it.property),
+                        Expressions.path(String::class.java, room, it.property),
                     )
                 }.toList().toTypedArray<OrderSpecifier<String>?>(),
             )
@@ -40,25 +40,25 @@ class RoomCustomRepositoryImpl(
 
         return PageableExecutionUtils.getPage(result, pageable) {
             getFilteredRoomsBaseQuery(filter)
-                .select(QRoom.room.count())
+                .select(room.count())
                 .fetchOne()!!
         }
     }
 
     override fun getReservedRooms(filter: RoomFilterDto, roomIds: Set<Long>): Set<Room> {
         return jpaQueryFactory
-            .from(QRoom.room)
+            .from(room)
             .where(
                 eqStatus(filter.status),
                 duplicatedRooms(filter, roomIds),
             )
-            .select(QRoom.room)
+            .select(room)
             .fetch()
             .toSet()
     }
 
     private fun getFilteredRoomsBaseQuery(filter: RoomFilterDto) = jpaQueryFactory
-        .from(QRoom.room)
+        .from(room)
         .where(
             eqStatus(filter.status),
             reservedRooms(filter),
@@ -68,10 +68,10 @@ class RoomCustomRepositoryImpl(
         if (filter.stayStartAt == null || filter.stayEndAt == null)
             return null
 
-        return QRoom.room.id.notIn(
+        return room.id.notIn(
             JPAExpressions
-                .select(QReservationRoom.reservationRoom.room.id)
-                .from(QReservationRoom.reservationRoom)
+                .select(reservationRoom.room.id)
+                .from(reservationRoom)
                 .where(
                     filterReservationRooms(filter),
                 )
@@ -83,12 +83,12 @@ class RoomCustomRepositoryImpl(
         if (filter.stayStartAt == null || filter.stayEndAt == null)
             return null
 
-        return QRoom.room.id.`in`(
+        return room.id.`in`(
             JPAExpressions
-                .select(QReservationRoom.reservationRoom.room.id)
-                .from(QReservationRoom.reservationRoom)
+                .select(reservationRoom.room.id)
+                .from(reservationRoom)
                 .where(
-                    QReservationRoom.reservationRoom.room.id.`in`(roomIds),
+                    reservationRoom.room.id.`in`(roomIds),
                     filterReservationRooms(filter),
                 )
                 .distinct(),
@@ -96,10 +96,10 @@ class RoomCustomRepositoryImpl(
     }
 
     private fun filterReservationRooms(filter: RoomFilterDto): BooleanExpression? =
-        QReservationRoom.reservationRoom.reservation.id.`in`(
+        reservationRoom.reservation.id.`in`(
             JPAExpressions
-                .select(QReservation.reservation.id)
-                .from(QReservation.reservation)
+                .select(reservation.id)
+                .from(reservation)
                 .where(
                     neReservationId(filter.excludeReservationId),
                     beforeDateFilterExpressions(filter)
@@ -130,26 +130,26 @@ class RoomCustomRepositoryImpl(
         goeStayStartAt(filter.stayStartAt)?.and(loeStayEndAt(filter.stayEndAt))
 
     private fun goeStayStartAt(localDate: LocalDate?) =
-        localDate?.let { QReservation.reservation.stayStartAt.goe(it) }
+        localDate?.let { reservation.stayStartAt.goe(it) }
 
     private fun loeStayStartAt(localDate: LocalDate?) =
-        localDate?.let { QReservation.reservation.stayStartAt.loe(it) }
+        localDate?.let { reservation.stayStartAt.loe(it) }
 
     private fun ltStayStartAt(localDate: LocalDate?) =
-        localDate?.let { QReservation.reservation.stayStartAt.lt(it) }
+        localDate?.let { reservation.stayStartAt.lt(it) }
 
     private fun goeStayEndAt(localDate: LocalDate?) =
-        localDate?.let { QReservation.reservation.stayEndAt.goe(it) }
+        localDate?.let { reservation.stayEndAt.goe(it) }
 
     private fun gtStayEndAt(localDate: LocalDate?) =
-        localDate?.let { QReservation.reservation.stayEndAt.gt(it) }
+        localDate?.let { reservation.stayEndAt.gt(it) }
 
     private fun loeStayEndAt(localDate: LocalDate?) =
-        localDate?.let { QReservation.reservation.stayEndAt.loe(it) }
+        localDate?.let { reservation.stayEndAt.loe(it) }
 
     private fun eqStatus(status: RoomStatus?) =
-        status?.let { QRoom.room.status.eq(status) }
+        status?.let { room.status.eq(status) }
 
     private fun neReservationId(reservationId: Long?) =
-        reservationId?.let { QReservation.reservation.id.ne(reservationId) }
+        reservationId?.let { reservation.id.ne(reservationId) }
 }
