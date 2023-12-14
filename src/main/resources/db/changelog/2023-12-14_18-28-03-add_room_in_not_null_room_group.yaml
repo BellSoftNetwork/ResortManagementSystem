@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1702546083434-33
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addNotNullConstraint:
+            columnDataType: BIGINT
+            columnName: room_group_id
+            tableName: room
+            validate: true
+

@@ -36,16 +36,15 @@ class Room(
     @Comment("객실 번호")
     var number: String,
 
-    // TODO: 기존 데이터 roomGroup 설정 후 not null, optional = false 로 변경 필요
     @Audited(
         withModifiedFlag = true,
         modifiedColumnName = "room_group_id_mod",
         targetAuditMode = RelationTargetAuditMode.NOT_AUDITED,
     )
-    @ManyToOne(fetch = FetchType.EAGER, optional = true)
-    @JoinColumn(name = "room_group_id", nullable = true)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "room_group_id", nullable = false)
     @Comment("객실 그룹")
-    var roomGroup: RoomGroup?,
+    var roomGroup: RoomGroup,
 
     @Column(name = "note", nullable = false, length = 200)
     @Comment("객실 메모")

@@ -26,8 +26,7 @@ export type Room = {
 const RoomFieldMap: FieldMap = {
   id: { label: "ID" } as const,
   number: { label: "객실 번호" } as const,
-  // TODO: Not Null 로 변경 후 ?. 제거
-  roomGroup: { label: "객실 그룹", format: (roomGroup: RoomGroup) => roomGroup?.name } as const,
+  roomGroup: { label: "객실 그룹", format: (roomGroup: RoomGroup) => roomGroup.name } as const,
   note: { label: "메모" } as const,
   status: { label: "상태", format: roomStatusValueToName } as const,
   ...BASE_TIME_FIELD_MAP,
