@@ -1,9 +1,9 @@
 <template>
   <q-page padding>
-    <ReservationListTable />
+    <ReservationListDynamicTable />
   </q-page>
 </template>
 
 <script setup lang="ts">
-import ReservationListTable from "components/reservation/ReservationListTable.vue";
+import ReservationListDynamicTable from "components/reservation/ReservationListDynamicTable.vue";
 </script>

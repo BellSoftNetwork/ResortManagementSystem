@@ -139,6 +139,18 @@
   resolved "https://registry.yarnpkg.com/@quasar/extras/-/extras-1.16.8.tgz#be93a0e2d465425f1d85e9fc9a09096bf2845aaf"
   integrity sha512-mNSwQ6wkIVoAemhYdLm9q/FVqLHmVONZgCYdLLeqpakKNsR0r/zHQnCngzdDaXI7veYEvE0uW1gJa1wdQsxXxA==
 
+"@quasar/quasar-app-extension-qcalendar@^4.0.0-beta.15":
+  version "4.0.0-beta.15"
+  resolved "https://registry.yarnpkg.com/@quasar/quasar-app-extension-qcalendar/-/quasar-app-extension-qcalendar-4.0.0-beta.15.tgz#1e85626a104c3a33083b7237f50ccf5f9048926a"
+  integrity sha512-i6hQkcP70LXLfVMPZMKQjSg3681gjZmASV3vq6ULzc0LhtBiPneLdVNNtH2itkWxAmaUj+1heQDI5Pa0F7VKLQ==
+  dependencies:
+    "@quasar/quasar-ui-qcalendar" "^4.0.0-beta.15"
+
+"@quasar/quasar-ui-qcalendar@^4.0.0-beta.15":
+  version "4.0.0-beta.16"
+  resolved "https://registry.yarnpkg.com/@quasar/quasar-ui-qcalendar/-/quasar-ui-qcalendar-4.0.0-beta.16.tgz#90dca0962f1fe1068361f387893df6c5da7522e2"
+  integrity sha512-KVbFJD1HQp91tiklv+6XsG7bq8FKK6mhhnoVzmjgoyhUAEb9csfbDPbpegy1/FzXy3o0wITe6mmRZ8nbaiMEZg==
+
 "@quasar/render-ssr-error@^1.0.1":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@quasar/render-ssr-error/-/render-ssr-error-1.0.2.tgz#92abb0d61cfdfbf51c2ec3cc2e4aadbf1c79f04f"
@@ -2484,6 +2496,20 @@ qs@6.11.0:
   dependencies:
     side-channel "^1.0.4"
 
+quasar-app-extension-qdraggabletree@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/quasar-app-extension-qdraggabletree/-/quasar-app-extension-qdraggabletree-2.0.5.tgz#cdc8a323c93437763d21030204ae36908abe0350"
+  integrity sha512-ybZEp6k3TFZSbRdo2uTf5jJpi3uL7xhM1aU3eOgOqPiJs0/WuYxsHwl/daRkRMhyTVOn1dCdB8A4sZgXuAOwMg==
+  dependencies:
+    quasar-ui-qdraggabletree latest
+
+quasar-ui-qdraggabletree@latest:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/quasar-ui-qdraggabletree/-/quasar-ui-qdraggabletree-1.0.8.tgz#0bfbf7e6923a7f4e1786dafbc83cd0a87c9a593e"
+  integrity sha512-lC2Kc+3ebe989lNe0ctvwJ7q6Z7pE1aQREh4Dt0PjUhTQm60bWXHFaFLB41+v9I8yRsjLQEPppnck8V/tO+wvw==
+  dependencies:
+    vue-draggable-next "^2.2.1"
+
 quasar@^2.6.0:
   version "2.13.1"
   resolved "https://registry.yarnpkg.com/quasar/-/quasar-2.13.1.tgz#50bdb03312a08780477e419ff618c4a6a1e56171"
@@ -2774,6 +2800,11 @@ slice-ansi@^4.0.0:
     astral-regex "^2.0.0"
     is-fullwidth-code-point "^3.0.0"
 
+sortablejs@1.14.0:
+  version "1.14.0"
+  resolved "https://registry.yarnpkg.com/sortablejs/-/sortablejs-1.14.0.tgz#6d2e17ccbdb25f464734df621d4f35d4ab35b3d8"
+  integrity sha512-pBXvQCs5/33fdN1/39pPL0NZF20LeRbLQ5jtnheIPN9JQAaufGjKdWduZn4U7wCtVuzKhmRkI0DFYHYRbB2H1w==
+
 source-map-js@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-1.0.2.tgz#adbc361d9c62df380125e7f161f71c826f1e490c"
@@ -3009,6 +3040,11 @@ vue-demi@>=0.14.5:
   resolved "https://registry.yarnpkg.com/vue-demi/-/vue-demi-0.14.6.tgz#dc706582851dc1cdc17a0054f4fec2eb6df74c92"
   integrity sha512-8QA7wrYSHKaYgUxDA5ZC24w+eHm3sYCbp0EzcDwKqN3p6HqtTCGR/GVsPyZW92unff4UlcSh++lmqDWN3ZIq4w==
 
+vue-draggable-next@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/vue-draggable-next/-/vue-draggable-next-2.2.1.tgz#adbe98c74610cca8f4eb63f92042681f96920451"
+  integrity sha512-EAMS1IRHF0kZO0o5PMOinsQsXIqsrKT1hKmbICxG3UEtn7zLFkLxlAtajcCcUTisNvQ6TtCB5COjD9a1raNADw==
+
 vue-eslint-parser@^9.3.1:
   version "9.3.2"
   resolved "https://registry.yarnpkg.com/vue-eslint-parser/-/vue-eslint-parser-9.3.2.tgz#6f9638e55703f1c77875a19026347548d93fd499"
@@ -3039,6 +3075,13 @@ vue@^3.0.0:
     "@vue/runtime-dom" "3.3.8"
     "@vue/server-renderer" "3.3.8"
     "@vue/shared" "3.3.8"
+
+vuedraggable@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/vuedraggable/-/vuedraggable-4.1.0.tgz#edece68adb8a4d9e06accff9dfc9040e66852270"
+  integrity sha512-FU5HCWBmsf20GpP3eudURW3WdWTKIbEIQxh9/8GE806hydR9qZqRRxRE3RjqX7PkuLuMQG/A7n3cfj9rCEchww==
+  dependencies:
+    sortablejs "1.14.0"
 
 wcwidth@^1.0.1:
   version "1.0.1"

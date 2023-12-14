@@ -18,7 +18,7 @@
       />
 
       <q-stepper-navigation>
-        <q-btn @click="$refs.stepper.next()" label="다음" color="primary" />
+        <q-btn @click="$refs.stepper.next() || checkRooms()" label="다음" color="primary" />
       </q-stepper-navigation>
     </q-step>
 
@@ -29,9 +29,9 @@
       :caption="selectedRooms.length !== 0 ? selectedRooms.map((room) => room.number).join(', ') : '추후 배정'"
       icon="create_new_folder"
     >
-      <RoomSelectTable
+      <RoomGroupSelector
         v-model:selected="selectedRooms"
-        :parent-reservation="entity"
+        :parent-reservation="props.reservation"
         :stay-start-at="formModel.stayDate.from"
         :stay-end-at="formModel.stayDate.to"
       />
@@ -177,29 +177,28 @@
 import { computed, onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
-import RoomSelectTable from "components/room/RoomSelectTable.vue";
 import { formatDate, formatDiffDays, formatPrice, formatStayCaption, formatStayTitle } from "src/util/format-util";
 import { Reservation, reservationDynamicRules, reservationStaticRules } from "src/schema/reservation";
-import { fetchReservation, patchReservation, ReservationPatchParams } from "src/api/v1/reservation";
+import { patchReservation, ReservationPatchParams } from "src/api/v1/reservation";
 import { fetchPaymentMethods } from "src/api/v1/payment-method";
 import { formatSortParam } from "src/util/query-string-util";
 import { Room } from "src/schema/room";
 import { getPatchedFormData } from "src/util/data-util";
+import { fetchRooms } from "src/api/v1/room";
+import RoomGroupSelector from "components/room-group/RoomGroupSelector.vue";
 
 const router = useRouter();
 const $q = useQuasar();
 
 const props = defineProps<{
-  id: number;
+  reservation: Reservation;
 }>();
-const id = props.id;
-const entity = ref<Reservation>();
 const formStatus = ref({
   step: 1,
   isProgress: false,
 });
 const formModel = ref({
-  id: props.id,
+  id: props.reservation.id,
   paymentMethod: {
     id: -1,
     name: "네이버",
@@ -217,7 +216,7 @@ const formModel = ref({
   note: "",
   status: "NORMAL",
 });
-const selectedRooms = ref<Room[]>([]);
+const selectedRooms = ref<Room[]>(props.reservation.rooms);
 const status = ref({
   isProgress: false,
 });
@@ -246,23 +245,6 @@ const paymentMethods = ref({
   ],
 });
 
-function fetchData() {
-  status.value.isProgress = true;
-
-  return fetchReservation(id)
-    .then((response) => {
-      entity.value = response.value;
-    })
-    .catch((error) => {
-      if (error.response.status === 404) router.push({ name: "ErrorNotFound" });
-
-      console.log(error);
-    })
-    .finally(() => {
-      status.value.isProgress = false;
-    });
-}
-
 function loadPaymentMethods() {
   paymentMethods.value.status.isLoading = true;
   paymentMethods.value.status.isLoaded = false;
@@ -282,11 +264,29 @@ function loadPaymentMethods() {
 }
 
 function update() {
+  const patchParams = patchedData();
+
+  if (Object.keys(patchParams).length === 0) {
+    $q.notify({
+      message: "수정된 항목이 없습니다.",
+      type: "info",
+      actions: [
+        {
+          icon: "close",
+          color: "white",
+          round: true,
+        },
+      ],
+    });
+
+    return;
+  }
+
   status.value.isProgress = true;
 
-  patchReservation(id, patchedData())
+  patchReservation(props.reservation.id, patchParams)
     .then(() => {
-      router.push({ name: "Reservation", params: { id: id } });
+      router.push({ name: "Reservation", params: { id: props.reservation.id } });
 
       resetForm();
     })
@@ -308,6 +308,37 @@ function update() {
     });
 }
 
+function checkRooms() {
+  fetchRooms({
+    stayStartAt: formModel.value.stayDate.from,
+    stayEndAt: formModel.value.stayDate.to,
+    status: "NORMAL",
+    excludeReservationId: props.reservation.id,
+  }).then((response) => {
+    const availableRoomIds = response.values.map((room) => room.id);
+    const unavailableRooms = props.reservation.rooms.filter((room) => !availableRoomIds.includes(room.id));
+
+    selectedRooms.value = props.reservation.rooms.filter((room) => availableRoomIds.includes(room.id));
+
+    if (unavailableRooms.length > 0) {
+      $q.notify({
+        message:
+          `기존에 배정된 ${unavailableRooms.length}개의 객실이 해당 기간에 이용할 수 없어 제외되었습니다.<br />` +
+          `이용 불가 객실: ${unavailableRooms.map((room) => room.number).join(", ")}`,
+        type: "warning",
+        html: true,
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+          },
+        ],
+      });
+    }
+  });
+}
+
 function getFormData(): ReservationPatchParams {
   const formData: Partial<typeof formModel.value> & ReservationPatchParams = {
     ...formModel.value,
@@ -323,7 +354,7 @@ function getFormData(): ReservationPatchParams {
 }
 
 function patchedData(): ReservationPatchParams {
-  return getPatchedFormData(entity.value, getFormData());
+  return getPatchedFormData(props.reservation, getFormData());
 }
 
 function changePrice() {
@@ -331,21 +362,17 @@ function changePrice() {
 }
 
 function resetForm() {
-  Object.assign(formModel.value, entity.value);
-  formModel.value.stayDate.from = formatDate(entity.value?.stayStartAt);
-  formModel.value.stayDate.to = formatDate(entity.value?.stayEndAt);
+  Object.assign(formModel.value, props.reservation);
+  formModel.value.stayDate.from = formatDate(props.reservation.stayStartAt);
+  formModel.value.stayDate.to = formatDate(props.reservation.stayEndAt);
 }
 
 onBeforeMount(() => {
-  fetchData().then(() => {
-    if (entity.value === undefined) return;
-
-    resetForm();
-    loadPaymentMethods().then(() => {
-      formModel.value.paymentMethod = paymentMethods.value.values.find(
-        (item) => item.id === entity.value.paymentMethod.id,
-      );
-    });
+  resetForm();
+  loadPaymentMethods().then(() => {
+    formModel.value.paymentMethod = paymentMethods.value.values.find(
+      (item) => item.id === props.reservation.paymentMethod.id,
+    );
   });
 });
 </script>

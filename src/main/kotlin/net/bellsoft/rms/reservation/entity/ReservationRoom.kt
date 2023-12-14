@@ -1,6 +1,7 @@
 package net.bellsoft.rms.reservation.entity
 
 import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
@@ -8,6 +9,7 @@ import jakarta.persistence.UniqueConstraint
 import net.bellsoft.rms.common.entity.BaseMustAuditEntity
 import net.bellsoft.rms.common.entity.BaseTimeEntity
 import net.bellsoft.rms.room.entity.Room
+import org.hibernate.annotations.Comment
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Where
 import org.hibernate.envers.AuditTable
@@ -29,13 +31,16 @@ import java.io.Serializable
 )
 @SQLDelete(sql = "UPDATE reservation_room SET deleted_at = NOW() WHERE id = ?")
 @Where(clause = BaseTimeEntity.SOFT_DELETE_CONDITION)
+@Comment("예약 객실")
 class ReservationRoom(
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "reservation_id", nullable = false)
+    @Comment("예약 정보")
     var reservation: Reservation,
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "room_id", nullable = false)
+    @Comment("배정 객실")
     var room: Room,
 ) : Serializable, BaseMustAuditEntity() {
     companion object {

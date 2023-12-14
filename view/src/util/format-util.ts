@@ -40,5 +40,6 @@ export function formatStayTitle(dateDiff: number) {
 export function formatStayCaption(startDate: string | null, endDate: string | null) {
   if (startDate === null || endDate === null) return null;
 
-  return formatDiffDays(startDate, endDate) > 0 ? `${startDate} ~ ${endDate}` : null;
+  const diffDays = formatDiffDays(startDate, endDate);
+  return formatDiffDays(startDate, endDate) > 0 ? `${startDate} ~ ${endDate} (${formatStayTitle(diffDays)})` : null;
 }

@@ -1,9 +1,9 @@
 <template>
   <q-page padding>
-    <AccountListTable />
+    <AccountListDynamicTable />
   </q-page>
 </template>
 
 <script setup lang="ts">
-import AccountListTable from "components/account/AccountListTable.vue";
+import AccountListDynamicTable from "components/account/AccountListDynamicTable.vue";
 </script>

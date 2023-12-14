@@ -1,9 +1,9 @@
 <template>
   <q-page padding>
-    <RoomListTable />
+    <RoomListDynamicTable />
   </q-page>
 </template>
 
 <script setup lang="ts">
-import RoomListTable from "components/room/RoomListTable.vue";
+import RoomListDynamicTable from "components/room/RoomListDynamicTable.vue";
 </script>

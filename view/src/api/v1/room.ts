@@ -2,6 +2,7 @@ import { api } from "boot/axios";
 import { ListResponse, PageRequestParams, SingleResponse, SortRequestParams } from "src/schema/response";
 import { Room, RoomStatus } from "src/schema/room";
 import { Revision } from "src/schema/revision";
+import { EntityReference } from "src/schema/base";
 
 type FetchRoomsRequestParams = Partial<
   {
@@ -26,10 +27,8 @@ export async function fetchRoom(id: number) {
 }
 
 type RoomParams = {
+  roomGroup: EntityReference;
   number: string;
-  peekPrice: number;
-  offPeekPrice: number;
-  description: string;
   note: string;
   status: RoomStatus;
 };

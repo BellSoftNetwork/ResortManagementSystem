@@ -1,9 +1,9 @@
 <template>
   <q-page padding>
-    <PaymentMethodListTable />
+    <PaymentMethodListDynamicTable />
   </q-page>
 </template>
 
 <script setup lang="ts">
-import PaymentMethodListTable from "components/payment-method/PaymentMethodListTable.vue";
+import PaymentMethodListDynamicTable from "components/payment-method/PaymentMethodListDynamicTable.vue";
 </script>

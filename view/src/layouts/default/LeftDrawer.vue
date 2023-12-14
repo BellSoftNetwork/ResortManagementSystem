@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useAuthStore } from "stores/auth";
-import { fasBook, fasCommentDollar, fasPersonShelter, fasTableColumns } from "@quasar/extras/fontawesome-v6";
+import { fasBook, fasCommentDollar, fasHotel, fasPersonShelter, fasTableColumns } from "@quasar/extras/fontawesome-v6";
 
 defineExpose({
   toggleLeftDrawer,
@@ -43,6 +43,7 @@ const normalLinks = [{ icon: fasTableColumns, text: "대시보드", to: "Home" }
 const adminLinks = [
   { icon: fasBook, text: "예약", to: "Reservations" },
   { icon: fasPersonShelter, text: "객실", to: "Rooms" },
+  { icon: fasHotel, text: "객실 그룹", to: "RoomGroups" },
   { icon: fasCommentDollar, text: "결제 수단", to: "PaymentMethods" },
   { icon: "person", text: "계정 관리", to: "AdminAccounts" },
 ];

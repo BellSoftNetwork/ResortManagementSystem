@@ -53,6 +53,7 @@ dependencies {
     testRuntimeOnly(libs.h2database)
     runtimeOnly(libs.mysqlConnector)
     implementation(variantOf(libs.queryDslJpa) { classifier("jakarta") })
+    implementation(libs.queryDslSql)
     kapt(variantOf(libs.queryDslApt) { classifier("jakarta") })
     kaptTest(variantOf(libs.queryDslApt) { classifier("jakarta") })
 
@@ -232,6 +233,9 @@ private object JacocoViolationRuleSet {
     object Default {
         private val QUERY_DSL_DOMAINS = ('A'..'Z').map { "*.Q$it*" }
 
+        val GENERATED_FILES = listOf(
+            "*.mapper.*MapperImpl",
+        ) + QUERY_DSL_DOMAINS
         val EXCLUDE_FILES = listOf(
             "*ApplicationKt",
             "*.config.*Config",
@@ -240,7 +244,7 @@ private object JacocoViolationRuleSet {
             "*.dto.*",
             "*Dto",
             "*DTO",
-        ) + QUERY_DSL_DOMAINS
+        )
     }
 
     object Business {
@@ -265,6 +269,7 @@ tasks.jacocoTestCoverageVerification {
         rule {
             enabled = true
             element = "CLASS"
+            excludes = JacocoViolationRuleSet.Default.GENERATED_FILES
 
             // NOTE: 빈 줄을 제외한 코드의 라인수를 최대 200라인으로 제한
             limit {
@@ -278,7 +283,7 @@ tasks.jacocoTestCoverageVerification {
             enabled = true
             element = "CLASS"
             includes = JacocoViolationRuleSet.Business.INCLUDE_FILES
-            excludes = JacocoViolationRuleSet.Default.EXCLUDE_FILES
+            excludes = JacocoViolationRuleSet.Default.GENERATED_FILES + JacocoViolationRuleSet.Default.EXCLUDE_FILES
 
             // NOTE: 브랜치 커버리지 최소 90% 만족
             limit {

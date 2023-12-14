@@ -1,0 +1,100 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1702321434855-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_room_group
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(20)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: description
+                  type: VARCHAR(200)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_by
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updated_by
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: deleted_at
+                  type: DATETIME
+            tableName: room_group
+        - addUniqueConstraint:
+            columnNames: name, deleted_at
+            constraintName: uc_room_group_name
+            tableName: room_group
+        - addForeignKeyConstraint:
+            baseColumnNames: created_by
+            baseTableName: room_group
+            constraintName: FK_ROOM_GROUP_ON_CREATED_BY
+            referencedColumnNames: id
+            referencedTableName: user
+        - addForeignKeyConstraint:
+            baseColumnNames: updated_by
+            baseTableName: room_group
+            constraintName: FK_ROOM_GROUP_ON_UPDATED_BY
+            referencedColumnNames: id
+            referencedTableName: user
+  - changeSet:
+      id: 1702321434855-2
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: room_group_id
+                  type: BIGINT
+            tableName: room
+        - addForeignKeyConstraint:
+            baseColumnNames: room_group_id
+            baseTableName: room
+            constraintName: FK_ROOM_ON_ROOM_GROUP
+            referencedColumnNames: id
+            referencedTableName: room_group
+  - changeSet:
+      id: 1702321434855-3
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: room_group_id
+                  type: BIGINT
+              - column:
+                  name: room_group_id_mod
+                  type: BOOLEAN
+            tableName: room_history
+

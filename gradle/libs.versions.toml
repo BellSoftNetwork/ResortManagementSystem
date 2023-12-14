@@ -57,6 +57,7 @@ mysqlConnector = { module = "com.mysql:mysql-connector-j", version.ref = "mysqlC
 
 # NOTE: Database (classifier: Jakarta)
 queryDslJpa = { module = "com.querydsl:querydsl-jpa", version.ref = "queryDsl" }
+queryDslSql = { module = "com.querydsl:querydsl-sql", version.ref = "queryDsl" }
 queryDslApt = { module = "com.querydsl:querydsl-apt", version.ref = "queryDsl" }
 
 # NOTE: Broker

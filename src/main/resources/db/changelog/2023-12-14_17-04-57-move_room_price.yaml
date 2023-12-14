@@ -1,0 +1,60 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1702541097566-1
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: off_peek_price
+                  remarks: 비성수기 가격
+                  type: INT
+              - column:
+                  name: peek_price
+                  remarks: 성수기 가격
+                  type: INT
+            tableName: room_group
+        - addNotNullConstraint:
+            columnDataType: INT
+            columnName: off_peek_price
+            defaultNullValue: '0'
+            tableName: room_group
+        - addNotNullConstraint:
+            columnDataType: INT
+            columnName: peek_price
+            defaultNullValue: '0'
+            tableName: room_group
+  - changeSet:
+      id: 1702541097566-2
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropColumn:
+            columnName: description
+            tableName: room
+        - dropColumn:
+            columnName: off_peek_price
+            tableName: room
+        - dropColumn:
+            columnName: peek_price
+            tableName: room
+        - dropColumn:
+            columnName: description
+            tableName: room_history
+        - dropColumn:
+            columnName: description_mod
+            tableName: room_history
+        - dropColumn:
+            columnName: off_peek_price
+            tableName: room_history
+        - dropColumn:
+            columnName: off_peek_price_mod
+            tableName: room_history
+        - dropColumn:
+            columnName: peek_price
+            tableName: room_history
+        - dropColumn:
+            columnName: peek_price_mod
+            tableName: room_history
+
