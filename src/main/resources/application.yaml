@@ -54,7 +54,7 @@ spring:
   session:
     redis:
       namespace: ${REDIS_NAMESPACE:production.v1}
-    timeout: 24h
+    timeout: 7d
   data:
     redis:
       host: ${REDIS_HOST:127.0.0.1}
