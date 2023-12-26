@@ -31,6 +31,8 @@
       </div>
     </q-toolbar>
 
+    <TopTab v-if="$q.screen.lt.md" />
+
     <LogoutDialog ref="logoutDialogRef">
       <template></template>
     </LogoutDialog>
@@ -41,6 +43,7 @@
 import { ref } from "vue";
 import { useAuthStore } from "stores/auth";
 import LogoutDialog from "components/auth/LogoutDialog.vue";
+import TopTab from "layouts/default/TopTab.vue";
 
 const emit = defineEmits(["toggleLeftDrawer"]);
 const authStore = useAuthStore();
