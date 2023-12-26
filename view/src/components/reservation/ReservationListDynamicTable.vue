@@ -138,8 +138,16 @@ const pagination = ref({
 });
 const columns = [
   {
-    ...getColumnDef("paymentMethod"),
+    ...getColumnDef("stayStartAt"),
     align: "left",
+    headerStyle: "width: 10%",
+    required: true,
+    sortable: true,
+  },
+  {
+    ...getColumnDef("stayEndAt"),
+    align: "left",
+    headerStyle: "width: 10%",
     required: true,
     sortable: true,
   },
@@ -172,20 +180,6 @@ const columns = [
     sortable: true,
   },
   {
-    ...getColumnDef("stayStartAt"),
-    align: "left",
-    headerStyle: "width: 10%",
-    required: true,
-    sortable: true,
-  },
-  {
-    ...getColumnDef("stayEndAt"),
-    align: "left",
-    headerStyle: "width: 10%",
-    required: true,
-    sortable: true,
-  },
-  {
     ...getColumnDef("checkInAt"),
     align: "left",
     headerStyle: "width: 15%",
@@ -210,6 +204,12 @@ const columns = [
     ...getColumnDef("paymentAmount"),
     align: "left",
     headerStyle: "width: 10%",
+    required: true,
+    sortable: true,
+  },
+  {
+    ...getColumnDef("paymentMethod"),
+    align: "left",
     required: true,
     sortable: true,
   },
