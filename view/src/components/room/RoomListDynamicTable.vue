@@ -6,7 +6,6 @@
     :loading="status.isLoading"
     :columns="columns"
     :rows="rooms"
-    :filter="filter"
     style="height: 90vh"
     row-key="id"
     title="객실"
@@ -51,27 +50,36 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useQuasar } from "quasar";
 import { getRoomFieldDetail, Room } from "src/schema/room";
 import { convertTableColumnDef } from "src/util/table-util";
 import { deleteRoom, fetchRooms } from "src/api/v1/room";
 import { formatSortParam } from "src/util/query-string-util";
+import { useRoute, useRouter } from "vue-router";
 
 const $q = useQuasar();
 const status = ref({
   isLoading: false,
-  isLoaded: false,
-  isPatching: false,
 });
 const tableRef = ref();
-const filter = ref("");
+const route = useRoute();
+const router = useRouter();
+
+const defaultConfig = {
+  pagination: {
+    sortBy: "number",
+    descending: false,
+    page: 1,
+    rowsPerPage: 15,
+  },
+};
 const pagination = ref({
-  sortBy: "number",
-  descending: false,
-  page: 1,
-  rowsPerPage: 15,
-  rowsNumber: 10,
+  sortBy: defaultConfig.pagination.sortBy,
+  descending: defaultConfig.pagination.descending,
+  page: defaultConfig.pagination.page,
+  rowsPerPage: defaultConfig.pagination.rowsPerPage,
+  rowsNumber: 0,
 });
 const columns = [
   {
@@ -116,6 +124,35 @@ const columns = [
 ];
 const rooms = ref<Room[]>();
 
+loadQueryString();
+
+watch(route, () => {
+  loadQueryString();
+});
+
+function loadQueryString() {
+  pagination.value.sortBy = route.query.sortBy?.toString() ?? defaultConfig.pagination.sortBy;
+  pagination.value.descending = Boolean(route.query.descending ?? defaultConfig.pagination.descending);
+  pagination.value.page = Number(route.query.page ?? defaultConfig.pagination.page);
+  pagination.value.rowsPerPage = Number(route.query.rowsPerPage ?? defaultConfig.pagination.rowsPerPage);
+}
+
+function setPaginationQuery() {
+  router.push({
+    query: {
+      ...route.query,
+      page: pagination.value.page !== defaultConfig.pagination.page ? pagination.value.page : undefined,
+      rowsPerPage:
+        pagination.value.rowsPerPage !== defaultConfig.pagination.rowsPerPage
+          ? pagination.value.rowsPerPage
+          : undefined,
+      sortBy: pagination.value.sortBy !== defaultConfig.pagination.sortBy ? pagination.value.sortBy : undefined,
+      descending:
+        pagination.value.descending !== defaultConfig.pagination.descending ? pagination.value.descending : undefined,
+    },
+  });
+}
+
 function getColumnDef(field: string) {
   return convertTableColumnDef(getRoomFieldDetail(field));
 }
@@ -124,7 +161,6 @@ function onRequest(props) {
   const { page, rowsPerPage, sortBy, descending } = props.pagination;
 
   status.value.isLoading = true;
-  status.value.isLoaded = false;
 
   fetchRooms({
     page: page - 1,
@@ -142,7 +178,23 @@ function onRequest(props) {
       pagination.value.sortBy = sortBy;
       pagination.value.descending = descending;
 
-      status.value.isLoaded = true;
+      setPaginationQuery();
+    })
+    .catch((error) => {
+      rooms.value = [];
+
+      console.error(error);
+      $q.notify({
+        message: error.response.data.message,
+        type: "negative",
+        actions: [
+          {
+            icon: "close",
+            color: "white",
+            round: true,
+          },
+        ],
+      });
     })
     .finally(() => {
       status.value.isLoading = false;
