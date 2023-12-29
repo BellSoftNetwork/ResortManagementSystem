@@ -8,7 +8,7 @@
     <div v-else class="q-gutter-sm">
       <div class="row">
         <div class="col">
-          <ReservationDetailCard :reservation="reservation" />
+          <ReservationEditor :reservation="reservation" mode="view" />
         </div>
       </div>
 
@@ -22,12 +22,12 @@
 </template>
 
 <script setup lang="ts">
-import ReservationDetailCard from "components/reservation/ReservationDetailCard.vue";
 import ReservationHistoryDynamicTable from "components/reservation/ReservationHistoryDynamicTable.vue";
 import { useRoute, useRouter } from "vue-router";
 import { onBeforeMount, ref } from "vue";
 import { Reservation } from "src/schema/reservation";
 import { fetchReservation } from "src/api/v1/reservation";
+import ReservationEditor from "components/reservation/ReservationEditor.vue";
 
 const route = useRoute();
 const router = useRouter();

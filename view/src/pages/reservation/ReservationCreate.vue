@@ -1,9 +1,9 @@
 <template>
   <q-page padding>
-    <ReservationCreateCard />
+    <ReservationEditor />
   </q-page>
 </template>
 
 <script setup lang="ts">
-import ReservationCreateCard from "components/reservation/ReservationCreateCard.vue";
+import ReservationEditor from "components/reservation/ReservationEditor.vue";
 </script>

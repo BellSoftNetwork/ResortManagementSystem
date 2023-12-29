@@ -6,17 +6,17 @@
       </q-inner-loading>
     </div>
     <div v-else>
-      <ReservationEditCard :reservation="reservation" />
+      <ReservationEditor :reservation="reservation" mode="update" />
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import ReservationEditCard from "components/reservation/ReservationEditCard.vue";
 import { useRoute, useRouter } from "vue-router";
 import { onBeforeMount, ref } from "vue";
 import { Reservation } from "src/schema/reservation";
 import { fetchReservation } from "src/api/v1/reservation";
+import ReservationEditor from "components/reservation/ReservationEditor.vue";
 
 const route = useRoute();
 const router = useRouter();

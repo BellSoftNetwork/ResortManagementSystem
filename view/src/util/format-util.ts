@@ -19,6 +19,10 @@ export function formatDate(value: string | undefined = undefined) {
   return dayjs(value).format("YYYY-MM-DD");
 }
 
+export function formatSimpleDate(value: string | undefined = undefined) {
+  return dayjs(value).format("YY/MM/DD");
+}
+
 export function formatTime(value: string | undefined = undefined) {
   return dayjs(value).format("HH:mm:ss");
 }

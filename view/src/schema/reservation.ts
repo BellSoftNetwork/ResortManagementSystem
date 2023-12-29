@@ -1,7 +1,7 @@
 import { Room } from "src/schema/room";
 import { PaymentMethod } from "src/schema/payment-method";
 import { DynamicRuleMap, EnumMap, FieldDetail, FieldMap, StaticRuleMap } from "src/types/map";
-import { formatDate, formatDateTime, formatPrice } from "src/util/format-util";
+import { formatDateTime, formatPrice, formatSimpleDate } from "src/util/format-util";
 import { BASE_AUDIT_FIELD_MAP, BASE_TIME_FIELD_MAP, BaseAudit, BaseTime } from "src/schema/base";
 
 const RESERVATION_STATUS_MAP: EnumMap = {
@@ -53,8 +53,8 @@ const ReservationFieldMap: FieldMap = {
     format: (value: string) => value || "-",
   } as const,
   peopleCount: { label: "예약인원" } as const,
-  stayStartAt: { label: "입실일", format: formatDate } as const,
-  stayEndAt: { label: "퇴실일", format: formatDate } as const,
+  stayStartAt: { label: "입실일", format: formatSimpleDate } as const,
+  stayEndAt: { label: "퇴실일", format: formatSimpleDate } as const,
   checkInAt: {
     label: "체크인 시각",
     format: (value: string | null) => (value ? formatDateTime(value) : ""),
