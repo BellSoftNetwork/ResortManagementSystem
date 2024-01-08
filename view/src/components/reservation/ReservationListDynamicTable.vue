@@ -16,49 +16,101 @@
   >
     <template v-slot:top-right>
       <div class="row q-gutter-sm">
-        <q-btn color="primary" label="상세 검색" icon="search">
-          <q-menu anchor="bottom end" self="top end" @hide="setFilterQuery">
-            <div class="row no-wrap q-pa-md">
-              <q-input
-                v-model="filter.peopleInfo"
-                debounce="300"
-                placeholder="홍길동"
-                label="예약자 정보"
-                class="fit"
-              />
-            </div>
+        <q-btn @click="filterDialog = true" color="primary" label="상세 검색" icon="search" />
 
-            <div class="row no-wrap q-pa-md">
-              <q-input v-model="filter.stayStartAt" mask="####-##-##" :readonly="true" outlined>
-                <template v-slot:append>
-                  <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-date v-model="filter.stayStartAt" mask="YYYY-MM-DD">
-                        <div class="row items-center justify-end">
-                          <q-btn v-close-popup label="Close" color="primary" flat />
-                        </div>
-                      </q-date>
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
-              <span class="self-center q-mx-sm">~</span>
-              <q-input v-model="filter.stayEndAt" mask="####-##-##" :readonly="true" outlined>
-                <template v-slot:append>
-                  <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-date v-model="filter.stayEndAt" mask="YYYY-MM-DD">
-                        <div class="row items-center justify-end">
-                          <q-btn v-close-popup label="Close" color="primary" flat />
-                        </div>
-                      </q-date>
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
-            </div>
-          </q-menu>
-        </q-btn>
+        <q-dialog
+          v-model="filterDialog"
+          @before-show="resetFilterBuffer"
+          :maximized="$q.screen.lt.md"
+          transition-show="slide-up"
+          transition-hide="slide-down"
+          persistent
+        >
+          <q-card flat>
+            <q-card-section>
+              <q-input v-model="filterBuffer.peopleInfo" placeholder="홍길동" label="예약자 정보" class="fit" />
+            </q-card-section>
+
+            <q-card-section>
+              <div class="row q-col-gutter-sm">
+                <div class="col-12 col-sm-3">
+                  <q-select
+                    v-model="filterBuffer.dueOption"
+                    @update:model-value="updateDueDate"
+                    :options="dueOptions"
+                    label="검색 기간"
+                    emit-value
+                    map-options
+                    outlined
+                  />
+                </div>
+
+                <div class="col-12 col-sm-9">
+                  <div class="row no-wrap">
+                    <q-input
+                      v-model="filterBuffer.stayStartAt"
+                      mask="####-##-##"
+                      :readonly="true"
+                      :bg-color="filterBuffer.dueOption !== 'CUSTOM' ? 'grey-4' : ''"
+                      class="due-date-text"
+                      outlined
+                    >
+                      <template v-slot:append>
+                        <q-icon @click="filterBuffer.dueOption = 'CUSTOM'" name="event" class="cursor-pointer">
+                          <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                            <q-date v-model="filterBuffer.stayStartAt" mask="YYYY-MM-DD">
+                              <div class="row items-center justify-end">
+                                <q-btn v-close-popup label="Close" color="primary" flat />
+                              </div>
+                            </q-date>
+                          </q-popup-proxy>
+                        </q-icon>
+                      </template>
+                    </q-input>
+                    <span class="self-center q-mx-sm">~</span>
+                    <q-input
+                      v-model="filterBuffer.stayEndAt"
+                      mask="####-##-##"
+                      :readonly="true"
+                      :bg-color="filterBuffer.dueOption !== 'CUSTOM' ? 'grey-4' : ''"
+                      class="due-date-text"
+                      outlined
+                    >
+                      <template v-slot:append>
+                        <q-icon @click="filterBuffer.dueOption = 'CUSTOM'" name="event" class="cursor-pointer">
+                          <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                            <q-date v-model="filterBuffer.stayEndAt" mask="YYYY-MM-DD">
+                              <div class="row items-center justify-end">
+                                <q-btn v-close-popup label="Close" color="primary" flat />
+                              </div>
+                            </q-date>
+                          </q-popup-proxy>
+                        </q-icon>
+                      </template>
+                    </q-input>
+                  </div>
+                </div>
+              </div>
+            </q-card-section>
+
+            <q-card-section>
+              <q-select
+                v-model="filterBuffer.status"
+                :options="statusOptions"
+                class="full-width"
+                label="예약 상태"
+                emit-value
+                map-options
+                outlined
+              />
+            </q-card-section>
+
+            <q-card-actions align="right">
+              <q-btn @click="setFilterQuery" color="primary">적용</q-btn>
+              <q-btn @click="filterDialog = false">취소</q-btn>
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
 
         <q-btn :to="{ name: 'CreateReservation' }" icon="add" color="grey" dense round flat />
       </div>
@@ -135,14 +187,21 @@ const defaultConfig = {
   },
   filter: {
     peopleInfo: "",
+    dueOption: "1M",
     stayStartAt: formatDate(),
-    stayEndAt: dayjs().add(3, "M").format("YYYY-MM-DD"),
+    stayEndAt: dayjs().add(1, "M").format("YYYY-MM-DD"),
+    status: "NORMAL",
   },
 };
 const filter = ref({
   peopleInfo: defaultConfig.filter.peopleInfo,
+  dueOption: defaultConfig.filter.dueOption,
   stayStartAt: defaultConfig.filter.stayStartAt,
   stayEndAt: defaultConfig.filter.stayEndAt,
+  status: defaultConfig.filter.status,
+});
+const filterBuffer = ref({
+  ...filter.value,
 });
 const pagination = ref({
   sortBy: defaultConfig.pagination.sortBy,
@@ -151,6 +210,21 @@ const pagination = ref({
   rowsPerPage: defaultConfig.pagination.rowsPerPage,
   rowsNumber: 0,
 });
+const statusOptions = [
+  { label: "전체", value: "ALL" },
+  { label: "예약 대기", value: "PENDING" },
+  { label: "예약 확정", value: "NORMAL" },
+  { label: "예약 취소", value: "CANCEL" },
+  { label: "환불 완료", value: "REFUND" },
+];
+const dueOptions = [
+  { label: "전체", value: "ALL" },
+  { label: "1개월", value: "1M" },
+  { label: "2개월", value: "2M" },
+  { label: "3개월", value: "3M" },
+  { label: "직접 선택", value: "CUSTOM" },
+];
+const filterDialog = ref(false);
 const columns = [
   {
     ...getColumnDef("stayStartAt"),
@@ -261,6 +335,7 @@ function loadQueryString() {
   filter.value.peopleInfo = route.query.peopleInfo?.toString() ?? defaultConfig.filter.peopleInfo;
   filter.value.stayStartAt = route.query.stayStartAt?.toString() ?? defaultConfig.filter.stayStartAt;
   filter.value.stayEndAt = route.query.stayEndAt?.toString() ?? defaultConfig.filter.stayEndAt;
+  filter.value.status = route.query.status?.toString().toUpperCase() ?? defaultConfig.filter.status;
 
   pagination.value.sortBy = route.query.sortBy?.toString() ?? defaultConfig.pagination.sortBy;
   pagination.value.descending = Boolean(route.query.descending ?? defaultConfig.pagination.descending);
@@ -268,15 +343,45 @@ function loadQueryString() {
   pagination.value.rowsPerPage = Number(route.query.rowsPerPage ?? defaultConfig.pagination.rowsPerPage);
 }
 
+function resetFilterBuffer() {
+  Object.assign(filterBuffer.value, filter.value);
+}
+
+function updateDueDate(dueOption: string) {
+  if (dueOption === "ALL") {
+    filterBuffer.value.stayStartAt = "";
+    filterBuffer.value.stayEndAt = "";
+
+    return;
+  }
+
+  if (dueOption !== "CUSTOM") {
+    filterBuffer.value.stayStartAt = defaultConfig.filter.stayStartAt;
+  }
+
+  if (dueOption === "1M") {
+    filterBuffer.value.stayEndAt = dayjs().add(1, "M").format("YYYY-MM-DD");
+  } else if (dueOption === "2M") {
+    filterBuffer.value.stayEndAt = dayjs().add(2, "M").format("YYYY-MM-DD");
+  } else if (dueOption === "3M") {
+    filterBuffer.value.stayEndAt = dayjs().add(3, "M").format("YYYY-MM-DD");
+  }
+}
+
 function setFilterQuery() {
+  Object.assign(filter.value, filterBuffer.value);
+
   router.push({
     query: {
       ...route.query,
       peopleInfo: filter.value.peopleInfo !== defaultConfig.filter.peopleInfo ? filter.value.peopleInfo : undefined,
       stayStartAt: filter.value.stayStartAt !== defaultConfig.filter.stayStartAt ? filter.value.stayStartAt : undefined,
       stayEndAt: filter.value.stayEndAt !== defaultConfig.filter.stayEndAt ? filter.value.stayEndAt : undefined,
+      status: filter.value.status !== defaultConfig.filter.status ? filter.value.status.toLowerCase() : undefined,
     },
   });
+
+  filterDialog.value = false;
 }
 
 function setPaginationQuery() {
@@ -303,14 +408,16 @@ function onRequest(props) {
   const { page, rowsPerPage, sortBy, descending } = props.pagination;
 
   status.value.isLoading = true;
+  const statusParam = (filter.value.status || undefined) === "ALL" ? undefined : filter.value.status;
 
   fetchReservations({
     page: page - 1,
     size: rowsPerPage,
     sort: formatSortParam({ field: sortBy, isDescending: descending }),
-    stayStartAt: filter.value.stayStartAt,
-    stayEndAt: filter.value.stayEndAt,
+    stayStartAt: filter.value.stayStartAt || undefined,
+    stayEndAt: filter.value.stayEndAt || undefined,
     searchText: filter.value.peopleInfo || undefined,
+    status: statusParam,
   })
     .then((response) => {
       reservations.value = response.values;
