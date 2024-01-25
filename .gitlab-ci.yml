@@ -3,11 +3,8 @@
 #
 # [필수 구성 변수]
 # - KUBE_CONTEXT: {KAS 가 연결된 깃랩 repo 주소}:{에이전트명} (ex. BSN/bsn-primary-agent:primary-agent})
-# - KUBE_NAMESPACE: kubernetes 배포에 사용할 기본 네임스페이스
-# - KUBE_STAGING_NAMESPACE: kubernetes 스테이징 배포에 사용할 네임스페이스
-# - KUBE_PRODUCTION_NAMESPACE: kubernetes 프로덕션 배포에 사용할 네임스페이스
-# - KUBE_INGRESS_BASE_DOMAIN: kubernetes 내 ingress 에 등록할 기본 도메인
-#    (ex. `bell-safe-house.bellsoft.net` 으로 설정 후 develop 브랜치 배포시 `https://develop.bell-safe-house.bellsoft.net` 으로 등록됨)
+# - KUBE_NAMESPACE: kubernetes 배포에 사용할 기본 네임스페이스 (각 환경 별 설정 필요)
+# - KUBE_INGRESS_BASE_DOMAIN: kubernetes 내 ingress 에 등록할 도메인 (각 환경 별 설정 필요)
 # - PROJECT_NAME: kubernetes 내 ingress rule 에 등록할 프로젝트 이름 (백엔드와 프론트엔드 동일하게 설정 필요, 소문자 및 - 만 허용)
 #    (ex. 백엔드와 프론트엔드에 동일하게 `bell-safe-house` 로 설정)
 #
