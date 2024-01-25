@@ -19,7 +19,6 @@
     - *setup_kubectl_context_script
 
 .kubernetes_deploy_variables: &kubernetes_deploy_variables
-  CERT_MANAGER_CLUSTER_ISSUER: "letsencrypt-staging"
   KUBERNETES_DEPLOY_YAML_PATH: ${CI_PROJECT_DIR}/.kubernetes
   APPLICATION_ENVIRONMENT: ${CI_ENVIRONMENT_SLUG}
   APPLICATION_NAME: "${PROJECT_NAME}-${APPLICATION_ENVIRONMENT}"

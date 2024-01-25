@@ -10,8 +10,6 @@ include:
   needs:
     - build_boot_image
   interruptible: false
-  variables:
-    CERT_MANAGER_CLUSTER_ISSUER: "letsencrypt-prod"
   rules:
     - if: "$TEST_DISABLED || $BUILD_DISABLED"
       when: never
@@ -21,7 +19,8 @@ deploy_development:
     - .deploy
   stage: review
   variables:
-    APPLICATION_URL: development.${KUBE_INGRESS_BASE_DOMAIN}
+    APPLICATION_URL: ${KUBE_INGRESS_BASE_DOMAIN}
+    APPLICATION_TLS_SECRET_NAME: ${KUBE_INGRESS_TLS_SECRET_NAME}
     APPLICATION_NAMESPACE: ${KUBE_NAMESPACE}
     DEPLOY_ENVIRONMENT: "development"
   environment:
@@ -39,8 +38,9 @@ deploy_staging:
     - .deploy
   stage: staging
   variables:
-    APPLICATION_URL: staging.${KUBE_INGRESS_BASE_DOMAIN}
-    APPLICATION_NAMESPACE: ${KUBE_STAGING_NAMESPACE}
+    APPLICATION_URL: ${KUBE_INGRESS_BASE_DOMAIN}
+    APPLICATION_TLS_SECRET_NAME: ${KUBE_INGRESS_TLS_SECRET_NAME}
+    APPLICATION_NAMESPACE: ${KUBE_NAMESPACE}
     DEPLOY_ENVIRONMENT: "staging"
   environment:
     name: staging
@@ -58,7 +58,8 @@ deploy_production:
     - deploy_staging
   variables:
     APPLICATION_URL: ${KUBE_INGRESS_BASE_DOMAIN}
-    APPLICATION_NAMESPACE: ${KUBE_PRODUCTION_NAMESPACE}
+    APPLICATION_TLS_SECRET_NAME: ${KUBE_INGRESS_TLS_SECRET_NAME}
+    APPLICATION_NAMESPACE: ${KUBE_NAMESPACE}
     DEPLOY_ENVIRONMENT: "production"
   environment:
     name: production

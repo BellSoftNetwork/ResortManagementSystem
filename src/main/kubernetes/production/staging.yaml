@@ -3,9 +3,6 @@ apiVersion: networking.k8s.io/v1
 metadata:
   name: ${APPLICATION_NAME}
   namespace: ${APPLICATION_NAMESPACE}
-  annotations:
-    cert-manager.io/cluster-issuer: "${CERT_MANAGER_CLUSTER_ISSUER}"
-    acme.cert-manager.io/http01-edit-in-place: "true"
   labels:
     app: ${PROJECT_NAME}
     env: ${APPLICATION_ENVIRONMENT}
@@ -13,7 +10,7 @@ spec:
   tls:
     - hosts:
         - ${APPLICATION_URL}
-      secretName: ${APPLICATION_URL}-tls
+      secretName: ${APPLICATION_TLS_SECRET_NAME}
   rules:
     - host: ${APPLICATION_URL}
       http:
