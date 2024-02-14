@@ -343,7 +343,7 @@ function create() {
 }
 
 function update() {
-  const patchParams = getPatchedFormData(defaultReservationValue, formModel.value);
+  const patchParams = getPatchedFormData(defaultReservationValue, formData());
 
   let updatedKeyCount = Object.keys(patchParams).length;
   if (updatedKeyCount === 0) {
@@ -465,6 +465,7 @@ function changePrice() {
 
 function resetForm() {
   Object.assign(formModel.value, defaultReservationValue);
+  Object.assign(selectedRooms.value, defaultReservationValue.rooms);
 }
 
 onBeforeMount(() => {
