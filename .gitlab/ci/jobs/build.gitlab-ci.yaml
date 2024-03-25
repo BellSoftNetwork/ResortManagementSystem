@@ -34,7 +34,6 @@ build_boot_image:
     - .gradle_cache
     - .in_docker
   needs:
-    - test
     - build_vue_app
   variables:
     PROPERTY_REGISTRY: "-PproxyRegistryUrl=${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX} -PprojectRegistryUrl=${CI_REGISTRY_URL} -PregistryUser=${CI_REGISTRY_USER} -PregistryPassword=${CI_REGISTRY_PASSWORD} -PregistryEmail=${GITLAB_USER_EMAIL}"
