@@ -6,7 +6,7 @@
       </q-inner-loading>
     </div>
     <div v-else>
-      <ReservationEditor :reservation="reservation" mode="update" />
+      <ReservationEditor :reservation="reservation" mode="update" reservation-type="STAY" />
     </div>
   </q-page>
 </template>

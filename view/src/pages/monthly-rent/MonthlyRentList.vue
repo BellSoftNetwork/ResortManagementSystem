@@ -1,6 +1,6 @@
 <template>
   <q-page padding>
-    <ReservationListDynamicTable reservation-type="STAY" />
+    <ReservationListDynamicTable title="숙박 중인 달방" reservation-type="MONTHLY_RENT" />
   </q-page>
 </template>
 

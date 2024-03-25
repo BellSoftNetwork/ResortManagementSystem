@@ -174,6 +174,7 @@ function fetchData() {
     stayStartAt: filter.value.stayStartAt,
     stayEndAt: filter.value.stayEndAt,
     status: "NORMAL",
+    type: "STAY",
   })
     .then((response) => {
       reservationsOfDay.value = formatReservations(response.values);

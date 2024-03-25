@@ -33,6 +33,7 @@ abstract class ReservationMapperDecorator : ReservationMapper {
             note = dto.note,
             canceledAt = dto.canceledAt,
             status = dto.status,
+            type = dto.type,
         )
     }
 }

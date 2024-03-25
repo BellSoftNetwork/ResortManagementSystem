@@ -8,7 +8,7 @@
     <div v-else class="q-gutter-sm">
       <div class="row">
         <div class="col">
-          <ReservationEditor :reservation="reservation" mode="view" reservation-type="STAY" />
+          <ReservationEditor :reservation="reservation" mode="view" reservation-type="MONTHLY_RENT" />
         </div>
       </div>
 

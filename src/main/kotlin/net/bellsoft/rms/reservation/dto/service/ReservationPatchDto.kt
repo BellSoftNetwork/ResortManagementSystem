@@ -4,6 +4,7 @@ import net.bellsoft.rms.common.dto.service.EntityReferenceDto
 import net.bellsoft.rms.common.util.convert
 import net.bellsoft.rms.reservation.dto.request.ReservationPatchRequest
 import net.bellsoft.rms.reservation.type.ReservationStatus
+import net.bellsoft.rms.reservation.type.ReservationType
 import org.openapitools.jackson.nullable.JsonNullable
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -25,6 +26,7 @@ data class ReservationPatchDto(
     val note: JsonNullable<String> = JsonNullable.undefined(),
     val canceledAt: JsonNullable<LocalDateTime?> = JsonNullable.undefined(),
     val status: JsonNullable<ReservationStatus> = JsonNullable.undefined(),
+    val type: JsonNullable<ReservationType> = JsonNullable.undefined(),
 ) {
     companion object {
         fun of(dto: ReservationPatchRequest) = ReservationPatchDto(
@@ -44,6 +46,7 @@ data class ReservationPatchDto(
             note = dto.note,
             canceledAt = dto.canceledAt,
             status = dto.status,
+            type = dto.type,
         )
     }
 }

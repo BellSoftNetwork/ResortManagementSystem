@@ -1,6 +1,6 @@
 <template>
   <q-card>
-    <q-card-section class="text-h6">예약 {{ modeTitle }}</q-card-section>
+    <q-card-section class="text-h6">{{ typeName }} {{ modeTitle }}</q-card-section>
 
     <form @submit="submit">
       <q-card-section>
@@ -205,7 +205,7 @@ import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import dayjs from "dayjs";
 import { formatDate } from "src/util/format-util";
-import { Reservation, reservationDynamicRules, reservationStaticRules } from "src/schema/reservation";
+import { Reservation, reservationDynamicRules, reservationStaticRules, ReservationType } from "src/schema/reservation";
 import {
   createReservation,
   deleteReservation,
@@ -226,11 +226,16 @@ const props = withDefaults(
   defineProps<{
     mode: "create" | "update" | "view";
     reservation?: Reservation;
+    reservationType: ReservationType;
   }>(),
   {
     mode: "create",
   },
 );
+const typeName = computed(() => {
+  if (props.reservationType === "MONTHLY_RENT") return "달방";
+  else return "예약";
+});
 const mode = ref(props.mode);
 const modeTitle = computed(() => {
   switch (mode.value) {
@@ -261,6 +266,7 @@ const defaultReservationValue = <
   brokerFee: 0,
   note: "",
   status: "NORMAL",
+  type: props.reservationType,
 };
 const formModel = ref<
   {
@@ -320,9 +326,10 @@ function create() {
 
   createReservation(formData())
     .then(() => {
-      router.push({ name: "Reservations" });
-
       resetForm();
+
+      if (props.reservationType === "MONTHLY_RENT") return router.push({ name: "MonthlyRents" });
+      return router.push({ name: "Reservations" });
     })
     .catch((error) => {
       $q.notify({
@@ -408,7 +415,7 @@ function deleteItem() {
 
   $q.dialog({
     title: "삭제",
-    message: `정말로 ${itemName}님의 예약 정보를 삭제하시겠습니까?`,
+    message: `정말로 ${itemName}님의 ${typeName.value} 정보를 삭제하시겠습니까?`,
     ok: {
       label: "삭제",
       flat: true,
@@ -422,7 +429,8 @@ function deleteItem() {
   }).onOk(() => {
     deleteReservation(itemId)
       .then(() => {
-        router.push({ name: "Reservations" });
+        if (props.reservationType === "MONTHLY_RENT") return router.push({ name: "MonthlyRents" });
+        return router.push({ name: "Reservations" });
       })
       .catch((error) => {
         $q.notify({

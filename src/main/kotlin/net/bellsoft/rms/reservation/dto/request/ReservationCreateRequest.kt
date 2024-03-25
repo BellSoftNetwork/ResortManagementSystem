@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size
 import net.bellsoft.rms.common.dto.request.EntityReferenceRequest
 import net.bellsoft.rms.common.dto.service.EntityReferenceDto
 import net.bellsoft.rms.reservation.type.ReservationStatus
+import net.bellsoft.rms.reservation.type.ReservationType
 import org.hibernate.validator.constraints.Range
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -66,4 +67,7 @@ data class ReservationCreateRequest(
 
     @Schema(description = "예약 상태", example = "NORMAL")
     val status: ReservationStatus = ReservationStatus.PENDING,
+
+    @Schema(description = "예약 구분", example = "STAY")
+    val type: ReservationType = ReservationType.STAY,
 )

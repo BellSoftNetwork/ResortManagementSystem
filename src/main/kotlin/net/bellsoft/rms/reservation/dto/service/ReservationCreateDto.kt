@@ -3,6 +3,7 @@ package net.bellsoft.rms.reservation.dto.service
 import net.bellsoft.rms.common.dto.service.EntityReferenceDto
 import net.bellsoft.rms.reservation.dto.request.ReservationCreateRequest
 import net.bellsoft.rms.reservation.type.ReservationStatus
+import net.bellsoft.rms.reservation.type.ReservationType
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -23,6 +24,7 @@ data class ReservationCreateDto(
     val note: String = "",
     val canceledAt: LocalDateTime? = null,
     val status: ReservationStatus = ReservationStatus.PENDING,
+    val type: ReservationType = ReservationType.STAY,
 ) {
     companion object {
         fun of(dto: ReservationCreateRequest) = ReservationCreateDto(
@@ -42,6 +44,7 @@ data class ReservationCreateDto(
             note = dto.note,
             canceledAt = dto.canceledAt,
             status = dto.status,
+            type = dto.type,
         )
     }
 }

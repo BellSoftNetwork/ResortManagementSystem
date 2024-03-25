@@ -121,6 +121,36 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: "/monthly-rents",
+    component: DefaultLayout,
+    meta: {
+      isAuthenticated: true,
+      roles: ["ADMIN", "SUPER_ADMIN"],
+    },
+    children: [
+      {
+        path: "",
+        name: "MonthlyRents",
+        component: () => import("pages/monthly-rent/MonthlyRentList.vue"),
+      },
+      {
+        path: ":id",
+        name: "MonthlyRent",
+        component: () => import("pages/monthly-rent/MonthlyRentDetail.vue"),
+      },
+      {
+        path: ":id/edit",
+        name: "EditMonthlyRent",
+        component: () => import("pages/monthly-rent/MonthlyRentEdit.vue"),
+      },
+      {
+        path: "create",
+        name: "CreateMonthlyRent",
+        component: () => import("pages/monthly-rent/MonthlyRentCreate.vue"),
+      },
+    ],
+  },
+  {
     path: "/payment-methods",
     component: DefaultLayout,
     meta: {
