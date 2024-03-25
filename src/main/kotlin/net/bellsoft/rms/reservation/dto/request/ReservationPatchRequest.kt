@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size
 import net.bellsoft.rms.common.dto.request.EntityReferenceRequest
 import net.bellsoft.rms.common.dto.service.EntityReferenceDto
 import net.bellsoft.rms.reservation.type.ReservationStatus
+import net.bellsoft.rms.reservation.type.ReservationType
 import org.hibernate.validator.constraints.Range
 import org.openapitools.jackson.nullable.JsonNullable
 import java.time.LocalDate
@@ -67,4 +68,7 @@ data class ReservationPatchRequest(
 
     @Schema(description = "예약 상태", example = "NORMAL")
     val status: JsonNullable<ReservationStatus> = JsonNullable.undefined(),
+
+    @Schema(description = "예약 구분", example = "STAY")
+    val type: JsonNullable<ReservationType> = JsonNullable.undefined(),
 )

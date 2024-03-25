@@ -16,6 +16,16 @@ export function reservationStatusValueToName(role: ReservationStatus) {
   return RESERVATION_STATUS_MAP[role] || role;
 }
 
+const RESERVATION_TYPE_MAP = {
+  STAY: "숙박",
+  MONTHLY_RENT: "달방",
+} as const;
+export type ReservationType = keyof typeof RESERVATION_TYPE_MAP;
+
+export function reservationTypeValueToName(role: ReservationType) {
+  return RESERVATION_TYPE_MAP[role] || role;
+}
+
 export type Reservation = {
   id: number;
   paymentMethod: PaymentMethod;
@@ -34,6 +44,7 @@ export type Reservation = {
   note: string;
   canceledAt: string;
   status: ReservationStatus;
+  type: ReservationType;
 } & BaseTime &
   BaseAudit;
 
@@ -70,6 +81,7 @@ const ReservationFieldMap: FieldMap = {
   note: { label: "메모" } as const,
   canceledAt: { label: "취소 시각", format: formatDateTime } as const,
   status: { label: "상태", format: reservationStatusValueToName } as const,
+  type: { label: "구분", format: reservationTypeValueToName } as const,
   ...BASE_TIME_FIELD_MAP,
   ...BASE_AUDIT_FIELD_MAP,
 } as const;

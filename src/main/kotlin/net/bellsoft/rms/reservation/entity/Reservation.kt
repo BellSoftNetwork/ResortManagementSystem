@@ -13,6 +13,7 @@ import net.bellsoft.rms.common.entity.BaseMustAuditEntity
 import net.bellsoft.rms.common.entity.BaseTimeEntity
 import net.bellsoft.rms.payment.entity.PaymentMethod
 import net.bellsoft.rms.reservation.type.ReservationStatus
+import net.bellsoft.rms.reservation.type.ReservationType
 import net.bellsoft.rms.room.entity.Room
 import org.hibernate.annotations.Comment
 import org.hibernate.annotations.SQLDelete
@@ -103,6 +104,10 @@ class Reservation(
     @Column(name = "status", nullable = false, columnDefinition = "TINYINT")
     @Comment("예약 상태")
     var status: ReservationStatus = ReservationStatus.PENDING,
+
+    @Column(name = "type", nullable = false, columnDefinition = "TINYINT")
+    @Comment("예약 구분")
+    var type: ReservationType = ReservationType.STAY,
 ) : Serializable, BaseMustAuditEntity() {
     fun addRoom(room: Room) {
         rooms.add(ReservationRoom(reservation = this, room = room))

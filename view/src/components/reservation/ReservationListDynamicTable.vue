@@ -9,7 +9,7 @@
     :filter="filter"
     style="height: 90vh"
     row-key="id"
-    title="다가오는 예약"
+    :title="props.title"
     flat
     bordered
     binary-state-sort
@@ -112,7 +112,7 @@
           </q-card>
         </q-dialog>
 
-        <q-btn :to="{ name: 'CreateReservation' }" icon="add" color="grey" dense round flat />
+        <q-btn :to="createPageLink()" icon="add" color="grey" dense round flat />
       </div>
     </template>
 
@@ -131,13 +131,7 @@
 
     <template #body-cell-name="props">
       <q-td key="name" :props="props">
-        <q-btn
-          :to="{ name: 'Reservation', params: { id: props.row.id } }"
-          class="full-width"
-          align="left"
-          color="primary"
-          dense
-          flat
+        <q-btn :to="objectPageLink(props.row.id)" class="full-width" align="left" color="primary" dense flat
           >{{ props.row.name }}
         </q-btn>
       </q-td>
@@ -145,14 +139,7 @@
 
     <template #body-cell-actions="props">
       <q-td key="actions" :props="props">
-        <q-btn
-          dense
-          round
-          flat
-          color="grey"
-          icon="edit"
-          :to="{ name: 'EditReservation', params: { id: props.row.id } }"
-        ></q-btn>
+        <q-btn dense round flat color="grey" icon="edit" :to="editPageLink(props.row.id)"></q-btn>
         <q-btn dense round flat color="grey" icon="delete" @click="deleteItem(props.row)"></q-btn>
       </q-td>
     </template>
@@ -164,13 +151,22 @@ import { onMounted, ref, watch } from "vue";
 import dayjs from "dayjs";
 import { useQuasar } from "quasar";
 import { formatDate } from "src/util/format-util";
-import { getReservationFieldDetail, Reservation } from "src/schema/reservation";
+import { getReservationFieldDetail, Reservation, ReservationType } from "src/schema/reservation";
 import { convertTableColumnDef } from "src/util/table-util";
 import { deleteReservation, fetchReservations } from "src/api/v1/reservation";
 import { formatSortParam } from "src/util/query-string-util";
 import { useRoute, useRouter } from "vue-router";
 
 const $q = useQuasar();
+const props = withDefaults(
+  defineProps<{
+    title: string;
+    reservationType: ReservationType;
+  }>(),
+  {
+    title: "다가오는 예약",
+  },
+);
 const status = ref({
   isLoading: false,
 });
@@ -331,6 +327,24 @@ watch(route, () => {
   loadQueryString();
 });
 
+function createPageLink() {
+  if (props.reservationType === "MONTHLY_RENT") return { name: "CreateMonthlyRent" };
+
+  return { name: "CreateReservation" };
+}
+
+function editPageLink(reservationId: number) {
+  if (props.reservationType === "MONTHLY_RENT") return { name: "EditMonthlyRent", params: { id: reservationId } };
+
+  return { name: "EditReservation", params: { id: reservationId } };
+}
+
+function objectPageLink(reservationId: number) {
+  if (props.reservationType === "MONTHLY_RENT") return { name: "MonthlyRent", params: { id: reservationId } };
+
+  return { name: "Reservation", params: { id: reservationId } };
+}
+
 function loadQueryString() {
   filter.value.peopleInfo = route.query.peopleInfo?.toString() ?? defaultConfig.filter.peopleInfo;
   filter.value.stayStartAt = route.query.stayStartAt?.toString() ?? defaultConfig.filter.stayStartAt;
@@ -404,8 +418,8 @@ function getColumnDef(field: string) {
   return convertTableColumnDef(getReservationFieldDetail(field));
 }
 
-function onRequest(props) {
-  const { page, rowsPerPage, sortBy, descending } = props.pagination;
+function onRequest(tableProps) {
+  const { page, rowsPerPage, sortBy, descending } = tableProps.pagination;
 
   status.value.isLoading = true;
   const statusParam = (filter.value.status || undefined) === "ALL" ? undefined : filter.value.status;
@@ -418,6 +432,7 @@ function onRequest(props) {
     stayEndAt: filter.value.stayEndAt || undefined,
     searchText: filter.value.peopleInfo || undefined,
     status: statusParam,
+    type: props.reservationType,
   })
     .then((response) => {
       reservations.value = response.values;

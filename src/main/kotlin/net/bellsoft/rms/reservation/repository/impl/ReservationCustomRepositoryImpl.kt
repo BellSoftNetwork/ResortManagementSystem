@@ -9,6 +9,7 @@ import net.bellsoft.rms.reservation.entity.QReservation
 import net.bellsoft.rms.reservation.entity.Reservation
 import net.bellsoft.rms.reservation.repository.ReservationCustomRepository
 import net.bellsoft.rms.reservation.type.ReservationStatus
+import net.bellsoft.rms.reservation.type.ReservationType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.support.PageableExecutionUtils
@@ -48,6 +49,7 @@ class ReservationCustomRepositoryImpl(
             loeStayStartAt(filter.stayEndAt)?.or(loeStayEndAt(filter.stayEndAt)),
             likeSearchText(filter.searchText),
             eqStatus(filter.status),
+            eqType(filter.type),
         )
 
     private fun goeStayStartAt(stayStartAt: LocalDate?) =
@@ -70,4 +72,7 @@ class ReservationCustomRepositoryImpl(
 
     private fun eqStatus(status: ReservationStatus?) =
         status?.let { QReservation.reservation.status.eq(it) }
+
+    private fun eqType(status: ReservationType?) =
+        status?.let { QReservation.reservation.type.eq(it) }
 }

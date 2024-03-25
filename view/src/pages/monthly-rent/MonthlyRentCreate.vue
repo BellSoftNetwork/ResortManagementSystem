@@ -1,6 +1,6 @@
 <template>
   <q-page padding>
-    <ReservationEditor reservation-type="STAY" />
+    <ReservationEditor reservation-type="MONTHLY_RENT" />
   </q-page>
 </template>
 

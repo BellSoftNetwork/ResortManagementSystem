@@ -1,6 +1,6 @@
 import { api } from "boot/axios";
 import { ListResponse, PageRequestParams, SingleResponse, SortRequestParams } from "src/schema/response";
-import { Reservation, ReservationStatus } from "src/schema/reservation";
+import { Reservation, ReservationStatus, ReservationType } from "src/schema/reservation";
 import { Revision } from "src/schema/revision";
 import { EntityReference } from "src/schema/base";
 
@@ -10,6 +10,7 @@ export type FetchReservationsRequestParams = Partial<
     stayEndAt: string;
     searchText: string;
     status: ReservationStatus;
+    type: ReservationType;
   } & PageRequestParams &
     SortRequestParams
 >;
@@ -39,6 +40,7 @@ type ReservationParams = {
   brokerFee: number;
   note: string;
   status: ReservationStatus;
+  type: ReservationType;
 };
 
 export type ReservationCreateParams = ReservationParams;

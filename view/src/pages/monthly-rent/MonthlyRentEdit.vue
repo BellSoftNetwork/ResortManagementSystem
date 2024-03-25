@@ -5,24 +5,13 @@
         <q-spinner-gears size="20vh" color="primary" />
       </q-inner-loading>
     </div>
-    <div v-else class="q-gutter-sm">
-      <div class="row">
-        <div class="col">
-          <ReservationEditor :reservation="reservation" mode="view" reservation-type="STAY" />
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col">
-          <ReservationHistoryDynamicTable :id="id" />
-        </div>
-      </div>
+    <div v-else>
+      <ReservationEditor :reservation="reservation" mode="update" reservation-type="MONTHLY_RENT" />
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import ReservationHistoryDynamicTable from "components/reservation/ReservationHistoryDynamicTable.vue";
 import { useRoute, useRouter } from "vue-router";
 import { onBeforeMount, ref } from "vue";
 import { Reservation } from "src/schema/reservation";
