@@ -218,6 +218,7 @@ import { PaymentMethod } from "src/schema/payment-method";
 import { Room } from "src/schema/room";
 import RoomGroupSelector from "components/room-group/RoomGroupSelector.vue";
 import { getPatchedFormData } from "src/util/data-util";
+import _ from "lodash";
 
 const router = useRouter();
 const $q = useQuasar();
@@ -249,7 +250,7 @@ const modeTitle = computed(() => {
       return "";
   }
 });
-const defaultReservationValue = <
+let defaultReservationValue = <
   {
     paymentMethod: Partial<PaymentMethod>;
   } & ReservationCreateParams
@@ -272,7 +273,7 @@ const formModel = ref<
   {
     paymentMethod: Partial<PaymentMethod>;
   } & ReservationCreateParams
->({ ...defaultReservationValue });
+>(_.cloneDeep(defaultReservationValue));
 const selectedRooms = ref<Room[]>([]);
 const status = ref({
   isProgress: false,
@@ -301,7 +302,7 @@ function loadPaymentMethods() {
   })
     .then((response) => {
       paymentMethods.value = response.values;
-      defaultReservationValue.paymentMethod = response.values[0];
+      if (defaultReservationValue.paymentMethod.id === 0) defaultReservationValue.paymentMethod = response.values[0];
       formModel.value.paymentMethod = defaultReservationValue.paymentMethod;
 
       paymentMethodStatus.value.isLoaded = true;
@@ -388,7 +389,7 @@ function update() {
 
       mode.value = "view";
 
-      Object.assign(defaultReservationValue, response.value);
+      defaultReservationValue = _.cloneDeep(response.value);
       resetForm();
     })
     .catch((error) => {
@@ -472,12 +473,12 @@ function changePrice() {
 }
 
 function resetForm() {
-  Object.assign(formModel.value, defaultReservationValue);
-  Object.assign(selectedRooms.value, defaultReservationValue.rooms);
+  formModel.value = _.cloneDeep(defaultReservationValue);
+  selectedRooms.value = _.cloneDeep(defaultReservationValue.rooms);
 }
 
 onBeforeMount(() => {
-  if (props.mode !== "create") Object.assign(defaultReservationValue, props.reservation);
+  if (props.mode !== "create") defaultReservationValue = _.cloneDeep(props.reservation);
 
   resetForm();
   loadPaymentMethods();
