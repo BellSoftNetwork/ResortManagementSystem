@@ -183,9 +183,9 @@ const defaultConfig = {
   },
   filter: {
     peopleInfo: "",
-    dueOption: "1M",
+    dueOption: "3M",
     stayStartAt: formatDate(),
-    stayEndAt: dayjs().add(1, "M").format("YYYY-MM-DD"),
+    stayEndAt: dayjs().add(3, "M").format("YYYY-MM-DD"),
     status: "NORMAL",
   },
 };
