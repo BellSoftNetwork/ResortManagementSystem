@@ -9,6 +9,7 @@ import net.bellsoft.rms.common.util.TestDatabaseSupport
 import net.bellsoft.rms.fixture.baseFixture
 import net.bellsoft.rms.payment.dto.service.PaymentMethodCreateDto
 import net.bellsoft.rms.payment.dto.service.PaymentMethodPatchDto
+import net.bellsoft.rms.payment.entity.PaymentMethod
 import net.bellsoft.rms.payment.repository.PaymentMethodRepository
 import org.openapitools.jackson.nullable.JsonNullable
 import org.springframework.boot.test.context.SpringBootTest
@@ -127,6 +128,7 @@ internal class PaymentMethodServiceTest(
                     PaymentMethodPatchDto(
                         name = JsonNullable.of("BSN"),
                         commissionRate = JsonNullable.of(0.2),
+                        isDefaultSelect = JsonNullable.of(true),
                     ),
                 )
 
@@ -134,6 +136,7 @@ internal class PaymentMethodServiceTest(
                     updatePaymentMethod.run {
                         name shouldBe "BSN"
                         commissionRate shouldBe 0.2
+                        isDefaultSelect shouldBe true
                     }
                 }
             }
@@ -144,6 +147,55 @@ internal class PaymentMethodServiceTest(
                 Then("정상적으로 삭제된다") {
                     isDeleted shouldBe true
                     paymentMethodRepository.findByIdOrNull(paymentMethod.id) shouldBe null
+                }
+            }
+        }
+
+        Given("기본 선택 옵션이 각각 활성화 및 비활성화된 결제 수단이 한 개씩 등록된 상황에서") {
+            val defaultPaymentMethod = paymentMethodRepository.save(
+                fixture {
+                    property(PaymentMethod::isDefaultSelect) { true }
+                },
+            )
+            val notDefaultPaymentMethod = paymentMethodRepository.save(
+                fixture {
+                    property(PaymentMethod::isDefaultSelect) { false }
+                },
+            )
+
+            When("기본 선택 옵션이 비활성화 상태인 결제 수단을 활성화하는 변경 요청을 수행할 시") {
+                paymentMethodService.update(
+                    notDefaultPaymentMethod.id,
+                    PaymentMethodPatchDto(
+                        isDefaultSelect = JsonNullable.of(true),
+                    ),
+                )
+
+                Then("변경 요청에 맞게 정상적으로 기본 선택 옵션이 활성화된다") {
+                    val patchedPaymentMethod = paymentMethodRepository.findByIdOrNull(notDefaultPaymentMethod.id)
+
+                    patchedPaymentMethod?.isDefaultSelect shouldBe true
+                }
+
+                Then("기본 선택 옵션이 활성화 되어 있던 기존 결제 수단 정보에는 기본 선택 옵션이 비활성화된다") {
+                    val oldPaymentMethod = paymentMethodRepository.findByIdOrNull(defaultPaymentMethod.id)
+
+                    oldPaymentMethod?.isDefaultSelect shouldBe false
+                }
+            }
+
+            When("기본 선택 옵션이 활성화 상태인 결제 수단을 비활성화하는 변경 요청을 수행할 시") {
+                paymentMethodService.update(
+                    defaultPaymentMethod.id,
+                    PaymentMethodPatchDto(
+                        isDefaultSelect = JsonNullable.of(false),
+                    ),
+                )
+
+                Then("변경 요청에 맞게 정상적으로 기본 선택 옵션이 비활성화된다") {
+                    val patchedPaymentMethod = paymentMethodRepository.findByIdOrNull(notDefaultPaymentMethod.id)
+
+                    patchedPaymentMethod?.isDefaultSelect shouldBe false
                 }
             }
         }

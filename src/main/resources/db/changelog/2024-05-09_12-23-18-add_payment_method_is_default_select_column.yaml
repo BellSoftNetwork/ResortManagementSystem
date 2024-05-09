@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1715224998574-42
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: is_default_select
+                  remarks: 기본 선택 여부
+                  type: BOOLEAN
+            tableName: payment_method
+        - addNotNullConstraint:
+            columnDataType: BOOLEAN
+            columnName: is_default_select
+            defaultNullValue: 'false'
+            tableName: payment_method
+

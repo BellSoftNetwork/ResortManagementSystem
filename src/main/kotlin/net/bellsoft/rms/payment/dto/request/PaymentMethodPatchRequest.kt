@@ -17,4 +17,7 @@ data class PaymentMethodPatchRequest(
 
     @Schema(description = "미수금 금액 알림", example = "false")
     val requireUnpaidAmountCheck: JsonNullable<Boolean> = JsonNullable.undefined(),
+
+    @Schema(description = "기본 선택 여부", example = "false")
+    val isDefaultSelect: JsonNullable<Boolean> = JsonNullable.undefined(),
 )

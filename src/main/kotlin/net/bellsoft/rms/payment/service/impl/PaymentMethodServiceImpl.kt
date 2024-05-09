@@ -51,6 +51,9 @@ class PaymentMethodServiceImpl(
         val paymentMethod = paymentMethodRepository.findByIdOrNull(id)
             ?: throw DataNotFoundException("존재하지 않는 결제 수단")
 
+        if (paymentMethodPatchDto.isDefaultSelect.isPresent && paymentMethodPatchDto.isDefaultSelect.get()) {
+            paymentMethodRepository.updateAllIsDefaultSelectToFalse()
+        }
         paymentMethodMapper.updateEntity(paymentMethodPatchDto, paymentMethod)
 
         return paymentMethodMapper.toDto(paymentMethodRepository.save(paymentMethod))

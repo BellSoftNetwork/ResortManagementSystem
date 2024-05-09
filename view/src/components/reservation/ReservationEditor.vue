@@ -302,7 +302,13 @@ function loadPaymentMethods() {
   })
     .then((response) => {
       paymentMethods.value = response.values;
-      if (defaultReservationValue.paymentMethod.id === 0) defaultReservationValue.paymentMethod = response.values[0];
+
+      if (defaultReservationValue.paymentMethod.id === 0) {
+        const defaultSelectPaymentMethod = response.values.find((paymentMethod) => paymentMethod.isDefaultSelect);
+        defaultReservationValue.paymentMethod = defaultSelectPaymentMethod
+          ? defaultSelectPaymentMethod
+          : response.values[0];
+      }
       formModel.value.paymentMethod = defaultReservationValue.paymentMethod;
 
       paymentMethodStatus.value.isLoaded = true;

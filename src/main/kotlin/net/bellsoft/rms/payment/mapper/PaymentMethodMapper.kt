@@ -17,6 +17,9 @@ interface PaymentMethodMapper {
     fun toDto(entity: PaymentMethod): PaymentMethodDetailDto
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_DEFAULT)
+    @Mappings(
+        Mapping(target = "isDefaultSelect", ignore = true),
+    )
     fun toEntity(dto: PaymentMethodCreateDto): PaymentMethod
 
     @Mappings(

@@ -7,6 +7,7 @@ data class PaymentMethodDetailDto(
     val name: String,
     val commissionRate: Double,
     val requireUnpaidAmountCheck: Boolean,
+    val isDefaultSelect: Boolean,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 )
