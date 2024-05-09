@@ -80,6 +80,22 @@
       </q-td>
     </template>
 
+    <template #body-cell-isDefaultSelect="props">
+      <q-td key="isDefaultSelect" :props="props">
+        {{ props.row.isDefaultSelect ? "활성" : "비활성" }}
+        <q-popup-edit v-slot="scope" :model-value="props.row.isDefaultSelect" :persistent="status.isPatching">
+          <q-checkbox
+            v-model="scope.value"
+            @update:model-value="updateScope(props.row, scope, 'isDefaultSelect')"
+            :loading="status.isPatching"
+            :disable="status.isPatching"
+            label="신규 예약 등록 시 기본 선택"
+          >
+          </q-checkbox>
+        </q-popup-edit>
+      </q-td>
+    </template>
+
     <template #body-cell-actions="props">
       <q-td key="actions" :props="props">
         <q-btn dense round flat color="grey" icon="delete" @click="deleteItem(props.row)"></q-btn>
@@ -130,6 +146,13 @@ const columns = [
   },
   {
     ...getColumnDef("requireUnpaidAmountCheck"),
+    align: "left",
+    headerStyle: "width: 10%",
+    required: true,
+    sortable: true,
+  },
+  {
+    ...getColumnDef("isDefaultSelect"),
     align: "left",
     headerStyle: "width: 10%",
     required: true,
@@ -205,6 +228,8 @@ function updateScope(row, scope, key, formatter) {
     .then((response) => {
       scope.set();
       row[key] = response.value[key];
+
+      if (key === "isDefaultSelect") reloadData();
     })
     .catch((error) => {
       $q.notify({

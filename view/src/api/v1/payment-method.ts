@@ -27,7 +27,13 @@ export async function createPaymentMethod(params: PaymentMethodParams) {
   return result.data;
 }
 
-export async function patchPaymentMethod(id: number, params: Partial<PaymentMethodParams>) {
+type PaymentMethodPatchParams = Partial<
+  PaymentMethodParams & {
+    isDefaultSelect: boolean;
+  }
+>;
+
+export async function patchPaymentMethod(id: number, params: PaymentMethodPatchParams) {
   const result = await api.patch<SingleResponse<PaymentMethod>>(`/api/v1/payment-methods/${id}`, params);
   return result.data;
 }

@@ -7,6 +7,7 @@ export type PaymentMethod = {
   name: string;
   commissionRate: number;
   requireUnpaidAmountCheck: boolean;
+  isDefaultSelect: boolean;
 } & BaseTime;
 
 const PaymentMethodFieldMap: FieldMap = {
@@ -15,6 +16,10 @@ const PaymentMethodFieldMap: FieldMap = {
   commissionRate: { label: "수수료율", format: formatCommissionRate } as const,
   requireUnpaidAmountCheck: {
     label: "미수금 금액 알림",
+    format: (value: boolean) => (value ? "활성" : "비활성"),
+  } as const,
+  isDefaultSelect: {
+    label: "기본 선택 여부",
     format: (value: boolean) => (value ? "활성" : "비활성"),
   } as const,
   ...BASE_TIME_FIELD_MAP,

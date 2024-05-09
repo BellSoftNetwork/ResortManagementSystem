@@ -35,6 +35,12 @@ class PaymentMethod(
     @Comment("미수금 금액 알림")
     var requireUnpaidAmountCheck: Boolean = false,
 
+    @Column(name = "is_default_select", nullable = false)
+    @Comment("기본 선택 여부")
+    @get:JvmName("getIsDefaultSelect")
+    @set:JvmName("setIsDefaultSelect")
+    var isDefaultSelect: Boolean = false,
+
     @Column(
         name = "status",
         nullable = false,
