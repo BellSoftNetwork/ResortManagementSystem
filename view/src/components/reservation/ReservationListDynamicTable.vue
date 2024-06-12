@@ -291,20 +291,35 @@ const columns = [
     required: true,
     sortable: true,
   },
-  {
-    ...getColumnDef("checkInAt"),
-    align: "left",
-    headerStyle: "width: 15%",
-    required: true,
-    sortable: true,
-  },
-  {
-    ...getColumnDef("checkOutAt"),
-    align: "left",
-    headerStyle: "width: 15%",
-    required: true,
-    sortable: true,
-  },
+  ...(props.reservationType === "STAY"
+    ? [
+        {
+          ...getColumnDef("checkInAt"),
+          align: "left",
+          headerStyle: "width: 15%",
+          required: true,
+          sortable: true,
+        },
+        {
+          ...getColumnDef("checkOutAt"),
+          align: "left",
+          headerStyle: "width: 15%",
+          required: true,
+          sortable: true,
+        },
+      ]
+    : []),
+  ...(props.reservationType === "MONTHLY_RENT"
+    ? [
+        {
+          ...getColumnDef("deposit"),
+          align: "left",
+          headerStyle: "width: 15%",
+          required: true,
+          sortable: true,
+        },
+      ]
+    : []),
   {
     ...getColumnDef("updatedAt"),
     align: "left",

@@ -46,6 +46,10 @@ data class ReservationCreateRequest(
     @field:Range(min = 0, max = 100000000)
     val price: Int = 0,
 
+    @Schema(description = "보증금", example = "10000")
+    @field:Range(min = 0, max = 100000000)
+    val deposit: Int = 0,
+
     @Schema(description = "현재 총 지불 금액", example = "80000")
     @field:Range(min = 0, max = 100000000)
     val paymentAmount: Int = 0,

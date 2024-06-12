@@ -49,13 +49,20 @@ dependencies {
     implementation(libs.springBootStarterRedis)
     implementation(libs.springSessionDataRedis)
     implementation(libs.springDataEnvers)
-    implementation(libs.liquibase)
     testRuntimeOnly(libs.h2database)
     runtimeOnly(libs.mysqlConnector)
     implementation(variantOf(libs.queryDslJpa) { classifier("jakarta") })
     implementation(libs.queryDslSql)
     kapt(variantOf(libs.queryDslApt) { classifier("jakarta") })
     kaptTest(variantOf(libs.queryDslApt) { classifier("jakarta") })
+
+    implementation(libs.liquibase)
+    liquibaseRuntime(libs.liquibase)
+    liquibaseRuntime(libs.mysqlConnector)
+    liquibaseRuntime("info.picocli:picocli:4.7.5")
+    liquibaseRuntime("org.yaml:snakeyaml:1.33")
+    liquibaseRuntime(sourceSets["main"].output)
+    liquibaseRuntime(libs.kotlinLogging)
 
     // NOTE: Security
     implementation(libs.springBootStarterSecurity)
@@ -100,6 +107,26 @@ dependencies {
     testImplementation(libs.bundles.kotest)
     testImplementation(libs.bundles.mock)
     testImplementation(libs.bundles.fixture)
+}
+
+liquibase {
+    activities {
+        val DB_JDBC_URL = System.getenv("DB_JDBC_URL")
+        val DB_USERNAME = System.getenv("DB_USERNAME")
+        val DB_PASSWORD = System.getenv("DB_PASSWORD")
+
+        register("main") {
+            arguments = mapOf(
+                "logLevel" to "info",
+                "changelogFile" to "db/changelog-master.yaml",
+                "databaseChangeLogTableName" to "database_changelog",
+                "databaseChangeLogLockTableName" to "database_changelog_lock",
+                "url" to DB_JDBC_URL,
+                "username" to DB_USERNAME,
+                "password" to DB_PASSWORD,
+            )
+        }
+    }
 }
 
 tasks.withType<KotlinCompile> {

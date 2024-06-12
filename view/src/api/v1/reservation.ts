@@ -36,6 +36,7 @@ type ReservationParams = {
   stayStartAt: string;
   stayEndAt: string;
   price: number;
+  deposit: number;
   paymentAmount: number;
   brokerFee: number;
   note: string;
