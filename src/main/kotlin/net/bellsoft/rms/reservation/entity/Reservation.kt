@@ -81,6 +81,10 @@ class Reservation(
     @Comment("예약 가격")
     var price: Int,
 
+    @Column(name = "deposit", nullable = false)
+    @Comment("보증금")
+    var deposit: Int = 0,
+
     @Column(name = "payment_amount", nullable = false)
     @Comment("현재 총 지불 금액")
     var paymentAmount: Int = 0,

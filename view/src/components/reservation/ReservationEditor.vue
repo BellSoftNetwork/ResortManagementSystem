@@ -144,6 +144,18 @@
               max="10000000"
               required
             ></q-input>
+
+            <q-input
+              v-model.number="formModel.deposit"
+              :rules="reservationDynamicRules.paymentAmount(formModel.deposit)"
+              :readonly="mode === 'view'"
+              label="보증금"
+              placeholder="100000"
+              type="number"
+              min="0"
+              max="10000000"
+              required
+            ></q-input>
           </div>
 
           <div class="col">
@@ -263,6 +275,7 @@ let defaultReservationValue = <
   stayStartAt: formatDate(),
   stayEndAt: dayjs().add(1, "d").format("YYYY-MM-DD"),
   price: 0,
+  deposit: 0,
   paymentAmount: 0,
   brokerFee: 0,
   note: "",

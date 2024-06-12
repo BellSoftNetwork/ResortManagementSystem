@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1718170823591-44
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: deposit
+                  remarks: 보증금
+                  type: INT
+            tableName: reservation
+        - addNotNullConstraint:
+            columnDataType: INT
+            columnName: deposit
+            defaultNullValue: '0'
+            tableName: reservation
+  - changeSet:
+      id: 1718170823591-46
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: deposit
+                  type: INT
+              - column:
+                  name: deposit_mod
+                  type: BOOLEAN
+            tableName: reservation_history
+

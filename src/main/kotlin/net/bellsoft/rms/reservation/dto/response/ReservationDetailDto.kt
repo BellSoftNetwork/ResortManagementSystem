@@ -20,6 +20,7 @@ data class ReservationDetailDto(
     val checkInAt: LocalDateTime?,
     val checkOutAt: LocalDateTime?,
     val price: Int,
+    val deposit: Int,
     val paymentAmount: Int,
     val refundAmount: Int,
     val brokerFee: Int,

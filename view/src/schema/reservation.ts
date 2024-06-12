@@ -38,6 +38,7 @@ export type Reservation = {
   checkInAt: string;
   checkOutAt: string;
   price: number;
+  deposit: number;
   paymentAmount: number;
   refundAmount: number;
   brokerFee: number;
@@ -75,6 +76,7 @@ const ReservationFieldMap: FieldMap = {
     format: (value: string | null) => (value ? formatDateTime(value) : ""),
   } as const,
   price: { label: "판매 금액", format: formatPrice } as const,
+  deposit: { label: "보증금", format: formatPrice } as const,
   paymentAmount: { label: "누적 결제 금액", format: formatPrice } as const,
   refundAmount: { label: "환불 금액", format: formatPrice } as const,
   brokerFee: { label: "결제 수단 수수료", format: formatPrice } as const,
@@ -117,6 +119,7 @@ export const reservationStaticRules: StaticRuleMap = {
     (value: string) => /^-?[\d]+-[0-1]\d-[0-3]\d$/.test(value) || "####-##-## 형태의 날짜만 입력 가능합니다.",
   ] as const,
   price: [(value: number) => (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다"] as const,
+  deposit: [(value: number) => (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다"] as const,
   brokerFee: [(value: number) => (value >= 0 && value <= 100000000) || "금액은 1억 미만 양수만 가능합니다"] as const,
   note: [(value: string) => (value.length >= 0 && value.length <= 200) || "200 글자까지 입력 가능합니다"] as const,
 } as const;

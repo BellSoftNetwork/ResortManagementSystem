@@ -47,6 +47,10 @@ data class ReservationPatchRequest(
     @field:Range(min = 0, max = 100000000)
     val price: JsonNullable<Int> = JsonNullable.undefined(),
 
+    @Schema(description = "보증금", example = "10000")
+    @field:Range(min = 0, max = 100000000)
+    val deposit: JsonNullable<Int> = JsonNullable.undefined(),
+
     @Schema(description = "현재 총 지불 금액", example = "80000")
     @field:Range(min = 0, max = 100000000)
     val paymentAmount: JsonNullable<Int> = JsonNullable.undefined(),
