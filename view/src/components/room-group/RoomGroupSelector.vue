@@ -139,11 +139,13 @@ function loadRoomGroup(roomGroup: RoomGroup) {
   });
 }
 
-watch(props, (value, oldValue) => {
-  if (value.stayStartAt !== oldValue.stayStartAt || value.stayEndAt !== oldValue.stayEndAt) {
+watch(
+  () => `${props.stayStartAt}-${props.stayEndAt}`,
+  (value, oldValue) => {
+    if (value === oldValue) return;
     if (selectedRoomGroup.value) loadRoomGroup(selectedRoomGroup.value);
-  }
-});
+  },
+);
 
 onMounted(() => {
   loadRoomGroups().then(() => {
