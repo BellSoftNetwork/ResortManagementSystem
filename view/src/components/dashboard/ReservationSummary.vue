@@ -175,6 +175,7 @@ function fetchData() {
     stayEndAt: filter.value.stayEndAt,
     status: "NORMAL",
     type: "STAY",
+    size: 200, // TODO: 임시 수정
   })
     .then((response) => {
       reservationsOfDay.value = formatReservations(response.values);
