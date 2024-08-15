@@ -16,7 +16,15 @@
               :name="stayStartAt"
               class="q-px-none"
             >
-              <q-table :columns="columns" :rows="reservations" row-key="id" :title="stayStartAt" flat bordered>
+              <q-table
+                :columns="columns"
+                :rows="reservations"
+                row-key="id"
+                :title="stayStartAt"
+                flat
+                bordered
+                :pagination="{ rowsPerPage: 20 }"
+              >
                 <template #body-cell-rooms="props">
                   <q-td key="rooms" :props="props">
                     <div v-if="props.row.rooms.length !== 0">
