@@ -4,7 +4,7 @@
     <q-input
       v-model.number="addRoomCount"
       type="number"
-      min="1"
+      :min="filteredRooms.length > 0 ? 1 : 0"
       :max="filteredRooms?.length"
       label="객실 개수"
       hint="희망 기간 전 퇴실일이 가장 먼 순서로 자동 배정됩니다."
@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { Room } from "src/schema/room";
 import { Reservation } from "src/schema/reservation";
 import { RoomGroupDetailResponse } from "src/api/v1/room-group";
@@ -67,4 +67,17 @@ function addRoom(room: Room) {
     selected.value.sort((a, b) => a.id - b.id);
   }
 }
+
+// Watch for changes in filteredRooms and update addRoomCount accordingly
+watch(
+  filteredRooms,
+  (newValue) => {
+    if (newValue.length === 0) {
+      addRoomCount.value = 0;
+    } else if (addRoomCount.value === 0) {
+      addRoomCount.value = 1;
+    }
+  },
+  { immediate: true },
+);
 </script>
