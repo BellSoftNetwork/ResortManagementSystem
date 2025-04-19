@@ -31,6 +31,20 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: "/room-status",
+    component: DefaultLayout,
+    meta: {
+      isAuthenticated: true,
+    },
+    children: [
+      {
+        path: "",
+        name: "RoomStatus",
+        component: () => import("pages/room/RoomStatus.vue"),
+      },
+    ],
+  },
+  {
     path: "/rooms",
     component: DefaultLayout,
     meta: {
