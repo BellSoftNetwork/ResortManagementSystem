@@ -42,62 +42,78 @@
           <div class="text-body1 q-mt-md">객실 정보를 불러오는 중입니다...</div>
         </div>
         <template v-else>
-          <div v-for="room in rooms" :key="room.id" class="col-12 col-md-6 col-lg-4">
-            <q-card class="room-card">
-              <q-card-section
-                :class="isRoomOccupiedToday(room.id) ? 'bg-orange-8 text-white' : 'bg-primary text-white'"
-              >
-                <div class="row items-center">
-                  <div class="col">
-                    <div
-                      class="text-h6 cursor-pointer"
-                      @click="$router.push({ name: 'Room', params: { id: room.id } })"
+          <!-- Group rooms by roomGroup -->
+          <div v-for="(groupRooms, groupName) in roomsByGroup" :key="groupName" class="col-12 q-mb-md">
+            <q-expansion-item
+              :label="groupName"
+              icon="hotel"
+              header-class="bg-secondary text-white"
+              expand-icon-class="text-white"
+              default-opened
+            >
+              <div class="row q-col-gutter-md q-pa-md">
+                <div v-for="room in groupRooms" :key="room.id" class="col-12 col-md-6 col-lg-4">
+                  <q-card class="room-card">
+                    <q-card-section
+                      :class="isRoomOccupiedToday(room.id) ? 'bg-orange-8 text-white' : 'bg-primary text-white'"
                     >
-                      {{ room.number }}
-                      <q-badge :color="isRoomOccupiedToday(room.id) ? 'red' : 'green'" class="q-ml-sm">
-                        {{ isRoomOccupiedToday(room.id) ? "입실 중" : "빈 방" }}
-                      </q-badge>
-                    </div>
-                    <div class="text-subtitle2">{{ room.roomGroup.name }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <q-badge :color="getStatusBadgeColor(room.status)">
-                      {{ roomStatusValueToName(room.status) }}
-                    </q-badge>
-                  </div>
+                      <div class="row items-center">
+                        <div class="col">
+                          <div
+                            class="text-h6 cursor-pointer"
+                            @click="$router.push({ name: 'Room', params: { id: room.id } })"
+                          >
+                            {{ room.number }}
+                            <q-badge :color="isRoomOccupiedToday(room.id) ? 'red' : 'green'" class="q-ml-sm">
+                              {{ isRoomOccupiedToday(room.id) ? "입실 중" : "빈 방" }}
+                            </q-badge>
+                          </div>
+                        </div>
+                        <div class="col-auto">
+                          <q-badge :color="getStatusBadgeColor(room.status)">
+                            {{ roomStatusValueToName(room.status) }}
+                          </q-badge>
+                        </div>
+                      </div>
+                    </q-card-section>
+                    <q-list bordered separator v-if="roomReservations[room.id] && roomReservations[room.id].length > 0">
+                      <q-item
+                        v-for="reservation in roomReservations[room.id]"
+                        :key="reservation.id"
+                        clickable
+                        :to="{ name: 'Reservation', params: { id: reservation.id } }"
+                        :class="{ 'bg-yellow-1': isCheckInOrOutToday(reservation) }"
+                      >
+                        <q-item-section>
+                          <q-item-label>{{ reservation.name }} ({{ reservation.phone }})</q-item-label>
+                          <q-item-label caption>
+                            {{ formatSimpleDate(reservation.stayStartAt) }} ~
+                            {{ formatSimpleDate(reservation.stayEndAt) }}
+                          </q-item-label>
+                          <q-item-label caption>
+                            <q-badge :color="getStatusColor(reservation.status)">
+                              {{ reservationStatusValueToName(reservation.status) }}
+                            </q-badge>
+                            <q-badge v-if="isCheckInToday(reservation)" color="green" class="q-ml-xs"
+                              >오늘 입실</q-badge
+                            >
+                            <q-badge v-if="isCheckOutToday(reservation)" color="blue" class="q-ml-xs"
+                              >오늘 퇴실</q-badge
+                            >
+                          </q-item-label>
+                        </q-item-section>
+                        <q-item-section side>
+                          <q-icon name="arrow_forward_ios" color="primary" size="xs" />
+                        </q-item-section>
+                      </q-item>
+                    </q-list>
+                    <q-card-section v-else>
+                      <div class="text-grey text-center q-pa-md">해당 기간에 예약이 없습니다.</div>
+                    </q-card-section>
+                  </q-card>
                 </div>
-              </q-card-section>
-              <q-list bordered separator v-if="roomReservations[room.id] && roomReservations[room.id].length > 0">
-                <q-item
-                  v-for="reservation in roomReservations[room.id]"
-                  :key="reservation.id"
-                  clickable
-                  :to="{ name: 'Reservation', params: { id: reservation.id } }"
-                  :class="{ 'bg-yellow-1': isCheckInOrOutToday(reservation) }"
-                >
-                  <q-item-section>
-                    <q-item-label>{{ reservation.name }} ({{ reservation.phone }})</q-item-label>
-                    <q-item-label caption>
-                      {{ formatSimpleDate(reservation.stayStartAt) }} ~
-                      {{ formatSimpleDate(reservation.stayEndAt) }}
-                    </q-item-label>
-                    <q-item-label caption>
-                      <q-badge :color="getStatusColor(reservation.status)">
-                        {{ reservationStatusValueToName(reservation.status) }}
-                      </q-badge>
-                      <q-badge v-if="isCheckInToday(reservation)" color="green" class="q-ml-xs">오늘 입실</q-badge>
-                      <q-badge v-if="isCheckOutToday(reservation)" color="blue" class="q-ml-xs">오늘 퇴실</q-badge>
-                    </q-item-label>
-                  </q-item-section>
-                  <q-item-section side>
-                    <q-icon name="arrow_forward_ios" color="primary" size="xs" />
-                  </q-item-section>
-                </q-item>
-              </q-list>
-              <q-card-section v-else>
-                <div class="text-grey text-center q-pa-md">해당 기간에 예약이 없습니다.</div>
-              </q-card-section>
-            </q-card>
+              </div>
+            </q-expansion-item>
           </div>
         </template>
       </div>
@@ -138,6 +154,21 @@ const roomReservations = computed(() => {
         result[room.id].push(reservation);
       }
     });
+  });
+
+  return result;
+});
+
+// Group rooms by roomGroup
+const roomsByGroup = computed(() => {
+  const result: Record<string, Room[]> = {};
+
+  rooms.value.forEach((room) => {
+    const groupName = room.roomGroup.name;
+    if (!result[groupName]) {
+      result[groupName] = [];
+    }
+    result[groupName].push(room);
   });
 
   return result;
@@ -205,14 +236,17 @@ async function loadRoomStatus() {
   loading.value = true;
 
   try {
-    // Fetch all rooms
-    const roomsResponse = await fetchRooms({});
+    // Fetch all rooms with increased size limit
+    const roomsResponse = await fetchRooms({
+      size: 1000,
+    });
     rooms.value = roomsResponse.values;
 
-    // Fetch reservations for the selected date range
+    // Fetch reservations for the selected date range with increased size limit
     const reservationsResponse = await fetchReservations({
       stayStartAt: dateRange.value.from,
       stayEndAt: dateRange.value.to,
+      size: 1000,
     });
     reservations.value = reservationsResponse.values;
   } catch (error) {
