@@ -10,6 +10,7 @@
             class="GNL__drawer-item"
             v-ripple
             clickable
+            :exact="link.text !== '객실'"
           >
             <q-item-section avatar>
               <q-icon :name="link.icon" />
