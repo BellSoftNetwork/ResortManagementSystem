@@ -332,6 +332,46 @@ function loadPaymentMethods() {
 }
 
 function submit() {
+  // Check if rooms are selected
+  if (selectedRooms.value.length === 0) {
+    $q.dialog({
+      title: "경고",
+      message: [
+        "객실 미배정 상태로 먼저 예약을 등록하시겠습니까?",
+        "객실을 배정하면 객실 현황 페이지에서 현재 객실 입실 상태를 한 눈에 확인할 수 있습니다.",
+      ].join("<br />"),
+      html: true,
+      cancel: {
+        label: "취소",
+        flat: true,
+        color: "negative",
+      },
+      ok: {
+        label: "등록",
+        flat: true,
+        color: "primary",
+      },
+      persistent: true,
+    })
+      .onOk(() => {
+        // Proceed with registration without room assignment
+        switch (mode.value) {
+          case "create":
+            return create();
+          case "update":
+            return update();
+        }
+      })
+      .onCancel(() => {
+        // Scroll to room assignment section
+        const roomGroupSelector = document.querySelector(".q-ma-none");
+        if (roomGroupSelector) {
+          roomGroupSelector.scrollIntoView({ behavior: "smooth" });
+        }
+      });
+    return;
+  }
+
   switch (mode.value) {
     case "create":
       return create();
