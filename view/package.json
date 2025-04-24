@@ -39,7 +39,6 @@
     "eslint-plugin-vue": "^9.0.0",
     "postcss": "^8.4.14",
     "prettier": "^2.5.1",
-    "quasar-app-extension-qdraggabletree": "^2.0.5",
     "typescript": "^5.3.2"
   },
   "engines": {

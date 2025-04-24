@@ -2506,20 +2506,6 @@ qs@6.11.0:
   dependencies:
     side-channel "^1.0.4"
 
-quasar-app-extension-qdraggabletree@^2.0.5:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/quasar-app-extension-qdraggabletree/-/quasar-app-extension-qdraggabletree-2.0.5.tgz#cdc8a323c93437763d21030204ae36908abe0350"
-  integrity sha512-ybZEp6k3TFZSbRdo2uTf5jJpi3uL7xhM1aU3eOgOqPiJs0/WuYxsHwl/daRkRMhyTVOn1dCdB8A4sZgXuAOwMg==
-  dependencies:
-    quasar-ui-qdraggabletree latest
-
-quasar-ui-qdraggabletree@latest:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/quasar-ui-qdraggabletree/-/quasar-ui-qdraggabletree-1.0.8.tgz#0bfbf7e6923a7f4e1786dafbc83cd0a87c9a593e"
-  integrity sha512-lC2Kc+3ebe989lNe0ctvwJ7q6Z7pE1aQREh4Dt0PjUhTQm60bWXHFaFLB41+v9I8yRsjLQEPppnck8V/tO+wvw==
-  dependencies:
-    vue-draggable-next "^2.2.1"
-
 quasar@^2.14.2:
   version "2.14.2"
   resolved "https://registry.yarnpkg.com/quasar/-/quasar-2.14.2.tgz#794d8434eb449549fc8455aaec9bc14b71a57c98"
@@ -3051,11 +3037,6 @@ vue-demi@>=0.14.5:
   version "0.14.6"
   resolved "https://registry.yarnpkg.com/vue-demi/-/vue-demi-0.14.6.tgz#dc706582851dc1cdc17a0054f4fec2eb6df74c92"
   integrity sha512-8QA7wrYSHKaYgUxDA5ZC24w+eHm3sYCbp0EzcDwKqN3p6HqtTCGR/GVsPyZW92unff4UlcSh++lmqDWN3ZIq4w==
-
-vue-draggable-next@^2.2.1:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/vue-draggable-next/-/vue-draggable-next-2.2.1.tgz#adbe98c74610cca8f4eb63f92042681f96920451"
-  integrity sha512-EAMS1IRHF0kZO0o5PMOinsQsXIqsrKT1hKmbICxG3UEtn7zLFkLxlAtajcCcUTisNvQ6TtCB5COjD9a1raNADw==
 
 vue-eslint-parser@^9.3.1:
   version "9.3.2"
