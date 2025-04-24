@@ -2,7 +2,7 @@
   <q-card>
     <q-card-section class="text-h6">{{ typeName }} {{ modeTitle }}</q-card-section>
 
-    <form @submit="submit">
+    <form @submit.prevent="submit">
       <q-card-section>
         <div class="row q-gutter-md q-pa-sm">
           <div class="col">
