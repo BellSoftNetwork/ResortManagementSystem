@@ -17,9 +17,26 @@
 
       <!-- 달력 네비게이션 컨트롤 -->
       <div class="row q-mb-md justify-between items-center">
-        <q-btn icon="chevron_left" color="primary" flat round dense @click="navigatePreviousMonth" />
+        <q-btn icon="chevron_left" color="primary" flat round dense @click="calendar?.prev()" />
         <div class="text-h6">{{ currentMonthLabel }}</div>
-        <q-btn icon="chevron_right" color="primary" flat round dense @click="navigateNextMonth" />
+        <q-btn icon="chevron_right" color="primary" flat round dense @click="calendar?.next()" />
+      </div>
+
+      <!-- 새로고침 상태 표시 -->
+      <div class="row q-mb-md justify-between items-center">
+        <div class="text-caption text-grey">
+          마지막 갱신: {{ lastRefreshTime }}
+          <q-tooltip>페이지 포커스 복귀 시 자동 갱신됩니다.</q-tooltip>
+        </div>
+        <q-btn
+          icon="refresh"
+          color="primary"
+          flat
+          dense
+          :loading="status.isLoading"
+          @click="fetchData()"
+          label="새로고침"
+        />
       </div>
 
       <div class="row">
@@ -28,19 +45,22 @@
             ref="calendar"
             v-model="selectedDate"
             @navigation="changeView"
+            @update:model-value="onDateSelect"
+            :year="calendarYear"
+            :month="calendarMonth"
             :hoverable="true"
-            :focusable="true"
+            :focusable="false"
             :focus-type="['day', 'date']"
             :now="formatDate"
             mask="YYYY-MM-DD"
             locale="ko-KR"
-            day-min-height="60"
+            day-min-height="150"
             :day-height="0"
             animated
             bordered
           >
-            <template #week="{ scope: { week, weekdays } }">
-              <template v-for="(displayedEvent, index) in getWeekEvents(week, weekdays)" :key="index">
+            <template #week="{ scope: { week } }">
+              <template v-for="(displayedEvent, index) in getWeekEvents(week)" :key="index">
                 <div :class="badgeClasses(displayedEvent)" :style="badgeStyles(displayedEvent, week.length)">
                   <q-btn
                     v-if="displayedEvent.event && displayedEvent.event.name"
@@ -66,124 +86,130 @@
         </div>
       </div>
 
-      <div class="row">
+      <div class="row q-pt-sm">
         <div class="col q-pa-md-sm">
-          <q-tab-panels v-model="selectedDate">
-            <q-tab-panel
-              v-for="(reservations, stayStartAt) in reservationsOfDay"
-              :key="stayStartAt"
-              :name="stayStartAt"
-              class="q-px-none"
+          <div style="min-height: 500px">
+            <q-table
+              :columns="columns"
+              :rows="currentDateReservations"
+              row-key="id"
+              flat
+              bordered
+              :pagination="{ rowsPerPage: 20, sortBy: 'type', descending: false }"
             >
-              <q-table
-                :columns="columns"
-                :rows="reservations"
-                row-key="id"
-                flat
-                bordered
-                :pagination="{ rowsPerPage: 20, sortBy: 'type', descending: false }"
-              >
-                <template #top>
-                  <div class="row justify-between items-center q-pa-sm full-width">
-                    <div class="text-h6">{{ stayStartAt }} 예약 현황</div>
-                    <div class="row q-gutter-sm">
-                      <q-badge v-if="checkInOutCounts[stayStartAt]?.checkIn > 0" color="positive" class="q-px-sm">
-                        입실 {{ checkInOutCounts[stayStartAt]?.checkIn }}
-                      </q-badge>
-                      <q-badge v-if="checkInOutCounts[stayStartAt]?.checkOut > 0" color="negative" class="q-px-sm">
-                        퇴실 {{ checkInOutCounts[stayStartAt]?.checkOut }}
-                      </q-badge>
-                    </div>
+              <template #top>
+                <div class="row justify-between items-center q-pa-sm full-width">
+                  <div class="row items-center">
+                    <q-btn icon="chevron_left" color="primary" flat round dense @click="changeDatePrev()" />
+                    <div class="text-h6">{{ selectedDate }} 예약 현황</div>
+                    <q-btn icon="chevron_right" color="primary" flat round dense @click="changeDateNext()" />
                   </div>
-                </template>
-                <template #header="props">
-                  <q-tr :props="props">
-                    <q-th v-for="col in props.cols" :key="col.name" :props="props" class="bg-blue-1">
-                      {{ col.label }}
-                    </q-th>
-                  </q-tr>
-                </template>
-                <template #body-cell-type="props">
-                  <q-td key="type" :props="props">
-                    <q-badge :color="getTypeColor(props.row.type)" text-color="white" class="q-px-sm">
-                      {{ props.row.type }}
+                  <div class="row q-gutter-sm">
+                    <q-badge v-if="checkInOutCounts[selectedDate]?.checkIn > 0" color="positive" class="q-px-sm">
+                      입실 {{ checkInOutCounts[selectedDate]?.checkIn }}
                     </q-badge>
-                  </q-td>
-                </template>
+                    <q-badge v-if="checkInOutCounts[selectedDate]?.checkOut > 0" color="negative" class="q-px-sm">
+                      퇴실 {{ checkInOutCounts[selectedDate]?.checkOut }}
+                    </q-badge>
+                    <q-badge v-if="!currentDateReservations.length" color="grey" class="q-px-sm"> 예약 없음</q-badge>
+                  </div>
+                </div>
+              </template>
 
-                <template #body-cell-rooms="props">
-                  <q-td key="rooms" :props="props">
-                    <div v-if="props.row.rooms.length !== 0">
-                      <span v-for="room in props.row.rooms" :key="room.id">
-                        <div v-if="authStore.isAdminRole">
-                          <q-btn
-                            :to="{
-                              name: 'Room',
-                              params: { id: room.id },
-                            }"
-                            align="left"
-                            color="primary"
-                            dense
-                            flat
-                            >{{ room.number }}
-                          </q-btn>
-                        </div>
-                        <div v-else>
-                          {{ room.number }}
-                        </div>
-                      </span>
-                    </div>
-                    <div v-else class="text-grey">미배정</div>
-                  </q-td>
-                </template>
+              <template #header="props">
+                <q-tr :props="props">
+                  <q-th v-for="col in props.cols" :key="col.name" :props="props" class="bg-blue-1">
+                    {{ col.label }}
+                  </q-th>
+                </q-tr>
+              </template>
 
-                <template #body-cell-name="props">
-                  <q-td key="name" :props="props">
-                    <div v-if="authStore.isAdminRole">
-                      <q-btn
-                        :to="{
-                          name: 'Reservation',
-                          params: { id: props.row.id },
-                        }"
-                        class="full-width"
-                        align="left"
-                        color="primary"
-                        dense
-                        flat
-                        >{{ props.row.name }}
-                      </q-btn>
-                    </div>
-                    <div v-else>
-                      {{ props.row.name }}
-                    </div>
-                  </q-td>
-                </template>
+              <template #body-cell-type="props">
+                <q-td key="type" :props="props">
+                  <q-badge :color="getTypeColor(props.row.type)" text-color="white" class="q-px-sm">
+                    {{ props.row.type }}
+                  </q-badge>
+                </q-td>
+              </template>
 
-                <template #body-cell-missPrice="props">
-                  <q-td :props="props" key="missPrice" :class="missPriceBackgroundColor(props.row)">
-                    {{ formatPrice(props.row.missPrice) }}
-                  </q-td>
-                </template>
+              <template #body-cell-rooms="props">
+                <q-td key="rooms" :props="props">
+                  <div v-if="props.row.rooms.length !== 0">
+                    <span v-for="room in props.row.rooms" :key="room.id">
+                      <div v-if="authStore.isAdminRole">
+                        <q-btn
+                          :to="{
+                            name: 'Room',
+                            params: { id: room.id },
+                          }"
+                          align="left"
+                          color="primary"
+                          dense
+                          flat
+                          >{{ room.number }}
+                        </q-btn>
+                      </div>
+                      <div v-else>
+                        {{ room.number }}
+                      </div>
+                    </span>
+                  </div>
+                  <div v-else class="text-grey">미배정</div>
+                </q-td>
+              </template>
 
-                <template #body-cell-note="props">
-                  <q-td :props="props" key="note">
+              <template #body-cell-name="props">
+                <q-td key="name" :props="props">
+                  <div v-if="authStore.isAdminRole">
                     <q-btn
-                      v-if="props.row.note"
-                      @click="
-                        $q.dialog({
-                          title: `${props.row.name}님 예약 메모`,
-                          message: props.row.note,
-                        })
-                      "
+                      :to="{
+                        name: 'Reservation',
+                        params: { id: props.row.id },
+                      }"
+                      class="full-width"
+                      align="left"
                       color="primary"
-                    >
-                      메모 확인
+                      dense
+                      flat
+                      >{{ props.row.name }}
                     </q-btn>
-                  </q-td>
-                </template>
-              </q-table>
-            </q-tab-panel>
-          </q-tab-panels>
+                  </div>
+                  <div v-else>
+                    {{ props.row.name }}
+                  </div>
+                </q-td>
+              </template>
+
+              <template #body-cell-missPrice="props">
+                <q-td :props="props" key="missPrice" :class="missPriceBackgroundColor(props.row)">
+                  {{ formatPrice(props.row.missPrice) }}
+                </q-td>
+              </template>
+
+              <template #body-cell-note="props">
+                <q-td :props="props" key="note">
+                  <q-btn
+                    v-if="props.row.note"
+                    @click="
+                      $q.dialog({
+                        title: `${props.row.name}님 예약 메모`,
+                        message: props.row.note,
+                      })
+                    "
+                    color="primary"
+                  >
+                    메모 확인
+                  </q-btn>
+                </q-td>
+              </template>
+
+              <template #no-data>
+                <div class="full-width row justify-center q-py-md">
+                  <div class="text-grey text-body1">이 날짜에 등록된 예약이 없습니다.</div>
+                </div>
+              </template>
+            </q-table>
+          </div>
         </div>
       </div>
     </q-card-section>
@@ -191,7 +217,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import dayjs from "dayjs";
 import { useQuasar } from "quasar";
 import { daysBetween, isOverlappingDates, parsed, QCalendarMonth, Timestamp } from "@quasar/quasar-ui-qcalendar";
@@ -212,6 +238,7 @@ const status = ref({
 });
 const filter = ref({
   sort: "stayStartAt",
+  // 초기값은 나중에 calculateExtendedDateRange 함수로 계산된 값으로 대체됩니다
   stayStartAt: dayjs().startOf("month").format("YYYY-MM-DD"),
   stayEndAt: dayjs().endOf("month").format("YYYY-MM-DD"),
 });
@@ -259,6 +286,15 @@ const calendar = ref<QCalendarMonth>();
 const selectedDate = ref(formatDate());
 const currentMonth = ref(dayjs());
 const reservationsOfDay = ref({});
+const lastRefreshTime = ref("로딩 중...");
+const refreshTimer = ref<number | null>(null);
+const refreshInterval = ref(5 * 60 * 1000); // 기본값: 5분마다 갱신
+
+// 현재 선택된 날짜의 예약 정보를 계산하는 속성
+const currentDateReservations = computed((): Reservation[] => {
+  return reservationsOfDay.value[selectedDate.value] || [];
+});
+
 const calendarEvents = computed(() => {
   const events = [];
 
@@ -284,6 +320,12 @@ const calendarEvents = computed(() => {
 
 const currentMonthLabel = computed(() => {
   return currentMonth.value.format("YYYY년 M월");
+});
+const calendarYear = computed(() => {
+  return currentMonth.value.year();
+});
+const calendarMonth = computed(() => {
+  return currentMonth.value.month() + 1; // dayjs는 0-indexed 월을 반환하지만 QCalendar는 1-indexed 월을 사용
 });
 const checkInOutCounts = computed(() => {
   const counts: { [date: string]: { checkIn: number; checkOut: number } } = {};
@@ -334,8 +376,9 @@ function fetchData() {
   })
     .then((response) => {
       reservationsOfDay.value = formatReservations(response.values);
-
       status.value.isLoaded = true;
+      // 마지막 갱신 시간 업데이트
+      lastRefreshTime.value = dayjs().format("YYYY-MM-DD HH:mm:ss");
     })
     .finally(() => {
       status.value.isLoading = false;
@@ -378,29 +421,57 @@ function getDateArray(startDate: string, endDate: string) {
   return dateArray;
 }
 
+// 달력에 표시되는 확장된 날짜 범위를 계산하는 함수
+function calculateExtendedDateRange(month: dayjs.Dayjs) {
+  // 해당 월의 시작일과 마지막일
+  const monthStart = month.startOf("month");
+  const monthEnd = month.endOf("month");
+
+  // 해당 월의 첫 날짜가 속한 주의 첫째 날 (전월의 마지막 주 포함)
+  const startOfFirstWeek = monthStart.startOf("week");
+
+  // 해당 월의 마지막 날짜가 속한 주의 마지막 날 (다음 월의 첫째 주 포함)
+  const endOfLastWeek = monthEnd.endOf("week");
+
+  return {
+    startAt: startOfFirstWeek.format("YYYY-MM-DD"),
+    endAt: endOfLastWeek.format("YYYY-MM-DD"),
+  };
+}
+
 function changeView(view) {
   const year = view.year;
   const month = view.month;
 
   currentMonth.value = dayjs(`${year}-${month}-01`);
-  filter.value.stayStartAt = currentMonth.value.startOf("month").format("YYYY-MM-DD");
-  filter.value.stayEndAt = currentMonth.value.endOf("month").format("YYYY-MM-DD");
+
+  // 확장된 날짜 범위 계산
+  const dateRange = calculateExtendedDateRange(currentMonth.value);
+  filter.value.stayStartAt = dateRange.startAt;
+  filter.value.stayEndAt = dateRange.endAt;
+
+  // 날짜 선택값도 현재 월의 1일로 업데이트
+  selectedDate.value = currentMonth.value.startOf("month").format("YYYY-MM-DD");
 
   fetchData();
 }
 
-function navigatePreviousMonth() {
-  currentMonth.value = currentMonth.value.subtract(1, "month");
-  filter.value.stayStartAt = currentMonth.value.startOf("month").format("YYYY-MM-DD");
-  filter.value.stayEndAt = currentMonth.value.endOf("month").format("YYYY-MM-DD");
-  fetchData();
-}
+function onDateSelect(date) {
+  // 날짜 선택 시 해당 날짜로 selectedDate 업데이트
+  selectedDate.value = date;
 
-function navigateNextMonth() {
-  currentMonth.value = currentMonth.value.add(1, "month");
-  filter.value.stayStartAt = currentMonth.value.startOf("month").format("YYYY-MM-DD");
-  filter.value.stayEndAt = currentMonth.value.endOf("month").format("YYYY-MM-DD");
-  fetchData();
+  const selectedMonth = dayjs(date);
+  // 선택된 날짜의 월이 현재 표시 중인 월과 다른 경우에만 업데이트
+  if (selectedMonth.month() !== currentMonth.value.month() || selectedMonth.year() !== currentMonth.value.year()) {
+    currentMonth.value = selectedMonth;
+
+    // 확장된 날짜 범위 계산
+    const dateRange = calculateExtendedDateRange(currentMonth.value);
+    filter.value.stayStartAt = dateRange.startAt;
+    filter.value.stayEndAt = dateRange.endAt;
+
+    fetchData();
+  }
 }
 
 function missPriceBackgroundColor(value) {
@@ -468,6 +539,26 @@ function getTypeColor(type: string) {
     default:
       return "grey";
   }
+}
+
+function changeDatePrev() {
+  const prevDate = dayjs(selectedDate.value).subtract(1, "day").format("YYYY-MM-DD");
+
+  if (dayjs(prevDate).month() !== dayjs(selectedDate.value).month()) {
+    calendar.value?.prev();
+  }
+
+  selectedDate.value = prevDate;
+}
+
+function changeDateNext() {
+  const nextDate = dayjs(selectedDate.value).add(1, "day").format("YYYY-MM-DD");
+
+  if (dayjs(nextDate).month() !== dayjs(selectedDate.value).month()) {
+    calendar.value?.next();
+  }
+
+  selectedDate.value = nextDate;
 }
 
 interface CalendarEvent {
@@ -599,8 +690,67 @@ function badgeStyles(displayedEvent: DisplayedEvent, weekLength: number) {
   return s;
 }
 
+// 페이지 포커스 이벤트 핸들러
+function handleVisibilityChange() {
+  if (document.visibilityState === "visible") {
+    // 페이지가 다시 보이게 되면 데이터 새로고침
+    fetchData();
+  }
+}
+
+// 키보드 이벤트 핸들러 - 화살표 키로 날짜 이동
+function handleKeyDown(e: KeyboardEvent) {
+  // 다른 입력 필드에 포커스가 있을 때는 이벤트를 무시
+  if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+    return;
+  }
+
+  if (e.key === "ArrowLeft") {
+    changeDatePrev();
+  } else if (e.key === "ArrowRight") {
+    changeDateNext();
+  }
+}
+
+// 자동 갱신 타이머 설정
+function setupRefreshTimer() {
+  // 기존 타이머가 있으면 정리
+  if (refreshTimer.value !== null) {
+    clearInterval(refreshTimer.value);
+  }
+
+  // 새 타이머 설정 (기본값: 5분)
+  refreshTimer.value = window.setInterval(() => {
+    fetchData();
+  }, refreshInterval.value);
+}
+
 onMounted(() => {
+  // 초기 로딩 시 현재 월에 대한 확장된 날짜 범위 설정
+  const dateRange = calculateExtendedDateRange(currentMonth.value);
+  filter.value.stayStartAt = dateRange.startAt;
+  filter.value.stayEndAt = dateRange.endAt;
+
+  // 페이지 포커스 변경 이벤트 리스너 등록
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+
+  // 키보드 이벤트 리스너 등록
+  document.addEventListener("keydown", handleKeyDown);
+
+  // 초기 데이터 로드 및 자동 갱신 타이머 설정
   fetchData();
+  setupRefreshTimer();
+});
+
+onUnmounted(() => {
+  // 컴포넌트 언마운트 시 이벤트 리스너 및 타이머 정리
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
+  document.removeEventListener("keydown", handleKeyDown);
+
+  if (refreshTimer.value !== null) {
+    clearInterval(refreshTimer.value);
+    refreshTimer.value = null;
+  }
 });
 </script>
 
