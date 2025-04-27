@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import {
   fasBook,
   fasCalendar,
+  fasChartLine,
   fasCommentDollar,
   fasHotel,
   fasPersonShelter,
@@ -23,6 +24,7 @@ const adminLinks: Link[] = [
   { icon: fasBook, text: "예약", to: "Reservations", gnb: true },
   { icon: fasSignature, text: "달방", to: "MonthlyRents", gnb: true },
   { icon: fasCalendar, text: "객실 현황", to: "RoomStatus", gnb: true },
+  { icon: fasChartLine, text: "통계", to: "Stats", gnb: true },
   { icon: fasPersonShelter, text: "객실", to: "Rooms" },
   { icon: fasHotel, text: "객실 그룹", to: "RoomGroups" },
   { icon: fasCommentDollar, text: "결제 수단", to: "PaymentMethods" },
