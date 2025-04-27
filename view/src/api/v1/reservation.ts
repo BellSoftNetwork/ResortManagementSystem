@@ -71,3 +71,43 @@ export async function fetchReservationHistories(id: number, params: FetchReserva
   });
   return result.data;
 }
+
+export enum StatisticsPeriodType {
+  DAILY = "DAILY",
+  WEEKLY = "WEEKLY",
+  MONTHLY = "MONTHLY",
+  YEARLY = "YEARLY",
+}
+
+export interface StatisticsData {
+  period: string;
+  totalSales: number;
+  totalReservations: number;
+  totalGuests: number;
+}
+
+export interface ReservationStatistics {
+  periodType: StatisticsPeriodType;
+  stats: Array<StatisticsData>;
+  monthlyStats: Array<{
+    yearMonth: string;
+    totalSales: number;
+    totalReservations: number;
+    totalGuests: number;
+  }>;
+}
+
+export async function fetchReservationStatistics(
+  startDate: string,
+  endDate: string,
+  periodType: StatisticsPeriodType = StatisticsPeriodType.MONTHLY,
+) {
+  const result = await api.get<SingleResponse<ReservationStatistics>>("/api/v1/reservation-statistics", {
+    params: {
+      startDate,
+      endDate,
+      periodType,
+    },
+  });
+  return result.data;
+}

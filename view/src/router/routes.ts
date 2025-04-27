@@ -195,6 +195,21 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: "/stats",
+    component: DefaultLayout,
+    meta: {
+      isAuthenticated: true,
+      roles: ["ADMIN", "SUPER_ADMIN"],
+    },
+    children: [
+      {
+        path: "",
+        name: "Stats",
+        component: () => import("pages/stats/StatsPage.vue"),
+      },
+    ],
+  },
+  {
     path: "/debug",
     component: DefaultLayout,
     meta: {

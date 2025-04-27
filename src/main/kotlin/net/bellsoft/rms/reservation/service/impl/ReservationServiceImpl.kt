@@ -6,6 +6,8 @@ import net.bellsoft.rms.common.dto.response.EntityListDto
 import net.bellsoft.rms.common.exception.DataNotFoundException
 import net.bellsoft.rms.reservation.dto.filter.ReservationFilterDto
 import net.bellsoft.rms.reservation.dto.response.ReservationDetailDto
+import net.bellsoft.rms.reservation.dto.response.ReservationStatisticsDto
+import net.bellsoft.rms.reservation.dto.response.StatisticsPeriodType
 import net.bellsoft.rms.reservation.dto.service.ReservationCreateDto
 import net.bellsoft.rms.reservation.dto.service.ReservationPatchDto
 import net.bellsoft.rms.reservation.entity.Reservation
@@ -22,6 +24,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 @Transactional(readOnly = true)
@@ -114,4 +117,12 @@ class ReservationServiceImpl(
     override fun findHistory(id: Long, pageable: Pageable): EntityListDto<EntityRevisionDto<ReservationDetailDto>> =
         EntityListDto
             .of(entityRevisionComponent.findAllHistory(Reservation::class, reservationMapper::toDto, id, pageable))
+
+    override fun getStatistics(
+        startDate: LocalDate,
+        endDate: LocalDate,
+        periodType: StatisticsPeriodType,
+    ): ReservationStatisticsDto {
+        return reservationRepository.getReservationStatistics(startDate, endDate, periodType)
+    }
 }

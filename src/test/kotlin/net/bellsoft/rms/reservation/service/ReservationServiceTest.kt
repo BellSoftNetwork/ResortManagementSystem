@@ -14,6 +14,7 @@ import net.bellsoft.rms.common.util.TestDatabaseSupport
 import net.bellsoft.rms.fixture.baseFixture
 import net.bellsoft.rms.payment.repository.PaymentMethodRepository
 import net.bellsoft.rms.reservation.dto.filter.ReservationFilterDto
+import net.bellsoft.rms.reservation.dto.response.StatisticsPeriodType
 import net.bellsoft.rms.reservation.dto.service.ReservationCreateDto
 import net.bellsoft.rms.reservation.dto.service.ReservationPatchDto
 import net.bellsoft.rms.reservation.entity.Reservation
@@ -297,18 +298,26 @@ internal class ReservationServiceTest(
                     fixture {
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 10, 31) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 1) }
+                        property(Reservation::price) { 100000 }
+                        property(Reservation::peopleCount) { 2 }
                     },
                     fixture {
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 1) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 11, 5) }
+                        property(Reservation::price) { 200000 }
+                        property(Reservation::peopleCount) { 3 }
                     },
                     fixture {
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 11, 30) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 12, 5) }
+                        property(Reservation::price) { 300000 }
+                        property(Reservation::peopleCount) { 4 }
                     },
                     fixture {
                         property(Reservation::stayStartAt) { LocalDate.of(2023, 12, 1) }
                         property(Reservation::stayEndAt) { LocalDate.of(2023, 12, 5) }
+                        property(Reservation::price) { 400000 }
+                        property(Reservation::peopleCount) { 5 }
                     },
                 ),
             )
@@ -365,6 +374,56 @@ internal class ReservationServiceTest(
 
                 Then("중복 객실 설정 예외가 발생하면서 수정되지 않는다") {
                     exception.message shouldContain "(${room.number})"
+                }
+            }
+
+            When("기본 기간 타입(MONTHLY)으로 예약 통계를 조회하면") {
+                val startDate = LocalDate.of(2023, 10, 1)
+                val endDate = LocalDate.of(2023, 12, 31)
+                val statistics = reservationService.getStatistics(startDate, endDate)
+
+                Then("월별 통계 데이터가 정상적으로 조회된다") {
+                    statistics.periodType shouldBe StatisticsPeriodType.MONTHLY
+                    statistics.stats.size shouldBe 3
+
+                    // 10월 데이터 확인
+                    val octoberStats = statistics.stats.find { it.period == "2023-10" }
+                    octoberStats shouldNotBe null
+                    octoberStats?.totalSales shouldBe 100000L
+                    octoberStats?.totalReservations shouldBe 1
+                    octoberStats?.totalGuests shouldBe 2
+
+                    // 11월 데이터 확인
+                    val novemberStats = statistics.stats.find { it.period == "2023-11" }
+                    novemberStats shouldNotBe null
+                    novemberStats?.totalSales shouldBe 500000L // 200000 + 300000
+                    novemberStats?.totalReservations shouldBe 2
+                    novemberStats?.totalGuests shouldBe 7 // 3 + 4
+
+                    // 12월 데이터 확인
+                    val decemberStats = statistics.stats.find { it.period == "2023-12" }
+                    decemberStats shouldNotBe null
+                    decemberStats?.totalSales shouldBe 400000L
+                    decemberStats?.totalReservations shouldBe 1
+                    decemberStats?.totalGuests shouldBe 5
+                }
+            }
+
+            When("일별 기간 타입으로 예약 통계를 조회하면") {
+                val startDate = LocalDate.of(2023, 11, 1)
+                val endDate = LocalDate.of(2023, 11, 5)
+                val statistics = reservationService.getStatistics(startDate, endDate, StatisticsPeriodType.DAILY)
+
+                Then("일별 통계 데이터가 정상적으로 조회된다") {
+                    statistics.periodType shouldBe StatisticsPeriodType.DAILY
+                    statistics.stats.size shouldBe 2
+
+                    // 11월 1일 데이터 확인
+                    val nov1Stats = statistics.stats.find { it.period == "2023-11-01" }
+                    nov1Stats shouldNotBe null
+                    nov1Stats?.totalSales shouldBe 200000L
+                    nov1Stats?.totalReservations shouldBe 1
+                    nov1Stats?.totalGuests shouldBe 3
                 }
             }
         }
