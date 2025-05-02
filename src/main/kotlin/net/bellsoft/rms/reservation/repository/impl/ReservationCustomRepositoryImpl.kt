@@ -3,7 +3,6 @@ package net.bellsoft.rms.reservation.repository.impl
 import com.querydsl.core.types.Order
 import com.querydsl.core.types.OrderSpecifier
 import com.querydsl.core.types.Projections
-import com.querydsl.core.types.dsl.Expressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import net.bellsoft.rms.reservation.dto.filter.ReservationFilterDto
 import net.bellsoft.rms.reservation.dto.response.ReservationStatisticsDto
@@ -29,12 +28,14 @@ class ReservationCustomRepositoryImpl(
         val result = getFilteredReservationsBaseQuery(filter)
             .select(QReservation.reservation)
             .orderBy(
-                *pageable.sort.map {
-                    OrderSpecifier(
-                        if (it.isAscending) Order.ASC else Order.DESC,
-                        Expressions.path(String::class.java, QReservation.reservation, it.property),
-                    )
-                }.toList().toTypedArray<OrderSpecifier<String>?>(),
+                // 1. 입실일 빠른 순
+                OrderSpecifier(Order.ASC, QReservation.reservation.stayStartAt),
+                // 2. 퇴실일 늦은 순
+                OrderSpecifier(Order.DESC, QReservation.reservation.stayEndAt),
+                // 3. 예약 인원 많은 순
+                OrderSpecifier(Order.DESC, QReservation.reservation.peopleCount),
+                // 4. 예약 정보 등록 시간이 빠른 순
+                OrderSpecifier(Order.ASC, QReservation.reservation.id),
             )
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
