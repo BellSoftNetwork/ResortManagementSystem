@@ -54,6 +54,7 @@
             :now="formatDate"
             mask="YYYY-MM-DD"
             locale="ko-KR"
+            :weekdays="[1, 2, 3, 4, 5, 6, 0]"
             day-min-height="150"
             :day-height="0"
             animated
@@ -427,11 +428,26 @@ function calculateExtendedDateRange(month: dayjs.Dayjs) {
   const monthStart = month.startOf("month");
   const monthEnd = month.endOf("month");
 
-  // 해당 월의 첫 날짜가 속한 주의 첫째 날 (전월의 마지막 주 포함)
-  const startOfFirstWeek = monthStart.startOf("week");
+  // 월요일(1)을 기준으로 시작 날짜 계산
+  // day()가 1(월요일)이면 0, 0(일요일)이면 -6, 나머지는 해당 요일만큼 빼기
+  let daysToSubtract = 0;
+  const firstDayOfMonth = monthStart.day();
 
-  // 해당 월의 마지막 날짜가 속한 주의 마지막 날 (다음 월의 첫째 주 포함)
-  const endOfLastWeek = monthEnd.endOf("week");
+  if (firstDayOfMonth === 0) {
+    // 일요일인 경우 6일 전으로
+    daysToSubtract = 6;
+  } else if (firstDayOfMonth !== 1) {
+    // 월요일이 아닌 경우 (화~토), 해당 요일에서 1 빼기
+    daysToSubtract = firstDayOfMonth - 1;
+  }
+  // 월요일인 경우 daysToSubtract는 0 유지
+
+  const startOfFirstWeek = monthStart.subtract(daysToSubtract, "day");
+
+  // 일요일(0)을 기준으로 종료 날짜 계산
+  // day()가 0(일요일)이면 0, 나머지는 (7 - 해당 요일) 더하기
+  const daysToAdd = monthEnd.day() === 0 ? 0 : 7 - monthEnd.day();
+  const endOfLastWeek = monthEnd.add(daysToAdd, "day");
 
   return {
     startAt: startOfFirstWeek.format("YYYY-MM-DD"),
