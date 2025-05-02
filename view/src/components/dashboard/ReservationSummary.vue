@@ -259,6 +259,14 @@ const columns = [
     sortable: true,
   },
   {
+    name: "peopleCount",
+    field: "peopleCount",
+    label: "인원수",
+    align: "center",
+    required: true,
+    sortable: true,
+  },
+  {
     name: "missPrice",
     field: "missPrice",
     label: "미수금",
