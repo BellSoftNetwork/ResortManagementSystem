@@ -34,7 +34,9 @@ class ReservationCustomRepositoryImpl(
                 OrderSpecifier(Order.DESC, QReservation.reservation.stayEndAt),
                 // 3. 예약 인원 많은 순
                 OrderSpecifier(Order.DESC, QReservation.reservation.peopleCount),
-                // 4. 예약 정보 등록 시간이 빠른 순
+                // 4. 이름순
+                OrderSpecifier(Order.ASC, QReservation.reservation.name),
+                // 5. 예약 정보 등록 시간이 빠른 순
                 OrderSpecifier(Order.ASC, QReservation.reservation.id),
             )
             .offset(pageable.offset)
