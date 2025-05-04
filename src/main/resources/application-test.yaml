@@ -19,3 +19,8 @@ spring:
   sql:
     init:
       platform: h2
+
+# JWT Configuration
+security:
+  jwt:
+    secret: ${JWT_SECRET:ThisIsASecretKeyForJwtTokenGenerationAndShouldBeChangedInProduction}

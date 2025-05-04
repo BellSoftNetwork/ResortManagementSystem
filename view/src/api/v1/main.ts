@@ -10,8 +10,8 @@ type MyParams = {
 
 export type MyPatchParams = Partial<MyParams>;
 
-export async function postMy() {
-  const result = await api.post<SingleResponse<User>>("/api/v1/my");
+export async function getMy() {
+  const result = await api.get<SingleResponse<User>>("/api/v1/my");
   return result.data;
 }
 

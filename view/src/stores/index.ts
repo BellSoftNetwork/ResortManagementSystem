@@ -25,8 +25,16 @@ declare module "pinia" {
 export default store((/* { ssrContext } */) => {
   const pinia = createPinia();
 
-  // You can add Pinia plugins here
-  // pinia.use(SomePiniaPlugin)
+  // Add a plugin to call hydrate method on stores that have it
+  pinia.use(({ store }) => {
+    // Add a hook to call hydrate after the store is initialized
+    if (store.$id === "auth" && "hydrate" in store) {
+      console.log("Calling hydrate method on auth store");
+      // Call the hydrate method with the store's state
+      const hydrateFn = store.hydrate as (state: unknown) => Promise<void>;
+      hydrateFn.call(store, store.$state);
+    }
+  });
 
   return pinia;
 });

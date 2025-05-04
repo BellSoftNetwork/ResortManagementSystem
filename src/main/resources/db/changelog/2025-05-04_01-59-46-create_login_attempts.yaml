@@ -1,0 +1,89 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1746291586314-45
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_login_attempts
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: username
+                  remarks: 계정 ID
+                  type: VARCHAR(50)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: ip_address
+                  remarks: IP 주소
+                  type: VARCHAR(50)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: successful
+                  remarks: 로그인 성공 여부
+                  type: BOOLEAN
+              - column:
+                  constraints:
+                    nullable: false
+                  name: attempt_at
+                  remarks: 로그인 시도 시각
+                  type: DATETIME
+              - column:
+                  name: os_info
+                  type: VARCHAR(50)
+                  remarks: 운영체제 정보
+              - column:
+                  name: language_info
+                  type: VARCHAR(50)
+                  remarks: 언어 설정 정보
+              - column:
+                  name: user_agent
+                  remarks: 사용자 에이전트 정보
+                  type: VARCHAR(500)
+              - column:
+                  name: device_fingerprint
+                  remarks: 디바이스 정보
+                  type: VARCHAR(100)
+            tableName: login_attempts
+  - changeSet:
+      id: 1746291586314-46
+      author: Bell
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ip_address
+              - column:
+                  name: attempt_at
+            indexName: idx_login_attempts_ip_address_attempt_at
+            tableName: login_attempts
+        - createIndex:
+            columns:
+              - column:
+                  name: username
+              - column:
+                  name: attempt_at
+            indexName: idx_login_attempts_username_attempt_at
+            tableName: login_attempts
+        - createIndex:
+            columns:
+              - column:
+                  name: username
+              - column:
+                  name: ip_address
+              - column:
+                  name: attempt_at
+            indexName: idx_login_attempts_username_ip_address_attempt_at
+            tableName: login_attempts
+

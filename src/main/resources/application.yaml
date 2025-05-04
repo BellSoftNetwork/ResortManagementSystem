@@ -84,3 +84,13 @@ decorator:
   datasource:
     p6spy:
       enable-logging: false
+
+# JWT Configuration
+security:
+  login-attempt:
+    max-attempts: 5
+    window-minutes: 30
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-validity-in-hours: ${JWT_ACCESS_TOKEN_VALIDITY:1}
+    refresh-token-validity-in-hours: ${JWT_REFRESH_TOKEN_VALIDITY:720}
