@@ -1,5 +1,7 @@
 package net.bellsoft.rms.fixture.config
 
+import net.bellsoft.rms.authentication.fixture.DeviceInfoFixture
+import net.bellsoft.rms.authentication.fixture.LoginAttemptFixture
 import net.bellsoft.rms.payment.fixture.PaymentMethodFixture
 import net.bellsoft.rms.reservation.fixture.ReservationCreateDtoFixture
 import net.bellsoft.rms.reservation.fixture.ReservationFixture
@@ -21,6 +23,7 @@ private val domainConfigurations = listOf(
     ReservationFixture.BASE_CONFIGURATION,
     ReservationRoomFixture.BASE_CONFIGURATION,
     PaymentMethodFixture.BASE_CONFIGURATION,
+    LoginAttemptFixture.BASE_CONFIGURATION,
 )
 
 // NOTE: 신규 DTO 추가 시 해당 DTO Configuration 생성 후 아래에 등록 필요
@@ -31,6 +34,7 @@ private val dtoFixtureConfigurations = listOf(
     ReservationCreateDtoFixture.BASE_CONFIGURATION,
     RoomCreateDtoFixture.BASE_CONFIGURATION,
     RoomGroupCreateDtoFixture.BASE_CONFIGURATION,
+    DeviceInfoFixture.BASE_CONFIGURATION,
 )
 
 // NOTE: 신규 설정 리스트 생성 시 해당 설정 리스트를 아래에 등록 필요

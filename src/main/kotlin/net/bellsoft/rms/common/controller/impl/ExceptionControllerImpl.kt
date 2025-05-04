@@ -1,8 +1,14 @@
 package net.bellsoft.rms.common.controller.impl
 
+import io.jsonwebtoken.ExpiredJwtException
+import io.jsonwebtoken.MalformedJwtException
+import io.jsonwebtoken.UnsupportedJwtException
+import io.jsonwebtoken.security.SignatureException
 import jakarta.validation.ConstraintViolationException
 import mu.KLogging
+import net.bellsoft.rms.authentication.exception.InvalidRefreshTokenException
 import net.bellsoft.rms.authentication.exception.InvalidTokenException
+import net.bellsoft.rms.authentication.exception.TooManyRequestsException
 import net.bellsoft.rms.common.controller.ExceptionController
 import net.bellsoft.rms.common.dto.response.ErrorResponse
 import net.bellsoft.rms.common.exception.BadRequestException
@@ -13,6 +19,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.validation.BindException
 import org.springframework.web.bind.MethodArgumentNotValidException
@@ -102,7 +109,7 @@ class ExceptionControllerImpl : ExceptionController {
         logger.info(ex.message.toString())
 
         return ResponseEntity
-            .badRequest()
+            .status(HttpStatus.UNAUTHORIZED)
             .body(ErrorResponse("유효하지 않은 계정"))
     }
 
@@ -149,4 +156,60 @@ class ExceptionControllerImpl : ExceptionController {
     }
 
     companion object : KLogging()
+
+    override fun handleTooManyRequestsException(ex: TooManyRequestsException): ResponseEntity<ErrorResponse> {
+        logger.info(ex.message.toString())
+
+        return ResponseEntity
+            .status(HttpStatus.TOO_MANY_REQUESTS)
+            .body(ErrorResponse(ex.message.toString()))
+    }
+
+    override fun handleInvalidRefreshTokenException(ex: InvalidRefreshTokenException): ResponseEntity<ErrorResponse> {
+        logger.info(ex.message.toString())
+
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(ErrorResponse(ex.message.toString()))
+    }
+
+    override fun handleExpiredJwtException(ex: ExpiredJwtException): ResponseEntity<ErrorResponse> {
+        logger.info(ex.message.toString())
+
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(ErrorResponse("토큰이 만료되었습니다."))
+    }
+
+    override fun handleMalformedJwtException(ex: MalformedJwtException): ResponseEntity<ErrorResponse> {
+        logger.info(ex.message.toString())
+
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(ErrorResponse("잘못된 형식의 토큰입니다."))
+    }
+
+    override fun handleUnsupportedJwtException(ex: UnsupportedJwtException): ResponseEntity<ErrorResponse> {
+        logger.info(ex.message.toString())
+
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(ErrorResponse("지원하지 않는 토큰입니다."))
+    }
+
+    override fun handleSignatureException(ex: SignatureException): ResponseEntity<ErrorResponse> {
+        logger.info(ex.message.toString())
+
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(ErrorResponse("토큰 서명이 유효하지 않습니다."))
+    }
+
+    override fun handleBadCredentialsException(ex: BadCredentialsException): ResponseEntity<ErrorResponse> {
+        logger.info(ex.message.toString())
+
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(ErrorResponse("아이디 또는 비밀번호가 일치하지 않습니다."))
+    }
 }

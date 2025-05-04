@@ -58,6 +58,11 @@ spec:
               value: "${CI_COMMIT_TITLE}"
             - name: DEPLOY_COMMIT_TIMESTAMP
               value: "${CI_COMMIT_TIMESTAMP}"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: ${APPLICATION_NAME}-connection
+                  key: JWT_SECRET
             - name: DATABASE_MYSQL_HOST
               valueFrom:
                 secretKeyRef:

@@ -1,28 +1,57 @@
 import { boot } from "quasar/wrappers";
-import axios from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
+import { TIMEOUT_DURATION } from "src/api/constants";
+import { networkStatusService } from "src/api/services/NetworkStatusService";
+import { notificationService } from "src/api/services/NotificationService";
+import { authInterceptorService } from "src/api/services/AuthInterceptorService";
+import { retryService } from "src/api/services/RetryService";
 
-// Be careful when using SSR for cross-request state pollution
-// due to creating a Singleton instance here;
-// If any client changes this (global) instance, it might be a
-// good idea to move this instance creation inside of the
-// "export default () => {}" function below (which runs individually
-// for each client)
+/**
+ * API 인스턴스 생성
+ */
 const api = axios.create({
-  withCredentials: true,
-  xsrfCookieName: "XSRF-TOKEN",
-  xsrfHeaderName: "X-XSRF-TOKEN",
+  timeout: TIMEOUT_DURATION,
 });
 
+/**
+ * 요청 인터셉터 설정
+ */
+function setupInterceptors(): void {
+  // 요청 인터셉터 설정
+  authInterceptorService.setupRequestInterceptor(api);
+
+  // 응답 인터셉터 설정
+  api.interceptors.response.use(
+    (response: AxiosResponse) => {
+      // 온라인 상태 복구 처리
+      if (networkStatusService.isOffline) {
+        networkStatusService.setOnline();
+        notificationService.showOnlineNotification();
+      }
+
+      return response;
+    },
+    async (error: AxiosError) => {
+      const originalRequest = error.config || {};
+
+      // 401 에러인 경우 토큰 갱신 시도
+      if (error.response?.status === 401 && !originalRequest._retry) {
+        return authInterceptorService.handleTokenRefresh(originalRequest, error, api);
+      }
+
+      // 네트워크 오류나 타임아웃인 경우 재시도
+      return retryService.handleRetry(originalRequest, error, api);
+    },
+  );
+}
+
+// 인터셉터 설정 실행
+setupInterceptors();
+
 export default boot(({ app }) => {
-  // for use inside Vue files (Options API) through this.$axios and this.$api
-
+  // Vue 컴포넌트에서 사용할 수 있도록 전역 속성으로 등록
   app.config.globalProperties.$axios = axios;
-  // ^ ^ ^ this will allow you to use this.$axios (for Vue Options API form)
-  //       so you won't necessarily have to import axios in each vue file
-
   app.config.globalProperties.$api = api;
-  // ^ ^ ^ this will allow you to use this.$api (for Vue Options API form)
-  //       so you can easily perform requests against your app's API
 });
 
 export { api };
