@@ -47,7 +47,11 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: "production"
             - name: JAVA_TOOL_OPTIONS
-              value: "-Duser.timezone=Asia/Seoul"
+              value: "-Duser.timezone=Asia/Seoul -Dfile.encoding=UTF-8"
+            - name: LANG
+              value: "ko_KR.UTF-8"
+            - name: LC_ALL
+              value: "ko_KR.UTF-8"
             - name: DEPLOY_ENVIRONMENT
               value: "${DEPLOY_ENVIRONMENT}"
             - name: DEPLOY_COMMIT_SHA
