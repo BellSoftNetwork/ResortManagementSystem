@@ -25,9 +25,30 @@ class ReservationCustomRepositoryImpl(
     private val jpaQueryFactory: JPAQueryFactory,
 ) : ReservationCustomRepository {
     override fun getFilteredReservations(pageable: Pageable, filter: ReservationFilterDto): Page<Reservation> {
-        val result = getFilteredReservationsBaseQuery(filter)
+        val query = getFilteredReservationsBaseQuery(filter)
             .select(QReservation.reservation)
-            .orderBy(
+
+        // Apply sorting from pageable if provided, otherwise use default sorting
+        if (pageable.sort.isSorted) {
+            val orderSpecifiers = pageable.sort.map { order ->
+                val direction = if (order.isAscending) Order.ASC else Order.DESC
+                when (order.property) {
+                    "stayStartAt" -> OrderSpecifier(direction, QReservation.reservation.stayStartAt)
+                    "stayEndAt" -> OrderSpecifier(direction, QReservation.reservation.stayEndAt)
+                    "peopleCount" -> OrderSpecifier(direction, QReservation.reservation.peopleCount)
+                    "name" -> OrderSpecifier(direction, QReservation.reservation.name)
+                    "id" -> OrderSpecifier(direction, QReservation.reservation.id)
+                    "price" -> OrderSpecifier(direction, QReservation.reservation.price)
+                    "status" -> OrderSpecifier(direction, QReservation.reservation.status)
+                    "type" -> OrderSpecifier(direction, QReservation.reservation.type)
+                    else -> OrderSpecifier(direction, QReservation.reservation.id)
+                }
+            }.toList().toTypedArray()
+
+            query.orderBy(*orderSpecifiers)
+        } else {
+            // Default sorting if none provided
+            query.orderBy(
                 // 1. 입실일 빠른 순
                 OrderSpecifier(Order.ASC, QReservation.reservation.stayStartAt),
                 // 2. 퇴실일 늦은 순
@@ -39,6 +60,9 @@ class ReservationCustomRepositoryImpl(
                 // 5. 예약 정보 등록 시간이 빠른 순
                 OrderSpecifier(Order.ASC, QReservation.reservation.id),
             )
+        }
+
+        val result = query
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .fetch()
