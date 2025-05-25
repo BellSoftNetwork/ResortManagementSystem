@@ -7,10 +7,13 @@ import net.bellsoft.rms.common.util.SecurityTestSupport
 import net.bellsoft.rms.common.util.TestDatabaseSupport
 import net.bellsoft.rms.fixture.baseFixture
 import net.bellsoft.rms.payment.repository.PaymentMethodRepository
+import net.bellsoft.rms.reservation.dto.filter.ReservationFilterDto
 import net.bellsoft.rms.reservation.dto.response.StatisticsPeriodType
 import net.bellsoft.rms.reservation.entity.Reservation
 import net.bellsoft.rms.user.entity.User
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 
@@ -124,6 +127,47 @@ internal class ReservationCustomRepositoryImplTest(
                     year2024Stats?.totalSales shouldBe 300000L
                     year2024Stats?.totalReservations shouldBe 2
                     year2024Stats?.totalGuests shouldBe 5
+                }
+            }
+
+            When("stayStartAt 기준 오름차순으로 정렬하면") {
+                val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "stayStartAt"))
+                val filter = ReservationFilterDto()
+                val result = reservationRepository.getFilteredReservations(pageable, filter)
+
+                Then("입실일이 빠른 순서대로 정렬된다") {
+                    result.content.size shouldBe 2
+                    result.content[0].stayStartAt shouldBe LocalDate.of(2024, 5, 1)
+                    result.content[1].stayStartAt shouldBe LocalDate.of(2024, 6, 1)
+                }
+            }
+
+            When("stayStartAt 기준 내림차순으로 정렬하면") {
+                val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "stayStartAt"))
+                val filter = ReservationFilterDto()
+                val result = reservationRepository.getFilteredReservations(pageable, filter)
+
+                Then("입실일이 늦은 순서대로 정렬된다") {
+                    result.content.size shouldBe 2
+                    result.content[0].stayStartAt shouldBe LocalDate.of(2024, 6, 1)
+                    result.content[1].stayStartAt shouldBe LocalDate.of(2024, 5, 1)
+                }
+            }
+
+            When("오름차순과 내림차순 정렬 결과를 비교하면") {
+                val ascPageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "stayStartAt"))
+                val descPageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "stayStartAt"))
+                val filter = ReservationFilterDto()
+
+                val ascResult = reservationRepository.getFilteredReservations(ascPageable, filter)
+                val descResult = reservationRepository.getFilteredReservations(descPageable, filter)
+
+                Then("정렬 결과가 서로 반대 순서여야 한다") {
+                    ascResult.content.size shouldBe 2
+                    descResult.content.size shouldBe 2
+
+                    ascResult.content[0].id shouldBe descResult.content[1].id
+                    ascResult.content[1].id shouldBe descResult.content[0].id
                 }
             }
         }
