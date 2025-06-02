@@ -97,7 +97,7 @@ const columns = [
     format: formatDateTime,
   },
 ];
-const roomHistories = ref<Revision<Room>[]>();
+const roomHistories = ref<Revision<Room>[]>([]);
 
 function onRequest(tableProps) {
   const { page, rowsPerPage, sortBy, descending } = tableProps.pagination;

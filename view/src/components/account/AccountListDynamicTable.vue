@@ -109,7 +109,7 @@ const columns = [
     headerStyle: "width: 5%",
   },
 ];
-const users = ref<User[]>();
+const users = ref<User[]>([]);
 
 function getColumnDef(field: string) {
   return convertTableColumnDef(getUserFieldDetail(field));

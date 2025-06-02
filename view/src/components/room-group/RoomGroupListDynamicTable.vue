@@ -115,7 +115,7 @@ const columns = [
     headerStyle: "width: 5%",
   },
 ];
-const roomGroups = ref<RoomGroup[]>();
+const roomGroups = ref<RoomGroup[]>([]);
 
 function getColumnDef(field: string) {
   return convertTableColumnDef(getRoomGroupFieldDetail(field));

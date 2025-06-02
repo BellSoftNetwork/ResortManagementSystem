@@ -31,7 +31,7 @@ onBeforeMount(() => {
   if (authStore.isLoggedIn) router.push({ name: "Home" });
 
   appConfigStore.loadAppConfig(true).finally(() => {
-    if (!appConfigStore.config.isAvailableRegistration) router.push({ name: "Login" });
+    if (!appConfigStore.config?.isAvailableRegistration) router.push({ name: "Login" });
   });
 });
 </script>

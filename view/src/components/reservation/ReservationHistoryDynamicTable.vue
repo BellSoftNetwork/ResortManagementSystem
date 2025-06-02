@@ -97,7 +97,7 @@ const columns = [
     format: formatDateTime,
   },
 ];
-const reservationHistories = ref<Revision<Reservation>[]>();
+const reservationHistories = ref<Revision<Reservation>[]>([]);
 
 function onRequest(tableProps) {
   const { page, rowsPerPage, sortBy, descending } = tableProps.pagination;

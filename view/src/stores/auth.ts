@@ -213,8 +213,12 @@ export const useAuthStore = defineStore("auth", {
 
     // 스토어 초기화 시 자동 실행
     async hydrate(storeState) {
+      // 현재 경로가 로그인 페이지인 경우 토큰 갱신 시도하지 않음
+      const currentPath = window.location.pathname;
+      const isLoginPage = currentPath === "/login" || currentPath.endsWith("/login");
+
       // 액세스 토큰이 없지만 리프레시 토큰이 있는 경우 (페이지 새로고침 후)
-      if (!storeState.accessToken && storeState.refreshToken) {
+      if (!storeState.accessToken && storeState.refreshToken && !isLoginPage) {
         try {
           // 액세스 토큰 갱신 시도 (페이지 새로고침 후에는 forceLoading=true로 설정)
           await this.refreshAccessToken(true);

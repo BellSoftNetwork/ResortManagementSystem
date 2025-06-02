@@ -51,7 +51,7 @@
             :hoverable="true"
             :focusable="false"
             :focus-type="['day', 'date']"
-            :now="formatDate"
+            :now="formatDate()"
             mask="YYYY-MM-DD"
             locale="ko-KR"
             :weekdays="[1, 2, 3, 4, 5, 6, 0]"
