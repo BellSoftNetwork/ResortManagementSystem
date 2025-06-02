@@ -19,7 +19,7 @@
 
 variables:
   GRADLE_VERSION: 7.5.0-jdk17
-  NODE_VERSION: 16-alpine
+  NODE_VERSION: 22
   JACOCO2COBERTURA_VERSION: 1.0.8
 
 stages:

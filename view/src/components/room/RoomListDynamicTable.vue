@@ -122,7 +122,7 @@ const columns = [
     headerStyle: "width: 5%",
   },
 ];
-const rooms = ref<Room[]>();
+const rooms = ref<Room[]>([]);
 
 loadQueryString();
 

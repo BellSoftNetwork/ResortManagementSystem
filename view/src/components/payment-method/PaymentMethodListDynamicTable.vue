@@ -179,7 +179,7 @@ const columns = [
     headerStyle: "width: 5%",
   },
 ];
-const paymentMethods = ref<PaymentMethod[]>();
+const paymentMethods = ref<PaymentMethod[]>([]);
 
 function getColumnDef(field: string) {
   return convertTableColumnDef(getPaymentMethodFieldDetail(field));

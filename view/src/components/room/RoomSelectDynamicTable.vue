@@ -87,7 +87,7 @@ const columns = [
     sortable: true,
   },
 ];
-const rooms = ref<Room[]>();
+const rooms = ref<Room[]>([]);
 
 function getColumnDef(field: string) {
   return convertTableColumnDef(getRoomFieldDetail(field));

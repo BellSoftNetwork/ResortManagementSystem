@@ -26,7 +26,60 @@ build_vue_app:
   artifacts:
     name: vue_dist
     paths:
-      - src/main/resources/static/
+      - view/dist/
+
+#build_android_app:
+#  extends:
+#    - .build
+#    - .node_yarn_cache
+#  needs:
+#    - build_vue_app
+#  variables:
+#    NODE_ENV: "production"
+#    FRONTEND_SRC_PATH: view
+#  script:
+#    # Install Android SDK and dependencies
+#    - apt-get update && apt-get install -y openjdk-17-jdk android-sdk
+#    - export ANDROID_HOME=/usr/lib/android-sdk
+#    - export PATH=$PATH:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
+#
+#    # Accept Android SDK licenses
+#    - mkdir -p $ANDROID_HOME/licenses
+#    - echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > $ANDROID_HOME/licenses/android-sdk-license
+#    - echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> $ANDROID_HOME/licenses/android-sdk-license
+#
+#    # Install Android build tools and platform
+#    - sdkmanager "build-tools;33.0.0" "platforms;android-33" "platform-tools"
+#
+#    # Navigate to frontend directory
+#    - cd ${FRONTEND_SRC_PATH}
+#
+#    # Install dependencies
+#    - yarn install
+#
+#    # Add Android platform if not already added
+#    - npx cap add android || echo "Android platform already exists"
+#
+#    # Set API URL for Android app and rebuild the frontend
+#    - yarn android:build:${CI_ENVIRONMENT_NAME}
+#
+#    # Build APK
+#    - cd android
+#    - ./gradlew assembleDebug
+#
+#    # Copy APK to artifacts directory
+#    - mkdir -p ${CI_PROJECT_DIR}/android-app
+#    - cp app/build/outputs/apk/debug/app-debug.apk ${CI_PROJECT_DIR}/android-app/rms-${CI_ENVIRONMENT_NAME}-${CI_COMMIT_SHORT_SHA}.apk
+#  artifacts:
+#    name: android_app
+#    paths:
+#      - android-app/
+#    expire_in: 1 week
+#  # Only run on specific environments
+#  rules:
+#    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop"'
+#      when: on_success
+#    - when: manual
 
 build_boot_image:
   extends:
@@ -41,4 +94,7 @@ build_boot_image:
     PROPERTY_IMAGE: "-PimagePath=${CI_REGISTRY_IMAGE} -PimageBaseName=${CI_COMMIT_REF_SLUG} -PimageTag=${CI_COMMIT_SHA}"
     PROPERTY_DOCKER: "-PdockerHost=${DOCKER_HOST} -PisDockerTlsVerify=true -PdockerCertPath=${DOCKER_CERT_PATH}"
   script:
+    # Copy frontend artifacts to backend static resources
+    - mkdir -p src/main/resources/static/
+    - cp -r view/dist/* src/main/resources/static/
     - gradle bootBuildImage ${GRADLE_CACHE_ARGS} --publishImage ${PROPERTY_REGISTRY} ${PROPERTY_BUILD} ${PROPERTY_IMAGE} ${PROPERTY_DOCKER}

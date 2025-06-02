@@ -334,7 +334,7 @@ const columns = [
     headerStyle: "width: 5%",
   },
 ];
-const reservations = ref<Reservation[]>();
+const reservations = ref<Reservation[]>([]);
 
 loadQueryString();
 
