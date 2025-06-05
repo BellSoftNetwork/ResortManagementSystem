@@ -1,0 +1,1 @@
+import{c as t}from"./format-util.3d0400b0.js";const e={createdAt:{label:"\uB4F1\uB85D \uC2DC\uAC01",format:t},updatedAt:{label:"\uC218\uC815 \uC2DC\uAC01",format:t}},C={createdBy:{label:"\uB4F1\uB85D\uC790",format:a=>a.name},updatedBy:{label:"\uC218\uC815\uC790",format:a=>a.name}};export{e as B,C as a};

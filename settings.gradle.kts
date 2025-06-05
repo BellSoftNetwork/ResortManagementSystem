@@ -1,5 +1,7 @@
 rootProject.name = "ResortManagementSystem"
 
+include("apps:api-legacy")
+
 dependencyResolutionManagement {
     versionCatalogs {
         create("paketobuildpacks") {

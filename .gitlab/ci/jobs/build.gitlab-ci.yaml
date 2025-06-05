@@ -20,13 +20,13 @@ build_vue_app:
   needs: [ ]
   variables:
     NODE_ENV: "production"
-    FRONTEND_SRC_PATH: view
+    FRONTEND_SRC_PATH: apps/frontend-web
   script:
     - yarn build
   artifacts:
     name: vue_dist
     paths:
-      - view/dist/
+      - apps/frontend-web/dist/
 
 #build_android_app:
 #  extends:
@@ -95,6 +95,6 @@ build_boot_image:
     PROPERTY_DOCKER: "-PdockerHost=${DOCKER_HOST} -PisDockerTlsVerify=true -PdockerCertPath=${DOCKER_CERT_PATH}"
   script:
     # Copy frontend artifacts to backend static resources
-    - mkdir -p src/main/resources/static/
-    - cp -r view/dist/* src/main/resources/static/
-    - gradle bootBuildImage ${GRADLE_CACHE_ARGS} --publishImage ${PROPERTY_REGISTRY} ${PROPERTY_BUILD} ${PROPERTY_IMAGE} ${PROPERTY_DOCKER}
+    - mkdir -p apps/api-legacy/src/main/resources/static/
+    - cp -r apps/frontend-web/dist/* apps/api-legacy/src/main/resources/static/
+    - cd apps/api-legacy && gradle bootBuildImage ${GRADLE_CACHE_ARGS} --publishImage ${PROPERTY_REGISTRY} ${PROPERTY_BUILD} ${PROPERTY_IMAGE} ${PROPERTY_DOCKER}

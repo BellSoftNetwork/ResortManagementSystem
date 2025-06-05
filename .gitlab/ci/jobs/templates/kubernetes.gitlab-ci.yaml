@@ -5,6 +5,7 @@
 
 .convert_kubernetes_resource_script: &convert_kubernetes_resource_script
   - export KUBERNETES_RESOURCE_NAMES="common ${DEPLOY_ENVIRONMENT}"
+  - mkdir -p ${KUBERNETES_DEPLOY_YAML_PATH}
   - |
     for filename in ${KUBERNETES_RESOURCE_NAMES}; do
       envsubst < ${KUBERNETES_RESOURCE_PATH}/${filename}.yaml > ${KUBERNETES_DEPLOY_YAML_PATH}/${filename}.yaml
@@ -19,7 +20,7 @@
     - *setup_kubectl_context_script
 
 .kubernetes_deploy_variables: &kubernetes_deploy_variables
-  KUBERNETES_DEPLOY_YAML_PATH: ${CI_PROJECT_DIR}/.kubernetes
+  KUBERNETES_DEPLOY_YAML_PATH: ${CI_PROJECT_DIR}/deploy/.k8s
   APPLICATION_ENVIRONMENT: ${CI_ENVIRONMENT_SLUG}
   APPLICATION_NAME: "${PROJECT_NAME}-${APPLICATION_ENVIRONMENT}"
   APPLICATION_SERVICE_NAME: ${APPLICATION_NAME}
@@ -29,7 +30,7 @@
 .setup_kubernetes_application_resource_yaml:
   variables:
     <<: *kubernetes_deploy_variables
-    KUBERNETES_RESOURCE_PATH: ${CI_PROJECT_DIR}/src/main/kubernetes/production
+    KUBERNETES_RESOURCE_PATH: ${CI_PROJECT_DIR}/deploy/templates
     APPLICATION_IMAGE_URL: ${CI_REGISTRY_IMAGE}/${CI_COMMIT_REF_SLUG}:${CI_COMMIT_SHA}
     APPLICATION_REPLICAS: 2
   before_script:
