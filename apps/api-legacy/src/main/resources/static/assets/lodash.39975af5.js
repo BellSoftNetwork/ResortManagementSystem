@@ -1,0 +1,1 @@
+import{bz as a}from"./index.cff9ac5d.js";import{l as r}from"./lodash.fef2f05b.js";import"./_commonjsHelpers.2cf1d77b.js";var i=a(async({app:o})=>{o.config.globalProperties.$_=r});export{i as default};

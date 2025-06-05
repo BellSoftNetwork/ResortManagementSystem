@@ -14,7 +14,7 @@ include:
     - .gradle
     - .test_rules
   variables:
-    JACOCO_XML_LOCATION: "${CI_PROJECT_DIR}/build/jacoco/jacoco.xml"
+    JACOCO_XML_LOCATION: "${CI_PROJECT_DIR}/apps/api-legacy/build/jacoco/jacoco.xml"
   stage: test
 
 test:
@@ -22,14 +22,14 @@ test:
     - .test
     - .gradle_cache
   script:
-    - gradle ${GRADLE_CACHE_ARGS} ktlintCheck test jacocoTestReport
+    - cd apps/api-legacy && gradle ${GRADLE_CACHE_ARGS} ktlintCheck test jacocoTestReport
   coverage: '/    - Instruction Coverage: ([0-9.]+)%/'
   artifacts:
     paths:
       - ${JACOCO_XML_LOCATION}
     when: always
     reports:
-      junit: ${CI_PROJECT_DIR}/build/test-results/test/**/TEST-*.xml
+      junit: ${CI_PROJECT_DIR}/apps/api-legacy/build/test-results/test/**/TEST-*.xml
 
 test_coverage_visualize:
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/haynes/jacoco2cobertura:${JACOCO2COBERTURA_VERSION}
@@ -38,9 +38,9 @@ test_coverage_visualize:
   needs:
     - test
   variables:
-    COVERAGE_REPORT_PATH: "${CI_PROJECT_DIR}/build/cobertura.xml"
+    COVERAGE_REPORT_PATH: "${CI_PROJECT_DIR}/apps/api-legacy/build/cobertura.xml"
   script:
-    - python /opt/cover2cover.py ${JACOCO_XML_LOCATION} ${CI_PROJECT_DIR}/src/main/kotlin/ > ${COVERAGE_REPORT_PATH}
+    - python /opt/cover2cover.py ${JACOCO_XML_LOCATION} ${CI_PROJECT_DIR}/apps/api-legacy/src/main/kotlin/ > ${COVERAGE_REPORT_PATH}
   artifacts:
     reports:
       coverage_report:

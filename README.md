@@ -23,7 +23,7 @@
 3. yarn 설치 (`npm install -g yarn`)
 4. 프로젝트 라이브러리 설치
     ```cmd
-    cd view
+    cd apps/frontend-web
     yarn
     ```
 
@@ -32,12 +32,12 @@
 1. 백엔드 앱 실행 (프로필: `local` (기본값))
 2. 프론트엔드 앱 실행
     ```cmd
-    cd view
+    cd apps/frontend-web
     yarn dev
     ```
 3. 브라우저 접속 (http://localhost:9000)  
    프론트엔드 앱에서 백엔드 API 호출 시 8080포트에 프록시를 태우도록 되어 있으므로 8080 포트로 접속할 필요 없음  
-   (`view\quasar.config.js` 파일 내 `devServer.proxy` 항목 참고)
+   (`apps\frontend-web\quasar.config.js` 파일 내 `devServer.proxy` 항목 참고)
 
 ### 모바일 앱 테스트 환경 설정
 
@@ -60,7 +60,7 @@
 
 3. 프로젝트 설정
    ```cmd
-   cd view
+   cd apps/frontend-web
    # 이미 package.json에 @capacitor/android가 있으므로 다음 명령은 생략 가능
    # yarn add @capacitor/android     
 
@@ -73,7 +73,7 @@
 
 4. Android 앱 실행 방법
    ```cmd
-   cd view
+   cd apps/frontend-web
    # Android Studio에서 프로젝트 열기
    yarn cap:open-android
 
@@ -109,7 +109,7 @@
     - `Unable to launch Android Studio. Is it installed?` 오류 발생 시:
 - CAPACITOR_ANDROID_STUDIO_PATH 환경 변수가 올바르게 설정되었는지 확인
 - 새 명령 프롬프트/터미널을 열어 다시 시도 (환경 변수 변경 후 필수)
-- 직접 Android Studio를 실행하고 `[프로젝트 경로]/view/android` 폴더를 열기
+- 직접 Android Studio를 실행하고 `[프로젝트 경로]/apps/frontend-web/android` 폴더를 열기
 
 7. 실제 기기에서 테스트하기
     - USB 디버깅 활성화 (Android 기기의 개발자 옵션에서 설정)
