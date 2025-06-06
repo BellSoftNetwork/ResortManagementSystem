@@ -1,0 +1,33 @@
+{
+  "name": "resort-management-system-performance-tests",
+  "version": "1.0.0",
+  "description": "리조트 관리 시스템 API용 Grafana k6 성능 테스트",
+  "scripts": {
+    "test:reservation-browsing": "k6 run scenarios/reservation-browsing.js",
+    "test:reservation-load": "k6 run scenarios/reservation-load-test.js",
+    "test:simple-api": "k6 run examples/simple-api-test.js",
+    "test:mixed-workload": "k6 run examples/mixed-workload.js",
+    "test:reservation-browsing:report": "k6 run --out html=reports/reservation-browsing.html scenarios/reservation-browsing.js",
+    "test:reservation-load:report": "k6 run --out html=reports/reservation-load.html scenarios/reservation-load-test.js",
+    "test:all": "npm run test:simple-api && npm run test:reservation-browsing && npm run test:mixed-workload",
+    "test:staging": "cross-env BASE_URL=https://staging.rms.bellsoft.net npm run test:all",
+    "test:production": "cross-env BASE_URL=https://api.rms.bellsoft.net npm run test:all",
+    "test:local": "cross-env BASE_URL=http://localhost:8080 npm run test:all",
+    "test:debug": "cross-env DEBUG=true npm run test:simple-api"
+  },
+  "keywords": [
+    "k6",
+    "성능 테스트",
+    "부하 테스트",
+    "API 테스트",
+    "리조트 관리"
+  ],
+  "author": "Bell <bell04204@gmail.com>",
+  "private": true,
+  "devDependencies": {
+    "cross-env": "^7.0.3"
+  },
+  "engines": {
+    "k6": ">=0.40.0"
+  }
+}
