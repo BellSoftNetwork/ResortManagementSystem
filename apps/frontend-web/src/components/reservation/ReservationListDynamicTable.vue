@@ -137,6 +137,23 @@
       </q-td>
     </template>
 
+    <template #body-cell-note="props">
+      <q-td :props="props" key="note">
+        <q-btn
+          v-if="props.row.note"
+          @click="
+            $q.dialog({
+              title: `${props.row.name}님 예약 메모`,
+              message: props.row.note,
+            })
+          "
+          color="primary"
+        >
+          메모 확인
+        </q-btn>
+      </q-td>
+    </template>
+
     <template #body-cell-actions="props">
       <q-td key="actions" :props="props">
         <q-btn dense round flat color="grey" icon="edit" :to="editPageLink(props.row.id)"></q-btn>
@@ -183,9 +200,9 @@ const defaultConfig = {
   },
   filter: {
     peopleInfo: "",
-    dueOption: "3M",
+    dueOption: "6M",
     stayStartAt: formatDate(),
-    stayEndAt: dayjs().add(3, "M").format("YYYY-MM-DD"),
+    stayEndAt: dayjs().add(6, "M").format("YYYY-MM-DD"),
     status: "NORMAL",
   },
 };
@@ -218,6 +235,7 @@ const dueOptions = [
   { label: "1개월", value: "1M" },
   { label: "2개월", value: "2M" },
   { label: "3개월", value: "3M" },
+  { label: "6개월", value: "6M" },
   { label: "직접 선택", value: "CUSTOM" },
 ];
 const filterDialog = ref(false);
@@ -294,18 +312,9 @@ const columns = [
   ...(props.reservationType === "STAY"
     ? [
         {
-          ...getColumnDef("checkInAt"),
+          ...getColumnDef("note"),
           align: "left",
-          headerStyle: "width: 15%",
-          required: true,
-          sortable: true,
-        },
-        {
-          ...getColumnDef("checkOutAt"),
-          align: "left",
-          headerStyle: "width: 15%",
-          required: true,
-          sortable: true,
+          headerStyle: "width: 10%",
         },
       ]
     : []),
@@ -394,6 +403,8 @@ function updateDueDate(dueOption: string) {
     filterBuffer.value.stayEndAt = dayjs().add(2, "M").format("YYYY-MM-DD");
   } else if (dueOption === "3M") {
     filterBuffer.value.stayEndAt = dayjs().add(3, "M").format("YYYY-MM-DD");
+  } else if (dueOption === "6M") {
+    filterBuffer.value.stayEndAt = dayjs().add(6, "M").format("YYYY-MM-DD");
   }
 }
 
