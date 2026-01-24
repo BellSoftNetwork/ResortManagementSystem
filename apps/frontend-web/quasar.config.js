@@ -91,7 +91,7 @@ export default configure(function (/* ctx */) {
           changeOrigin: true,
           secure: false,
           ws: true,
-          onProxyReq: (proxyReq, req, res) => {
+          onProxyReq: (proxyReq, req) => {
             console.log(
               `[Proxy] ${req.method} ${req.url} -> ${process.env.API_BACKEND === "legacy" ? "api-legacy" : "api-core"}`,
             );

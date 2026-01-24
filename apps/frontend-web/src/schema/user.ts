@@ -12,11 +12,7 @@ export function userRoleValueToName(role: UserRole) {
   return USER_ROLE_MAP[role] || role;
 }
 
-const USER_STATUS_MAP: EnumMap = {
-  ACTIVE: "활성화",
-  INACTIVE: "비활성화",
-} as const;
-export type UserStatus = keyof typeof USER_STATUS_MAP;
+export type UserStatus = "ACTIVE" | "INACTIVE";
 
 export type User = {
   id: number;

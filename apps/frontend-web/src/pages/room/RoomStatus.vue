@@ -85,7 +85,15 @@
                         :class="{ 'bg-yellow-1': isCheckInOrOutToday(reservation) }"
                       >
                         <q-item-section>
-                          <q-item-label>{{ reservation.name }} ({{ reservation.phone }})</q-item-label>
+                          <q-item-label>
+                            {{ reservation.name }}
+                            <template v-if="reservation.phone">
+                              (<a :href="`tel:${reservation.phone}`" class="text-primary" @click.stop>
+                                <q-icon name="phone" size="xs" />
+                                {{ reservation.phone }} </a
+                              >)
+                            </template>
+                          </q-item-label>
                           <q-item-label caption>
                             {{ formatSimpleDate(reservation.stayStartAt) }} ~
                             {{ formatSimpleDate(reservation.stayEndAt) }}

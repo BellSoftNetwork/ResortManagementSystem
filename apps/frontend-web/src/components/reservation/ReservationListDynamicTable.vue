@@ -137,6 +137,16 @@
       </q-td>
     </template>
 
+    <template #body-cell-phone="props">
+      <q-td :props="props">
+        <a v-if="props.row.phone" :href="`tel:${props.row.phone}`" class="text-primary">
+          <q-icon name="phone" size="xs" class="q-mr-xs" />
+          {{ props.row.phone }}
+        </a>
+        <span v-else>-</span>
+      </q-td>
+    </template>
+
     <template #body-cell-note="props">
       <q-td :props="props" key="note">
         <q-btn

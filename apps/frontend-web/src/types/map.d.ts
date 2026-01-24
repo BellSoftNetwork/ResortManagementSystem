@@ -7,7 +7,7 @@ export type EnumMap = {
 export type FieldDetail = {
   label: string;
   field?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   format?: (value: any) => any;
 };
 
@@ -20,6 +20,5 @@ export type StaticRuleMap = {
 };
 
 export type DynamicRuleMap = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [field: string]: (value: any) => ValidationRule[];
 };

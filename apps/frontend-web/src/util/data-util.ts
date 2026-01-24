@@ -1,11 +1,9 @@
 import { EnumMap } from "src/types/map";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isFormValueChanged(source: any, formData: any) {
   return Object.keys(formData).some((key) => source[key] !== formData[key]);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getPatchedFormData(source: any, formData: any) {
   const patchedData: EnumMap = {};
 
@@ -31,7 +29,6 @@ export function getPatchedFormData(source: any, formData: any) {
     }, patchedData);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function compareIdArrays(source: any[], target: any[]) {
   if (source.length !== target.length) return false;
 
