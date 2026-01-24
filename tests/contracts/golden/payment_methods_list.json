@@ -1,0 +1,51 @@
+{
+  "values": [
+    {
+      "id": 9,
+      "name": "테스트 결제수단",
+      "commissionRate": 0.03,
+      "requireUnpaidAmountCheck": false,
+      "isDefaultSelect": false,
+      "status": "INACTIVE"
+    },
+    {
+      "id": 4,
+      "name": "현장결제",
+      "commissionRate": 0,
+      "requireUnpaidAmountCheck": true,
+      "isDefaultSelect": false,
+      "status": "ACTIVE"
+    },
+    {
+      "id": 3,
+      "name": "펜션다나와",
+      "commissionRate": 0.13,
+      "requireUnpaidAmountCheck": false,
+      "isDefaultSelect": false,
+      "status": "ACTIVE"
+    },
+    {
+      "id": 2,
+      "name": "통장입금",
+      "commissionRate": 0,
+      "requireUnpaidAmountCheck": true,
+      "isDefaultSelect": true,
+      "status": "ACTIVE"
+    },
+    {
+      "id": 1,
+      "name": "수정된 결제수단",
+      "commissionRate": 0.15,
+      "requireUnpaidAmountCheck": false,
+      "isDefaultSelect": false,
+      "status": "ACTIVE"
+    }
+  ],
+  "page": {
+    "index": 0,
+    "size": 10,
+    "totalElements": 5,
+    "totalPages": 1
+  },
+  "filter": {}
+}

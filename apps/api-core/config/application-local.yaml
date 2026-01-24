@@ -1,0 +1,27 @@
+environment: local
+
+server:
+  port: 8080
+
+database:
+  mysql:
+    host: localhost
+    port: 3306
+    user: rms
+    password: rms123
+    database: rms-core
+
+redis:
+  host: localhost
+  port: 6379
+
+jwt:
+  secret: "local-development-secret-key"
+
+cors:
+  allowed_origins:
+    - "*"
+
+logging:
+  level: debug
+  format: text

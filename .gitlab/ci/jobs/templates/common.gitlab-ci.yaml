@@ -1,0 +1,171 @@
+# 공통 CI/CD 템플릿 정의
+
+# 데이터베이스 서비스 (MySQL + Redis) - extends로 사용
+.db-services:
+  services:
+    - name: mysql:8.0
+      alias: mysql
+      variables:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: resort_test
+        MYSQL_USER: test
+        MYSQL_PASSWORD: test
+      command: ["--default-authentication-plugin=mysql_native_password"]
+    - name: redis:7-alpine
+      alias: redis
+
+# 테스트 환경 변수 (공통) - extends로 사용
+.test-env-vars:
+  variables:
+    DATABASE_MYSQL_HOST: mysql
+    DATABASE_MYSQL_PORT: 3306
+    DATABASE_MYSQL_USER: test
+    DATABASE_MYSQL_PASSWORD: test
+    DATABASE_MYSQL_DATABASE: resort_test
+    REDIS_HOST: redis
+    REDIS_PORT: 6379
+
+# Docker 빌드 공통 설정
+.docker-build-base:
+  stage: build
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:24
+  services:
+    - name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:24-dind
+      alias: docker
+      command: ["--tls=false"]
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_DRIVER: overlay2
+    DOCKER_BUILDKIT: 1
+    BUILDKIT_INLINE_CACHE: 1
+  before_script:
+    - |
+      # Docker 데몬 대기
+      echo "Waiting for docker daemon..."
+      timeout=300
+      passed=0
+      until docker info >/dev/null 2>&1 || [ ${timeout} -lt ${passed} ]; do
+        passed=`expr $passed + 1`
+        sleep 1
+        echo "Waiting... ($passed/$timeout)"
+      done
+      echo "Docker daemon is ready!"
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+# 브랜치별 이미지 태그 생성 스크립트
+.create-image-tags: &create-image-tags
+  - |
+    # GitLab CI 사전 정의 변수 사용 (브랜치명 정규화)
+    BRANCH_NAME=$(echo "$CI_COMMIT_REF_SLUG" | sed 's/\//-/g')
+
+    # 이미지 태그 생성
+    IMAGE_TAG="${BRANCH_NAME}-${CI_COMMIT_SHORT_SHA}"
+    IMAGE_TAG_LATEST="${IMAGE_REGISTRY}:${IMAGE_TAG}"
+    IMAGE_TAG_BRANCH_LATEST="${IMAGE_REGISTRY}:${BRANCH_NAME}-latest"
+
+# 이미지 빌드 및 푸시 스크립트
+.build-and-push-image: &build-and-push-image
+  - echo "Building Docker image..."
+  - docker build --platform=linux/amd64 -t $IMAGE_TAG_LATEST -t $IMAGE_TAG_BRANCH_LATEST .
+  - docker push $IMAGE_TAG_LATEST
+  - docker push $IMAGE_TAG_BRANCH_LATEST
+
+# 캐시 정책 - 생성 전용
+.cache-policy-push:
+  cache:
+    policy: push
+
+# 캐시 정책 - 읽기 전용
+.cache-policy-pull:
+  cache:
+    policy: pull
+
+# 캐시 정책 - 읽기/쓰기 (dependencies job에서 사용)
+.cache-policy-pull-push:
+  cache:
+    policy: pull-push
+
+# Go 모듈 캐시 (fallback 포함)
+.go-cache-with-fallback:
+  cache:
+    - key: "$CI_PROJECT_ID-go-mod-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
+      paths:
+        - .cache/go-mod
+      policy: pull-push
+    - key: "$CI_PROJECT_ID-go-mod-$CI_COMMIT_REF_SLUG"
+      paths:
+        - .cache/go-mod
+      policy: pull-push
+    - key: "$CI_PROJECT_ID-go-mod"
+      paths:
+        - .cache/go-mod
+      policy: pull
+
+# Node 모듈 캐시 (fallback 포함)
+.node-cache-with-fallback:
+  cache:
+    - key: "$CI_PROJECT_ID-frontend-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
+      paths:
+        - apps/frontend-web/node_modules/
+        - apps/frontend-web/.yarn/cache/
+      policy: pull-push
+    - key: "$CI_PROJECT_ID-frontend-$CI_COMMIT_REF_SLUG"
+      paths:
+        - apps/frontend-web/node_modules/
+        - apps/frontend-web/.yarn/cache/
+      policy: pull-push
+    - key: "$CI_PROJECT_ID-frontend"
+      paths:
+        - apps/frontend-web/node_modules/
+        - apps/frontend-web/.yarn/cache/
+      policy: pull
+
+# Gradle 캐시 (fallback 포함)
+.gradle-cache-with-fallback:
+  cache:
+    - key: "$CI_PROJECT_ID-gradle-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
+      paths:
+        - .gradle/wrapper
+        - .gradle/caches
+        - gradle/wrapper
+      policy: pull-push
+    - key: "$CI_PROJECT_ID-gradle-$CI_COMMIT_REF_SLUG"
+      paths:
+        - .gradle/wrapper
+        - .gradle/caches
+        - gradle/wrapper
+      policy: pull-push
+    - key: "$CI_PROJECT_ID-gradle"
+      paths:
+        - .gradle/wrapper
+        - .gradle/caches
+        - gradle/wrapper
+      policy: pull
+
+# 공통 변경 감지 규칙
+.common-changes: &common-changes
+  - .gitlab-ci.yml
+  - .gitlab/ci/**/*
+
+# allow_failure 설정 (임시)
+.allow-failure-temp:
+  allow_failure: true
+
+# 테스트 비활성화 체크
+.skip-if-test-disabled:
+  rules:
+    - if: "$TEST_DISABLED"
+      when: never
+
+# 빌드 비활성화 체크
+.skip-if-build-disabled:
+  rules:
+    - if: "$BUILD_DISABLED"
+      when: never
+
+# 배포 비활성화 체크
+.skip-if-deploy-disabled:
+  rules:
+    - if: "$DEPLOY_DISABLED"
+      when: never

@@ -1,0 +1,209 @@
+{
+  "values": [
+    {
+      "id": 9,
+      "name": "5층 투룸",
+      "peekPrice": 150000,
+      "offPeekPrice": 120000,
+      "description": "5층 투룸 객실",
+      "rooms": [],
+      "createdBy": {
+        "id": 2,
+        "userId": "",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      },
+      "updatedBy": {
+        "id": 2,
+        "userId": "",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      }
+    },
+    {
+      "id": 8,
+      "name": "테스트 그룹",
+      "peekPrice": 200000,
+      "offPeekPrice": 150000,
+      "description": "테스트 설명",
+      "rooms": [],
+      "createdBy": {
+        "id": 4,
+        "userId": "",
+        "email": "testmanager@example.com",
+        "name": "Test Manager",
+        "profileImageUrl": "https://gravatar.com/avatar/519469694b5de5bc4600e4ba907a2d2e"
+      },
+      "updatedBy": {
+        "id": 4,
+        "userId": "",
+        "email": "testmanager@example.com",
+        "name": "Test Manager",
+        "profileImageUrl": "https://gravatar.com/avatar/519469694b5de5bc4600e4ba907a2d2e"
+      }
+    },
+    {
+      "id": 7,
+      "name": "대형룸",
+      "peekPrice": 200000,
+      "offPeekPrice": 160000,
+      "description": "대형룸",
+      "rooms": [],
+      "createdBy": {
+        "id": 2,
+        "userId": "",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      },
+      "updatedBy": {
+        "id": 2,
+        "userId": "",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      }
+    },
+    {
+      "id": 6,
+      "name": "부대시설",
+      "peekPrice": 50000,
+      "offPeekPrice": 50000,
+      "description": "부대시설",
+      "rooms": [],
+      "createdBy": {
+        "id": 2,
+        "userId": "",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      },
+      "updatedBy": {
+        "id": 2,
+        "userId": "",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      }
+    },
+    {
+      "id": 5,
+      "name": "원룸(20평형)",
+      "peekPrice": 100000,
+      "offPeekPrice": 80000,
+      "description": "원룸 20평형",
+      "rooms": [],
+      "createdBy": {
+        "id": 2,
+        "userId": "",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      },
+      "updatedBy": {
+        "id": 2,
+        "userId": "",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      }
+    },
+    {
+      "id": 4,
+      "name": "2층 투룸",
+      "peekPrice": 120000,
+      "offPeekPrice": 90000,
+      "description": "2층 투룸 객실",
+      "rooms": [],
+      "createdBy": {
+        "id": 2,
+        "userId": "",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      },
+      "updatedBy": {
+        "id": 2,
+        "userId": "",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      }
+    },
+    {
+      "id": 3,
+      "name": "3층 투룸",
+      "peekPrice": 130000,
+      "offPeekPrice": 100000,
+      "description": "3층 투룸 객실",
+      "rooms": [],
+      "createdBy": {
+        "id": 2,
+        "userId": "",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      },
+      "updatedBy": {
+        "id": 2,
+        "userId": "",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      }
+    },
+    {
+      "id": 2,
+      "name": "4층 투룸",
+      "peekPrice": 140000,
+      "offPeekPrice": 110000,
+      "description": "4층 투룸 객실",
+      "rooms": [],
+      "createdBy": {
+        "id": 2,
+        "userId": "",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      },
+      "updatedBy": {
+        "id": 2,
+        "userId": "",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      }
+    },
+    {
+      "id": 1,
+      "name": "수정된 그룹",
+      "peekPrice": 150000,
+      "offPeekPrice": 120000,
+      "description": "5층 투룸 객실",
+      "rooms": [],
+      "createdBy": {
+        "id": 2,
+        "userId": "",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      },
+      "updatedBy": {
+        "id": 4,
+        "userId": "",
+        "email": "testmanager@example.com",
+        "name": "Test Manager",
+        "profileImageUrl": "https://gravatar.com/avatar/519469694b5de5bc4600e4ba907a2d2e"
+      }
+    }
+  ],
+  "page": {
+    "index": 0,
+    "size": 10,
+    "totalElements": 9,
+    "totalPages": 1
+  },
+  "filter": {}
+}

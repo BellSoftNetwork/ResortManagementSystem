@@ -41,3 +41,47 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Golang ###
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Go workspace file
+go.work
+
+# Dependency directories
+vendor/
+
+### api-core specific ###
+apps/api-core/bin/
+apps/api-core/tmp/
+apps/api-core/*.log
+apps/api-core/local_token.txt
+apps/api-core/server.log
+
+# Local configuration overrides
+apps/api-core/config/application-local.override.yaml
+apps/api-core/.env.local
+
+# API test script tokens
+.tokens/
+scripts/.tokens/
+
+.mcp.json
+
+# Generated test results
+api-compatibility-results.json
+
+# AI agent workspace (session-specific, auto-generated)
+.sisyphus/

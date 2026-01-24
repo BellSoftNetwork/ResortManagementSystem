@@ -83,10 +83,19 @@ export default configure(function (/* ctx */) {
       open: false, // opens browser window automatically
       proxy: {
         "/api": {
-          target: "http://localhost:8080",
+          // Default to api-core, can be overridden with API_BACKEND env variable
+          target:
+            process.env.API_BACKEND === "legacy"
+              ? process.env.API_LEGACY_URL || "http://api-legacy:8080"
+              : process.env.API_CORE_URL || "http://api-core:8080",
           changeOrigin: true,
           secure: false,
           ws: true,
+          onProxyReq: (proxyReq, req, res) => {
+            console.log(
+              `[Proxy] ${req.method} ${req.url} -> ${process.env.API_BACKEND === "legacy" ? "api-legacy" : "api-core"}`,
+            );
+          },
         },
       },
     },

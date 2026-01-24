@@ -1,0 +1,45 @@
+{
+  "value": {
+    "periodType": "MONTHLY",
+    "stats": [
+      {
+        "period": "2026-01",
+        "totalSales": 4800000,
+        "totalReservations": 15,
+        "totalGuests": 38
+      },
+      {
+        "period": "2026-02",
+        "totalSales": 3200000,
+        "totalReservations": 2,
+        "totalGuests": 4
+      },
+      {
+        "period": "2026-03",
+        "totalSales": 3000000,
+        "totalReservations": 1,
+        "totalGuests": 2
+      }
+    ],
+    "monthlyStats": [
+      {
+        "yearMonth": "2026-01",
+        "totalSales": 4800000,
+        "totalReservations": 15,
+        "totalGuests": 38
+      },
+      {
+        "yearMonth": "2026-02",
+        "totalSales": 3200000,
+        "totalReservations": 2,
+        "totalGuests": 4
+      },
+      {
+        "yearMonth": "2026-03",
+        "totalSales": 3000000,
+        "totalReservations": 1,
+        "totalGuests": 2
+      }
+    ]
+  }
+}

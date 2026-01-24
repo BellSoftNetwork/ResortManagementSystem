@@ -4,12 +4,20 @@
   - echo "kubectl context ready"
 
 .convert_kubernetes_resource_script: &convert_kubernetes_resource_script
-  - export KUBERNETES_RESOURCE_NAMES="common ${DEPLOY_ENVIRONMENT}"
+  - source ${CI_PROJECT_DIR}/deploy/environments/${DEPLOY_ENVIRONMENT}.env
   - mkdir -p ${KUBERNETES_DEPLOY_YAML_PATH}
   - |
-    for filename in ${KUBERNETES_RESOURCE_NAMES}; do
-      envsubst < ${KUBERNETES_RESOURCE_PATH}/${filename}.yaml > ${KUBERNETES_DEPLOY_YAML_PATH}/${filename}.yaml
-      echo "'${filename}' converted"
+    # Process all YAML files in subdirectories
+    for dir in api-legacy api-core frontend ingress; do
+      if [ -d "${KUBERNETES_RESOURCE_PATH}/${dir}" ]; then
+        for file in ${KUBERNETES_RESOURCE_PATH}/${dir}/*.yaml; do
+          if [ -f "$file" ]; then
+            filename=$(basename "$file")
+            envsubst < "$file" > "${KUBERNETES_DEPLOY_YAML_PATH}/${dir}-${filename}"
+            echo "'${dir}/${filename}' converted"
+          fi
+        done
+      fi
     done
 
 .setup_kubectl:

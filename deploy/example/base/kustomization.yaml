@@ -1,0 +1,52 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# 기본 네임스페이스 (오버레이에서 재정의 가능)
+namespace: bsn-resort-management-system
+
+# 공통 라벨 (모든 리소스에 적용)
+commonLabels:
+  app.kubernetes.io/name: resort-management-system
+  app.kubernetes.io/part-of: bsn-platform
+
+# 기본 리소스 목록
+resources:
+  - namespace.yaml
+  - api-core/deployment.yaml
+  - api-core/service.yaml
+  - api-core/configmap.yaml
+  - api-legacy/deployment.yaml
+  - api-legacy/service.yaml
+  - frontend-web/deployment.yaml
+  - frontend-web/service.yaml
+  - ingress.yaml
+
+# 기본 이미지 설정 (오버레이에서 태그 재정의)
+images:
+  - name: api-core
+    newName: registry.gitlab.bellsoft.net/bell/resort-management-system/api-core
+    newTag: latest
+  - name: api-legacy
+    newName: registry.gitlab.bellsoft.net/bell/resort-management-system/api-legacy
+    newTag: latest
+  - name: frontend-web
+    newName: registry.gitlab.bellsoft.net/bell/resort-management-system/frontend-web
+    newTag: latest
+
+# 공통 설정값 (ConfigMap 생성)
+configMapGenerator:
+  - name: resort-common-config
+    literals:
+      - TZ=Asia/Seoul
+      - LANG=ko_KR.UTF-8
+      - LC_ALL=ko_KR.UTF-8
+
+# 공통 Secret 플레이스홀더 (실제 값은 외부에서 관리)
+secretGenerator:
+  - name: resort-secrets
+    literals:
+      - JWT_SECRET=placeholder-will-be-overridden
+      - DATABASE_MYSQL_HOST=placeholder-will-be-overridden
+      - DATABASE_MYSQL_USER=placeholder-will-be-overridden
+      - DATABASE_MYSQL_PASSWORD=placeholder-will-be-overridden
+      - REDIS_HOST=placeholder-will-be-overridden

@@ -1,0 +1,56 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+.vscode
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+**/target/
+**/build/
+**/dist/
+**/node_modules/
+**/.gradle/
+**/bin/
+**/out/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env.local
+.env.*.local
+
+# Docker
+docker-compose.override.yml
+Dockerfile*
+.dockerignore
+
+# Documentation
+docs/
+README.md
+*.md
+
+# Test files
+**/test/
+**/tests/
+**/*_test.go
+**/*.test.js
+**/*.spec.js
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~

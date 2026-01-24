@@ -1,0 +1,140 @@
+# api-core (Golang + Gin) CI/CD 구성
+
+# Go 전용 환경 변수 (의존성 설치와 테스트에서 공통 사용)
+.go-build-vars: &go-build-vars
+  CGO_ENABLED: "0"
+  GOOS: linux
+  GOARCH: amd64
+  GOCACHE: /builds/resort-assistant/resort-management-system/.cache/go-mod
+
+# api-core 의존성 설치 잡 (캐시 재사용 및 업데이트)
+dependencies:api-core:
+  stage: dependencies
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.24-alpine
+  extends:
+    - .go-cache-with-fallback
+  variables: *go-build-vars
+  before_script:
+    - apk add --no-cache git
+    - cd apps/api-core
+  script:
+    - echo "Checking Go dependencies cache..."
+    - |
+      # go.mod 또는 go.sum이 변경되었는지 확인
+      if [ -d "/builds/resort-assistant/resort-management-system/.cache/go-mod" ] && [ -f "go.mod" ]; then
+        echo "📦 Cache found, verifying dependencies..."
+        go mod verify 2>/dev/null && CACHE_VALID=true || CACHE_VALID=false
+        if [ "$CACHE_VALID" = "true" ]; then
+          echo "✅ Cache is valid, dependencies up to date"
+        else
+          echo "🔄 Cache invalid, downloading fresh dependencies..."
+          go mod download
+          go mod verify
+        fi
+      else
+        echo "📥 No cache found, downloading dependencies..."
+        go mod download
+        go mod verify
+      fi
+  rules:
+    - changes:
+        - apps/api-core/go.mod
+        - apps/api-core/go.sum
+        - apps/api-core/**/*
+        - .gitlab-ci.yml
+        - .gitlab/ci/apps/api-core.gitlab-ci.yaml
+
+# api-core 테스트 잡
+test:api-core:
+  stage: test
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.24-alpine
+  extends:
+    - .go-cache-with-fallback
+    - .allow-failure-temp
+    - .db-services
+    - .test-env-vars
+  variables:
+    # 테스트에서는 SQLite 사용을 위해 CGO 활성화
+    CGO_ENABLED: "1"
+    GOOS: linux
+    GOARCH: amd64
+    GOCACHE: /builds/resort-assistant/resort-management-system/.cache/go-mod
+    # api-core 전용 테스트 환경 변수
+    JWT_SECRET: test-secret-key
+    API_PROFILE: test
+  needs:
+    - job: dependencies:api-core
+      optional: true
+  before_script:
+    # CGO 컴파일을 위한 필수 패키지 설치
+    - apk add --no-cache git gcc musl-dev
+    - cd apps/api-core
+    - go mod download
+  script:
+    - echo "Running api-core tests..."
+    - go test ./... -v -coverprofile=coverage.out
+    - go tool cover -html=coverage.out -o coverage.html
+    - echo "Running api-core lint..."
+    - go vet ./...
+    - gofmt -d .
+  coverage: '/Total coverage: (\d+\.\d+)%/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: apps/api-core/coverage.xml
+    paths:
+      - apps/api-core/coverage.out
+      - apps/api-core/coverage.html
+    expire_in: 1 week
+  rules:
+    - if: "$TEST_DISABLED"
+      when: never
+    - changes:
+        - apps/api-core/**/*
+        - .gitlab-ci.yml
+        - .gitlab/ci/apps/api-core.gitlab-ci.yaml
+
+# api-core 빌드 잡
+build:api-core:
+  extends:
+    - .docker-build-base
+    - .go-cache-with-fallback
+  variables:
+    IMAGE_REGISTRY: $API_CORE_IMAGE
+  script:
+    - echo "Building api-core Docker image..."
+    - cd apps/api-core
+    # 브랜치별 이미지 태그 생성
+    - |
+      # GitLab CI 사전 정의 변수 사용 (브랜치명 정규화)
+      BRANCH_NAME=$(echo "$CI_COMMIT_REF_SLUG" | sed 's/\//-/g')
+
+      # 이미지 태그 생성
+      IMAGE_TAG="${BRANCH_NAME}-${CI_COMMIT_SHORT_SHA}"
+      IMAGE_TAG_LATEST="${IMAGE_REGISTRY}:${IMAGE_TAG}"
+      IMAGE_TAG_BRANCH_LATEST="${IMAGE_REGISTRY}:${BRANCH_NAME}-latest"
+    # 이미지 빌드 및 푸시
+    - echo "Building Docker image..."
+    # 이전 브랜치 이미지 pull 시도 (캐시로 활용)
+    - docker pull $IMAGE_TAG_BRANCH_LATEST || true
+    - docker build --platform=linux/amd64 --cache-from $IMAGE_TAG_BRANCH_LATEST --build-arg BUILDKIT_INLINE_CACHE=1 -t $IMAGE_TAG_LATEST -t $IMAGE_TAG_BRANCH_LATEST .
+    - docker push $IMAGE_TAG_LATEST
+    - docker push $IMAGE_TAG_BRANCH_LATEST
+    # 빌드 정보 저장 (배포 job에서 사용)
+    - echo "API_CORE_IMAGE_TAG=${IMAGE_TAG}" > build.env
+    - echo "API_CORE_IMAGE_FULL_TAG=${IMAGE_TAG_LATEST}" >> build.env
+    - echo "API_CORE_IMAGE_BRANCH_TAG=${IMAGE_TAG_BRANCH_LATEST}" >> build.env
+  artifacts:
+    reports:
+      dotenv: apps/api-core/build.env
+  needs:
+    - job: dependencies:api-core
+      optional: true
+  rules:
+    - if: "$BUILD_DISABLED"
+      when: never
+    - changes:
+        - apps/api-core/**/*
+        - .gitlab-ci.yml
+        - .gitlab/ci/apps/api-core.gitlab-ci.yaml

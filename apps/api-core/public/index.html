@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resort Management System API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .info {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        code {
+            background-color: #f5f5f5;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Resort Management System API</h1>
+        <p>Welcome to the Resort Management System API (Go version)</p>
+        
+        <div class="info">
+            <h3>API Information</h3>
+            <p>Base URL: <code>/api/v1</code></p>
+            <p>Authentication: JWT Bearer Token</p>
+        </div>
+        
+        <h3>Available Endpoints</h3>
+        <ul>
+            <li><code>POST /api/v1/auth/register</code> - User registration</li>
+            <li><code>POST /api/v1/auth/login</code> - User login</li>
+            <li><code>POST /api/v1/auth/refresh</code> - Refresh token</li>
+            <li><code>GET /api/v1/env</code> - Get environment info</li>
+            <li><code>GET /api/v1/config</code> - Get configuration</li>
+        </ul>
+        
+        <p>For more information, please refer to the API documentation.</p>
+    </div>
+</body>
+</html>

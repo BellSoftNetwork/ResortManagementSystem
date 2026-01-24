@@ -1,0 +1,10 @@
+{
+  "value": {
+    "id": 1,
+    "name": "수정된 결제수단",
+    "commissionRate": 0.15,
+    "requireUnpaidAmountCheck": false,
+    "isDefaultSelect": false,
+    "status": "ACTIVE"
+  }
+}

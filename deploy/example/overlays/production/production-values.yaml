@@ -1,0 +1,126 @@
+# 프로덕션 환경 Deployment 패치
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-core
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: api-core
+        env:
+        - name: API_PROFILE
+          value: "production"
+        - name: LOG_LEVEL
+          value: "info"
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-legacy
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+      - name: api-legacy
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "production"
+        - name: JAVA_OPTS
+          value: "-Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:+UseStringDeduplication -XX:+ExitOnOutOfMemoryError"
+        resources:
+          requests:
+            cpu: 300m
+            memory: 768Mi
+          limits:
+            cpu: 1500m
+            memory: 1.5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-web
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: frontend-web
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 300m
+            memory: 256Mi
+---
+# 프로덕션용 Ingress 패치
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: resort-management-system
+  annotations:
+    alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:ap-northeast-2:ACCOUNT:certificate/PRODUCTION-CERT-ID"
+    nginx.ingress.kubernetes.io/rate-limit: "200"
+    nginx.ingress.kubernetes.io/rate-limit-rps: "20"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://resort.bellsoft.net"
+spec:
+  tls:
+    - hosts:
+        - resort.bellsoft.net
+      secretName: resort-production-tls-secret
+  rules:
+    - host: resort.bellsoft.net
+      http:
+        paths:
+          - path: /api/v1
+            pathType: Prefix
+            backend:
+              service:
+                name: api-core
+                port:
+                  number: 8080
+          - path: /api/legacy
+            pathType: Prefix
+            backend:
+              service:
+                name: api-legacy
+                port:
+                  number: 8080
+          - path: /actuator
+            pathType: Prefix
+            backend:
+              service:
+                name: api-legacy
+                port:
+                  number: 8080
+          - path: /docs
+            pathType: Prefix
+            backend:
+              service:
+                name: api-core
+                port:
+                  number: 8080
+          - path: /health
+            pathType: Exact
+            backend:
+              service:
+                name: api-core
+                port:
+                  number: 8080
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-web
+                port:
+                  number: 80

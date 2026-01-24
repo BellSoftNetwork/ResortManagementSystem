@@ -1,0 +1,24 @@
+# Docker Compose Override for M1 Mac (Apple Silicon)
+# This file provides optimized settings for Apple Silicon Macs
+# To use native ARM64 images on M1 Mac, remove the platform specifications
+
+# Example override for using native ARM64 images:
+# services:
+#   mysql:
+#     platform: linux/arm64/v8
+#     image: mysql:8.0
+#   
+#   redis:
+#     platform: linux/arm64/v8
+#   
+#   api-core:
+#     platform: linux/arm64/v8
+#   
+#   api-legacy:
+#     platform: linux/arm64/v8
+#   
+#   frontend:
+#     platform: linux/arm64/v8
+
+# Note: Currently using linux/amd64 with Rosetta 2 emulation for better compatibility
+# If you experience performance issues, uncomment the above to use native ARM64 images

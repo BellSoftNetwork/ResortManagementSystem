@@ -1,0 +1,171 @@
+# api-legacy (Kotlin Spring Boot) CI/CD 구성
+
+
+# api-legacy 의존성 설치 잡 (캐시 재사용 및 업데이트)
+dependencies:api-legacy:
+  stage: dependencies
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:$GRADLE_VERSION
+  extends:
+    - .gradle-cache-with-fallback
+  before_script:
+    - chmod +x ./gradlew
+  script:
+    - echo "Checking Gradle dependencies cache..."
+    - |
+      # build.gradle.kts 또는 gradle.properties가 변경되었는지 확인
+      if [ -d ".gradle/caches" ] && [ -f "apps/api-legacy/build.gradle.kts" ]; then
+        echo "📦 Cache found, checking if dependencies are up to date..."
+        ./gradlew :apps:api-legacy:dependencies --dry-run >/dev/null 2>&1 && CACHE_VALID=true || CACHE_VALID=false
+        if [ "$CACHE_VALID" = "true" ]; then
+          echo "✅ Cache is valid, dependencies up to date"
+        else
+          echo "🔄 Cache invalid or dependencies changed, downloading fresh dependencies..."
+          ./gradlew :apps:api-legacy:dependencies
+          ./gradlew :apps:api-legacy:testClasses
+        fi
+      else
+        echo "📥 No cache found, downloading dependencies..."
+        ./gradlew :apps:api-legacy:dependencies
+        ./gradlew :apps:api-legacy:testClasses
+      fi
+  rules:
+    - when: never  # api-legacy 잡 스킵
+    - changes:
+        - apps/api-legacy/build.gradle.kts
+        - apps/api-legacy/gradle.properties
+        - gradle.properties
+        - apps/api-legacy/**/*
+        - .gitlab-ci.yml
+        - .gitlab/ci/apps/api-legacy.gitlab-ci.yaml
+
+# api-legacy 테스트 잡
+test:api-legacy:
+  stage: test
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:$GRADLE_VERSION
+  extends:
+    - .gradle-cache-with-fallback
+    - .allow-failure-temp
+    - .db-services
+    - .test-env-vars
+  variables:
+    # Spring Boot 전용 테스트 환경 변수
+    SPRING_PROFILES_ACTIVE: test
+  needs:
+    - job: dependencies:api-legacy
+      optional: true
+  before_script:
+    - chmod +x ./gradlew
+  script:
+    - echo "Running api-legacy tests..."
+    - ./gradlew :apps:api-legacy:clean :apps:api-legacy:test :apps:api-legacy:jacocoTestReport
+    - ./gradlew :apps:api-legacy:ktlintCheck
+  after_script:
+    - cd apps/api-legacy
+    # JaCoCo 리포트를 Cobertura 형식으로 변환
+    - |
+      awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, " instructions covered"; print 100*covered/instructions, "% covered" }' build/reports/jacoco/test/jacocoTestReport.csv || true
+  coverage: '/(\d+\.?\d*) % covered/'
+  artifacts:
+    reports:
+      junit:
+        - apps/api-legacy/build/test-results/test/**/TEST-*.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: apps/api-legacy/build/reports/jacoco/test/jacocoTestReport.xml
+    paths:
+      - apps/api-legacy/build/reports/
+    expire_in: 1 week
+  rules:
+    - when: never  # api-legacy 잡 스킵
+    - if: "$TEST_DISABLED"
+      when: never
+    - changes:
+        - apps/api-legacy/**/*
+        - .gitlab-ci.yml
+        - .gitlab/ci/apps/api-legacy.gitlab-ci.yaml
+
+# api-legacy 빌드 잡
+build:api-legacy:
+  extends:
+    - .docker-build-base
+    - .gradle-cache-with-fallback
+  variables:
+    IMAGE_REGISTRY: $API_LEGACY_IMAGE
+  script:
+    - echo "Building api-legacy Docker image..."
+    - cd apps/api-legacy
+    # 브랜치별 이미지 태그 생성
+    - |
+      # GitLab CI 사전 정의 변수 사용 (브랜치명 정규화)
+      BRANCH_NAME=$(echo "$CI_COMMIT_REF_SLUG" | sed 's/\//-/g')
+      
+      # 이미지 태그 생성
+      IMAGE_TAG="${BRANCH_NAME}-${CI_COMMIT_SHORT_SHA}"
+      IMAGE_TAG_LATEST="${IMAGE_REGISTRY}:${IMAGE_TAG}"
+      IMAGE_TAG_BRANCH_LATEST="${IMAGE_REGISTRY}:${BRANCH_NAME}-latest"
+    # 이미지 빌드 및 푸시
+    - echo "Building Docker image..."
+    - docker build --platform=linux/amd64 -t $IMAGE_TAG_LATEST -t $IMAGE_TAG_BRANCH_LATEST .
+    - docker push $IMAGE_TAG_LATEST
+    - docker push $IMAGE_TAG_BRANCH_LATEST
+    # 빌드 정보 저장
+    - echo "API_LEGACY_IMAGE_TAG=$IMAGE_TAG_LATEST" > build.env
+    - echo "API_LEGACY_IMAGE_TAG_COMMIT=$IMAGE_TAG_BRANCH_LATEST" >> build.env
+  artifacts:
+    reports:
+      dotenv: apps/api-legacy/build.env
+  needs:
+    - job: dependencies:api-legacy
+      optional: true
+    - job: test:api-legacy
+      optional: true
+  rules:
+    - when: never  # api-legacy 잡 스킵
+    - if: "$BUILD_DISABLED"
+      when: never
+    - changes:
+        - apps/api-legacy/**/*
+        - .gitlab-ci.yml
+        - .gitlab/ci/apps/api-legacy.gitlab-ci.yaml
+
+# api-legacy Spring Boot 이미지 빌드 (Gradle buildBootImage 사용)
+build:api-legacy:gradle:
+  stage: build
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/gradle:$GRADLE_VERSION
+  services:
+    - ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:24-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_VERIFY: 1
+    DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
+  before_script:
+    - cd apps/api-legacy
+    - |
+      # Docker 인증서 대기
+      until [ -f $DOCKER_CERT_PATH/ca.pem ]; do
+        echo "Waiting for Docker certificates..."
+        sleep 1
+      done
+  script:
+    - echo "Building api-legacy using Gradle bootBuildImage..."
+    # 브랜치별 태그 생성
+    - |
+      # GitLab CI 사전 정의 변수 사용 (브랜치명 정규화)
+      BRANCH_NAME=$(echo "$CI_COMMIT_REF_SLUG" | sed 's/\//-/g')
+      
+      IMAGE_NAME="$API_LEGACY_IMAGE/$BRANCH_NAME:gradle-$CI_COMMIT_SHORT_SHA"
+    # Gradle로 이미지 빌드
+    - ./gradlew :apps:api-legacy:bootBuildImage --imageName=$IMAGE_NAME
+    # 레지스트리로 푸시
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push $IMAGE_NAME
+  rules:
+    - when: never  # api-legacy 잡 스킵
+    - if: "$BUILD_DISABLED"
+      when: never
+    - changes:
+        - apps/api-legacy/**/*
+        - .gitlab-ci.yml
+        - .gitlab/ci/apps/api-legacy.gitlab-ci.yaml
+      when: manual

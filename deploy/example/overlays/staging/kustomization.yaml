@@ -1,0 +1,72 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# 스테이징 환경 설정
+namespace: bsn-resort-management-system-staging
+
+# 기본 구성 상속
+resources:
+  - ../../base
+
+# 환경별 라벨 추가
+commonLabels:
+  environment: staging
+  app.kubernetes.io/instance: staging
+
+# 스테이징용 이미지 태그 설정 (CI/CD에서 업데이트)
+images:
+  - name: api-core
+    newName: registry.gitlab.bellsoft.net/bell/resort-management-system/api-core
+    newTag: develop-latest  # CI/CD에서 develop-{commit-sha} 형태로 업데이트
+  - name: api-legacy
+    newName: registry.gitlab.bellsoft.net/bell/resort-management-system/api-legacy
+    newTag: develop-latest  # CI/CD에서 develop-{commit-sha} 형태로 업데이트
+  - name: frontend-web
+    newName: registry.gitlab.bellsoft.net/bell/resort-management-system/frontend-web
+    newTag: develop-latest  # CI/CD에서 develop-{commit-sha} 형태로 업데이트
+
+# 스테이징 환경별 ConfigMap 재정의
+configMapGenerator:
+  - name: resort-common-config
+    behavior: replace
+    literals:
+      - TZ=Asia/Seoul
+      - LANG=ko_KR.UTF-8
+      - LC_ALL=ko_KR.UTF-8
+  - name: api-core-config
+    behavior: merge
+    literals:
+      - API_PROFILE=staging
+      - LOG_LEVEL=debug
+      - LOG_FORMAT=json
+      - SECURITY_RATE_LIMIT_ENABLED=true
+      - SECURITY_RATE_LIMIT_RPS=100
+      - SECURITY_RATE_LIMIT_BURST=200
+      - CORS_ALLOWED_ORIGINS=https://staging-resort.bellsoft.net,http://localhost:9000
+      - GRACEFUL_SHUTDOWN_TIMEOUT=15s
+
+# 스테이징용 네임스페이스 패치
+patchesStrategicMerge:
+  - namespace-patch.yaml
+  - staging-values.yaml
+
+# 스테이징용 리소스 스케일링 (프로덕션보다 적게)
+replicas:
+  - name: api-core
+    count: 2
+  - name: api-legacy
+    count: 1
+  - name: frontend-web
+    count: 2
+
+# 스테이징용 Secret 재정의
+secretGenerator:
+  - name: resort-secrets
+    behavior: replace
+    literals:
+      - JWT_SECRET=STAGING_JWT_SECRET
+      - DATABASE_MYSQL_HOST=STAGING_DB_HOST
+      - DATABASE_MYSQL_USER=STAGING_DB_USER
+      - DATABASE_MYSQL_PASSWORD=STAGING_DB_PASSWORD
+      - REDIS_HOST=STAGING_REDIS_HOST
+      - REDIS_PASSWORD=STAGING_REDIS_PASSWORD

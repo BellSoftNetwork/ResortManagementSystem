@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bsn-resort-management-system
+  labels:
+    app.kubernetes.io/name: resort-management-system
+    app.kubernetes.io/part-of: bsn-platform
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+  annotations:
+    description: "Bell Soft Network - Resort Management System"
