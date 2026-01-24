@@ -73,10 +73,23 @@
               </q-popup-proxy>
             </q-input>
 
+            <!-- view 모드: tel: 링크 -->
+            <div v-if="mode === 'view'" class="q-field q-field--readonly">
+              <div class="q-field__label">예약자 연락처</div>
+              <div class="q-field__native">
+                <a v-if="formModel.phone" :href="`tel:${formModel.phone}`" class="text-primary">
+                  <q-icon name="phone" size="xs" class="q-mr-xs" />
+                  {{ formModel.phone }}
+                </a>
+                <span v-else>-</span>
+              </div>
+            </div>
+
+            <!-- edit/create 모드: 기존 q-input 유지 -->
             <q-input
+              v-else
               v-model="formModel.phone"
               :rules="reservationStaticRules.phone"
-              :readonly="mode === 'view'"
               label="예약자 연락처"
               placeholder="010-0000-0000"
             ></q-input>

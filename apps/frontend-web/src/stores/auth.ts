@@ -260,7 +260,7 @@ export const useAuthStore = defineStore("auth", {
           await this.refreshAccessToken(true);
           // 갱신 성공 시 여기서 리턴 (아래 코드는 실행되지 않음)
           return;
-        } catch (error) {
+        } catch {
           // 리프레시 토큰이 만료된 경우에만 로그인 페이지로 리다이렉트
           if (this.router) {
             this.router.push({ name: "Login" });

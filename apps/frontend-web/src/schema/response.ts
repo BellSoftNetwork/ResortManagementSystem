@@ -21,7 +21,7 @@ type PageResponse = {
 
 export type ListResponse<T> = {
   page: PageResponse;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   filter?: any;
   values: T[];
 };

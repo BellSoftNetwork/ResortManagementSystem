@@ -32,7 +32,7 @@ export function formatDiffDays(startDate: string | null, endDate: string | null)
 
   try {
     return dayjs(endDate).diff(dayjs(startDate), "day");
-  } catch (e) {
+  } catch {
     return 0;
   }
 }
