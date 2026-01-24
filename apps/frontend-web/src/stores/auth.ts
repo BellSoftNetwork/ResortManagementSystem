@@ -14,6 +14,8 @@ interface State {
   refreshToken: string | null;
   accessTokenExpiresIn: number | null;
   tokenRefreshTimer: number | null;
+  refreshAttempts: number;
+  lastRefreshAttempt: number;
 }
 
 // 로컬 스토리지 키
@@ -34,6 +36,8 @@ export const useAuthStore = defineStore("auth", {
       ? Number(localStorage.getItem(TOKEN_EXPIRES_KEY))
       : null,
     tokenRefreshTimer: null,
+    refreshAttempts: 0,
+    lastRefreshAttempt: 0,
   }),
 
   getters: {
@@ -103,16 +107,42 @@ export const useAuthStore = defineStore("auth", {
         throw new Error("리프레시 토큰이 없습니다.");
       }
 
+      // 재시도 횟수 제한 (store 레벨에서도 체크)
+      const MAX_ATTEMPTS = 3;
+      const RETRY_DELAY = 1000; // 1초
+
+      if (this.refreshAttempts >= MAX_ATTEMPTS) {
+        console.error("Store: Refresh token retry limit exceeded");
+        this.clearTokens();
+        throw new Error("리프래시 토큰 재시도 횟수 초과");
+      }
+
+      // 최소 재시도 간격 확인
+      const now = Date.now();
+      const timeSinceLastAttempt = now - this.lastRefreshAttempt;
+      if (timeSinceLastAttempt < RETRY_DELAY && this.refreshAttempts > 0) {
+        const delay = RETRY_DELAY - timeSinceLastAttempt;
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+
       // 토큰이 만료되었거나 강제 로딩이 필요한 경우에만 로딩 상태 표시
       const isExpired = this.isTokenExpired();
       if (isExpired || forceLoading) {
         this.status.isRefreshingToken = true;
       }
 
+      // 재시도 카운터 증가
+      this.refreshAttempts++;
+      this.lastRefreshAttempt = Date.now();
+
       try {
         const response = await postRefreshToken({
           refreshToken: this.refreshToken,
         });
+
+        // 성공 시 재시도 카운터 리셋
+        this.refreshAttempts = 0;
+        this.lastRefreshAttempt = 0;
 
         this.setTokens(response.value.accessToken, response.value.refreshToken, response.value.accessTokenExpiresIn);
 
@@ -131,7 +161,9 @@ export const useAuthStore = defineStore("auth", {
         const isAuthError = error.response?.status === 401 || error.response?.status === 403;
 
         if (!isNetworkError && isAuthError) {
-          // 인증 오류인 경우에만 토큰 제거
+          // 인증 오류인 경우 재시도 카운터 리셋 및 토큰 제거
+          this.refreshAttempts = 0;
+          this.lastRefreshAttempt = 0;
           this.clearTokens();
         }
 
@@ -160,6 +192,10 @@ export const useAuthStore = defineStore("auth", {
       this.accessToken = null;
       this.refreshToken = null;
       this.accessTokenExpiresIn = null;
+
+      // 재시도 카운터 리셋
+      this.refreshAttempts = 0;
+      this.lastRefreshAttempt = 0;
 
       localStorage.removeItem(ACCESS_TOKEN_KEY);
       localStorage.removeItem(REFRESH_TOKEN_KEY);

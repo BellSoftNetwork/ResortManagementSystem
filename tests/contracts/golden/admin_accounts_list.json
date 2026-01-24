@@ -1,0 +1,56 @@
+{
+  "values": [
+    {
+      "id": 1,
+      "userId": "newuser",
+      "email": "user@example.com",
+      "name": "수정된 이름",
+      "status": "ACTIVE",
+      "role": "NORMAL",
+      "profileImageUrl": "https://gravatar.com/avatar/b58996c504c5638798eb6b511e6f49af"
+    },
+    {
+      "id": 2,
+      "userId": "testadmin",
+      "email": "testadmin@test.com",
+      "name": "Test Admin",
+      "status": "ACTIVE",
+      "role": "SUPER_ADMIN",
+      "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+    },
+    {
+      "id": 3,
+      "userId": "newadmin",
+      "email": "newadmin@example.com",
+      "name": "새 관리자",
+      "status": "ACTIVE",
+      "role": "ADMIN",
+      "profileImageUrl": "https://gravatar.com/avatar/0cfe38aa1a568d55ceffc0e7282a526d"
+    },
+    {
+      "id": 4,
+      "userId": "testmanager",
+      "email": "testmanager@example.com",
+      "name": "Test Manager",
+      "status": "ACTIVE",
+      "role": "ADMIN",
+      "profileImageUrl": "https://gravatar.com/avatar/519469694b5de5bc4600e4ba907a2d2e"
+    },
+    {
+      "id": 5,
+      "userId": "testuser",
+      "email": "testuser@example.com",
+      "name": "새 이름",
+      "status": "ACTIVE",
+      "role": "NORMAL",
+      "profileImageUrl": "https://gravatar.com/avatar/7ec7606c46a14a7ef514d1f1f9038823"
+    }
+  ],
+  "page": {
+    "index": 0,
+    "size": 10,
+    "totalElements": 5,
+    "totalPages": 1
+  },
+  "filter": {}
+}

@@ -1,0 +1,162 @@
+# Docker Compose for Resort Management System
+# Development configuration with fixed local credentials
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    platform: linux/amd64  # M1 Mac 호환성을 위한 플랫폼 지정
+    container_name: rms-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_USER: ${MYSQL_USER:-rms}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-rms123}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./scripts/init-mysql.sql:/docker-entrypoint-initdb.d/01-init.sql
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      timeout: 20s
+      retries: 10
+      interval: 5s
+    networks:
+      - rms-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    platform: linux/amd64  # M1 Mac 호환성을 위한 플랫폼 지정
+    container_name: rms-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 5s
+      retries: 10
+      interval: 5s
+    networks:
+      - rms-network
+
+  # Go API (api-core) - Main API on port 8080
+  api-core:
+    platform: linux/amd64  # M1 Mac 호환성을 위한 플랫폼 지정
+    build:
+      context: ./apps/api-core
+      dockerfile: Dockerfile
+      target: ${BUILD_TARGET:-development}
+    container_name: rms-api-core
+    restart: unless-stopped
+    volumes:
+      - ./apps/api-core:/app
+      - go_modules:/go/pkg/mod
+    ports:
+      - "${API_CORE_PORT:-8080}:8080"
+      - "2345:2345"  # Delve debugger port
+    environment:
+      PROFILE: ${PROFILE:-local}
+      DATABASE_MYSQL_HOST: ${DATABASE_MYSQL_HOST:-mysql}
+      DATABASE_MYSQL_PORT: ${DATABASE_MYSQL_PORT:-3306}
+      DATABASE_MYSQL_USER: ${DATABASE_MYSQL_USER:-rms}
+      DATABASE_MYSQL_PASSWORD: ${DATABASE_MYSQL_PASSWORD:-rms123}
+      DATABASE_MYSQL_DATABASE: ${DATABASE_MYSQL_DATABASE:-rms-core}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      JWT_SECRET: ${JWT_SECRET:-local-development-secret-key-for-jwt-token-256bit}
+      JWT_ACCESS_TOKEN_EXPIRY: ${JWT_ACCESS_TOKEN_EXPIRY:-900}
+      JWT_REFRESH_TOKEN_EXPIRY: ${JWT_REFRESH_TOKEN_EXPIRY:-604800}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - rms-network
+
+  # Kotlin Spring Boot API (api-legacy) - Legacy API on port 8081
+  api-legacy:
+    platform: linux/amd64  # M1 Mac 호환성을 위한 플랫폼 지정
+    build:
+      context: .
+      dockerfile: ./apps/api-legacy/Dockerfile
+      target: ${BUILD_TARGET:-development}
+    container_name: rms-api-legacy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+    volumes:
+      - .:/app
+      - gradle_cache:/root/.gradle
+    working_dir: /app
+    command: ./gradlew :apps:api-legacy:bootRun --no-daemon
+    ports:
+      - "${API_LEGACY_PORT:-8081}:8080"
+      - "5006:5005"  # Java debugger port
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-local}
+      DATABASE_MYSQL_HOST: ${DATABASE_MYSQL_HOST:-mysql}
+      DATABASE_MYSQL_PORT: ${DATABASE_MYSQL_PORT:-3306}
+      DATABASE_MYSQL_USER: ${MYSQL_LEGACY_USER:-rms}
+      DATABASE_MYSQL_PASSWORD: ${MYSQL_LEGACY_PASSWORD:-rms123}
+      DATABASE_MYSQL_SCHEMA: ${MYSQL_DATABASE_LEGACY:-rms-legacy}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      JWT_SECRET: ${JWT_SECRET:-local-development-secret-key-for-jwt-token-256bit}
+      JWT_ACCESS_TOKEN_EXPIRY: ${JWT_ACCESS_TOKEN_EXPIRY:-900}
+      JWT_REFRESH_TOKEN_EXPIRY: ${JWT_REFRESH_TOKEN_EXPIRY:-604800}
+      JAVA_OPTS: "-Dspring.profiles.active=local -Dspring.devtools.restart.enabled=true"
+      GRADLE_OPTS: "-Xmx2g -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError"
+      JAVA_TOOL_OPTIONS: "--add-opens=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - rms-network
+
+  # Frontend Web (Vue.js/Quasar)
+  frontend:
+    platform: linux/amd64  # M1 Mac 호환성을 위한 플랫폼 지정
+    build:
+      context: ./apps/frontend-web
+      dockerfile: Dockerfile
+      target: ${BUILD_TARGET:-development}
+    container_name: rms-frontend
+    restart: unless-stopped
+    volumes:
+      - ./apps/frontend-web:/app
+      - /app/node_modules
+    ports:
+      - "${FRONTEND_PORT:-9000}:9000"
+    environment:
+      # Backend selection: 'core' (default) or 'legacy'
+      API_BACKEND: ${API_BACKEND:-core}
+      API_CORE_URL: ${API_CORE_URL:-http://api-core:8080}
+      API_LEGACY_URL: ${API_LEGACY_URL:-http://api-legacy:8080}
+      NODE_ENV: ${NODE_ENV:-development}
+    depends_on:
+      - api-core
+      - api-legacy
+    networks:
+      - rms-network
+
+volumes:
+  mysql_data:
+  redis_data:
+  go_modules:
+  gradle_cache:
+
+networks:
+  rms-network:
+    driver: bridge

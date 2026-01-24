@@ -1,0 +1,159 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-core
+  labels:
+    app.kubernetes.io/component: api-core
+    app.kubernetes.io/version: "1.0.0"
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: api-core
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: api-core
+        app.kubernetes.io/version: "1.0.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: api-core
+          image: api-core:latest  # Kustomize에서 이미지 치환
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: API_PROFILE
+              value: "production"
+            - name: API_PORT
+              value: "8080"
+            - name: TZ
+              valueFrom:
+                configMapKeyRef:
+                  name: resort-common-config
+                  key: TZ
+            - name: LANG
+              valueFrom:
+                configMapKeyRef:
+                  name: resort-common-config
+                  key: LANG
+            - name: LC_ALL
+              valueFrom:
+                configMapKeyRef:
+                  name: resort-common-config
+                  key: LC_ALL
+            # JWT 설정
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: resort-secrets
+                  key: JWT_SECRET
+            - name: JWT_ACCESS_TOKEN_EXPIRY
+              value: "900"
+            - name: JWT_REFRESH_TOKEN_EXPIRY
+              value: "604800"
+            # 데이터베이스 설정
+            - name: DATABASE_MYSQL_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: resort-secrets
+                  key: DATABASE_MYSQL_HOST
+            - name: DATABASE_MYSQL_PORT
+              value: "3306"
+            - name: DATABASE_MYSQL_DATABASE
+              value: "resort_management_core"
+            - name: DATABASE_MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: resort-secrets
+                  key: DATABASE_MYSQL_USER
+            - name: DATABASE_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: resort-secrets
+                  key: DATABASE_MYSQL_PASSWORD
+            # Redis 설정
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: resort-secrets
+                  key: REDIS_HOST
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: resort-secrets
+                  key: REDIS_PASSWORD
+                  optional: true
+          envFrom:
+            - configMapRef:
+                name: api-core-config
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 12
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: var-tmp
+              mountPath: /var/tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: var-tmp
+          emptyDir: {}

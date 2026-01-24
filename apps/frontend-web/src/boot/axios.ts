@@ -36,6 +36,10 @@ function setupInterceptors(): void {
 
       // 401 에러인 경우 토큰 갱신 시도
       if (error.response?.status === 401 && !originalRequest._retry) {
+        // refresh token API 호출인 경우 재시도하지 않음
+        if (originalRequest.url?.includes("/auth/refresh")) {
+          return Promise.reject(error);
+        }
         return authInterceptorService.handleTokenRefresh(originalRequest, error, api);
       }
 

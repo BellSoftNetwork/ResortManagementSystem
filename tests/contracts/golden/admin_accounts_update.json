@@ -1,0 +1,11 @@
+{
+  "value": {
+    "id": 1,
+    "userId": "newuser",
+    "email": "user@example.com",
+    "name": "수정된 이름",
+    "status": "ACTIVE",
+    "role": "NORMAL",
+    "profileImageUrl": "https://gravatar.com/avatar/b58996c504c5638798eb6b511e6f49af"
+  }
+}

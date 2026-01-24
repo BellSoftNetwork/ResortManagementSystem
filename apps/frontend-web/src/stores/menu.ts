@@ -9,6 +9,7 @@ import {
   fasSignature,
   fasTableColumns,
   fasUser,
+  fasFlask,
 } from "@quasar/extras/fontawesome-v6";
 import { useAuthStore } from "stores/auth";
 
@@ -31,6 +32,8 @@ const adminLinks: Link[] = [
   { icon: fasUser, text: "계정 관리", to: "AdminAccounts" },
 ] as const;
 
+const superAdminLinks: Link[] = [{ icon: fasFlask, text: "개발 테스트", to: "DevTest" }] as const;
+
 export const useMenuStore = defineStore("menu", {
   getters: {
     allLinks: () => {
@@ -38,6 +41,7 @@ export const useMenuStore = defineStore("menu", {
       const links = [normalLinks];
 
       if (authStore.isAdminRole) links.push(adminLinks);
+      if (authStore.isSuperAdminRole) links.push(superAdminLinks);
 
       return links;
     },

@@ -5,6 +5,11 @@ import { useAuthStore } from "src/stores/auth";
  * 인증 관련 인터셉터 로직을 관리하는 서비스
  */
 class AuthInterceptorService {
+  private refreshPromise: Promise<any> | null = null;
+  private refreshAttempts = 0;
+  private readonly MAX_REFRESH_ATTEMPTS = 3;
+  private readonly REFRESH_RETRY_DELAY = 1000; // 1초
+  private lastRefreshAttempt = 0;
   /**
    * 요청 인터셉터 설정: JWT 토큰을 요청 헤더에 추가
    * @param instance Axios 인스턴스
@@ -45,26 +50,89 @@ class AuthInterceptorService {
       return Promise.reject(error);
     }
 
+    // refresh 토큰 요청 자체인 경우 재시도하지 않음
+    if (originalRequest.url?.includes("/auth/refresh")) {
+      this.resetRefreshAttempts();
+      return Promise.reject(error);
+    }
+
+    // 재시도 횟수 초과 확인
+    if (this.refreshAttempts >= this.MAX_REFRESH_ATTEMPTS) {
+      console.error("Refresh token retry limit exceeded");
+      this.handleRefreshFailure(authStore);
+      return Promise.reject(error);
+    }
+
+    // 최소 재시도 간격 확인
+    const now = Date.now();
+    const timeSinceLastAttempt = now - this.lastRefreshAttempt;
+    if (timeSinceLastAttempt < this.REFRESH_RETRY_DELAY) {
+      const delay = this.REFRESH_RETRY_DELAY - timeSinceLastAttempt;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+
     originalRequest._retry = true;
 
-    try {
-      // 토큰 갱신 시도
-      await authStore.refreshAccessToken();
-
-      // 갱신된 토큰으로 원래 요청 재시도
-      originalRequest.headers.Authorization = `Bearer ${authStore.accessToken}`;
-      return api(originalRequest);
-    } catch (refreshError) {
-      // 리프레시 토큰도 만료된 경우 로그아웃
-      authStore.clearTokens();
-
-      // 로그인 페이지로 리다이렉트
-      if (authStore.router) {
-        authStore.router.push({ name: "Login" });
+    // 이미 진행 중인 refresh 요청이 있으면 기다림
+    if (this.refreshPromise) {
+      try {
+        await this.refreshPromise;
+        originalRequest.headers.Authorization = `Bearer ${authStore.accessToken}`;
+        return api(originalRequest);
+      } catch (error) {
+        return Promise.reject(error);
       }
-
-      return Promise.reject(refreshError);
     }
+
+    // 새로운 refresh 요청 시작
+    this.refreshAttempts++;
+    this.lastRefreshAttempt = Date.now();
+
+    this.refreshPromise = authStore
+      .refreshAccessToken()
+      .then(() => {
+        // 갱신 성공 시 재시도 카운터 리셋
+        this.resetRefreshAttempts();
+
+        // 갱신된 토큰으로 원래 요청 재시도
+        originalRequest.headers.Authorization = `Bearer ${authStore.accessToken}`;
+        return api(originalRequest);
+      })
+      .catch((refreshError) => {
+        // 리프레시 실패 시 처리
+        this.handleRefreshFailure(authStore);
+        return Promise.reject(refreshError);
+      })
+      .finally(() => {
+        this.refreshPromise = null;
+      });
+
+    return this.refreshPromise;
+  }
+
+  /**
+   * 리프레시 실패 처리
+   */
+  private handleRefreshFailure(authStore: any): void {
+    // 재시도 카운터 리셋
+    this.resetRefreshAttempts();
+
+    // 토큰 제거
+    authStore.clearTokens();
+
+    // 로그인 페이지로 리다이렉트
+    if (authStore.router) {
+      authStore.router.push({ name: "Login" });
+    }
+  }
+
+  /**
+   * 재시도 카운터 리셋
+   */
+  private resetRefreshAttempts(): void {
+    this.refreshAttempts = 0;
+    this.lastRefreshAttempt = 0;
+    this.refreshPromise = null;
   }
 }
 

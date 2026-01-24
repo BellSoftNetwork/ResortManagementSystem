@@ -1,0 +1,23 @@
+{
+  "value": {
+    "id": 2,
+    "number": "502호",
+    "roomGroupId": 1,
+    "note": "수정된 노트",
+    "status": "NORMAL",
+    "createdBy": {
+      "id": 2,
+      "userId": "testadmin",
+      "email": "testadmin@test.com",
+      "name": "Test Admin",
+      "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+    },
+    "updatedBy": {
+      "id": 4,
+      "userId": "testmanager",
+      "email": "testmanager@example.com",
+      "name": "Test Manager",
+      "profileImageUrl": "https://gravatar.com/avatar/519469694b5de5bc4600e4ba907a2d2e"
+    }
+  }
+}

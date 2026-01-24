@@ -143,8 +143,14 @@ tasks.named<BootRun>("bootRun") {
     setupEnvironment()
 }
 
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+    archiveFileName.set("app.jar")
+    destinationDirectory.set(layout.buildDirectory.dir("libs"))
+}
+
 fun BootRun.setupEnvironment() {
-    jvmArgs = listOf("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005")
+    // Debugger configuration is handled by JAVA_OPTS environment variable
+    // jvmArgs = listOf("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005")
     environment("SPRING_PROFILES_ACTIVE", "local")
 }
 

@@ -1,0 +1,743 @@
+{
+  "values": [
+    {
+      "id": 73,
+      "paymentMethodId": 2,
+      "paymentMethod": {
+        "id": 2,
+        "name": "통장입금",
+        "commissionRate": 0,
+        "requireUnpaidAmountCheck": true,
+        "isDefaultSelect": true,
+        "status": "ACTIVE"
+      },
+      "rooms": [
+        {
+          "id": 25,
+          "number": "303호",
+          "roomGroupId": 3,
+          "roomGroup": {
+            "id": 3,
+            "name": "3층 투룸",
+            "peekPrice": 130000,
+            "offPeekPrice": 100000,
+            "description": "3층 투룸 객실",
+            "rooms": null,
+            "createdBy": null,
+            "updatedBy": null
+          },
+          "note": "",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        }
+      ],
+      "name": "월세고객4",
+      "phone": "010-9999-1003",
+      "peopleCount": 2,
+      "stayStartAt": "2026-03-10",
+      "stayEndAt": "2026-04-10",
+      "price": 3000000,
+      "deposit": 3000000,
+      "paymentAmount": 3000000,
+      "refundAmount": 0,
+      "brokerFee": 0,
+      "note": "월세 예약",
+      "status": "NORMAL",
+      "type": "MONTHLY_RENT",
+      "createdBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      },
+      "updatedBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      }
+    },
+    {
+      "id": 72,
+      "paymentMethodId": 2,
+      "paymentMethod": {
+        "id": 2,
+        "name": "통장입금",
+        "commissionRate": 0,
+        "requireUnpaidAmountCheck": true,
+        "isDefaultSelect": true,
+        "status": "ACTIVE"
+      },
+      "rooms": [
+        {
+          "id": 24,
+          "number": "302호",
+          "roomGroupId": 3,
+          "roomGroup": {
+            "id": 3,
+            "name": "3층 투룸",
+            "peekPrice": 130000,
+            "offPeekPrice": 100000,
+            "description": "3층 투룸 객실",
+            "rooms": null,
+            "createdBy": null,
+            "updatedBy": null
+          },
+          "note": "",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        }
+      ],
+      "name": "월세고객3",
+      "phone": "010-9999-1002",
+      "peopleCount": 2,
+      "stayStartAt": "2026-02-10",
+      "stayEndAt": "2026-03-10",
+      "price": 3000000,
+      "deposit": 3000000,
+      "paymentAmount": 3000000,
+      "refundAmount": 0,
+      "brokerFee": 0,
+      "note": "월세 예약",
+      "status": "NORMAL",
+      "type": "MONTHLY_RENT",
+      "createdBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      },
+      "updatedBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      }
+    },
+    {
+      "id": 71,
+      "paymentMethodId": 2,
+      "paymentMethod": {
+        "id": 2,
+        "name": "통장입금",
+        "commissionRate": 0,
+        "requireUnpaidAmountCheck": true,
+        "isDefaultSelect": true,
+        "status": "ACTIVE"
+      },
+      "rooms": [
+        {
+          "id": 23,
+          "number": "301호",
+          "roomGroupId": 3,
+          "roomGroup": {
+            "id": 3,
+            "name": "3층 투룸",
+            "peekPrice": 130000,
+            "offPeekPrice": 100000,
+            "description": "3층 투룸 객실",
+            "rooms": null,
+            "createdBy": null,
+            "updatedBy": null
+          },
+          "note": "",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        }
+      ],
+      "name": "월세고객2",
+      "phone": "010-9999-1001",
+      "peopleCount": 2,
+      "stayStartAt": "2026-01-10",
+      "stayEndAt": "2026-02-10",
+      "price": 3000000,
+      "deposit": 3000000,
+      "paymentAmount": 3000000,
+      "refundAmount": 0,
+      "brokerFee": 0,
+      "note": "월세 예약",
+      "status": "NORMAL",
+      "type": "MONTHLY_RENT",
+      "createdBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      },
+      "updatedBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      }
+    },
+    {
+      "id": 70,
+      "paymentMethodId": 2,
+      "paymentMethod": {
+        "id": 2,
+        "name": "통장입금",
+        "commissionRate": 0,
+        "requireUnpaidAmountCheck": true,
+        "isDefaultSelect": true,
+        "status": "ACTIVE"
+      },
+      "rooms": [
+        {
+          "id": 50,
+          "number": "214호",
+          "roomGroupId": 4,
+          "roomGroup": {
+            "id": 4,
+            "name": "2층 투룸",
+            "peekPrice": 120000,
+            "offPeekPrice": 90000,
+            "description": "2층 투룸 객실",
+            "rooms": null,
+            "createdBy": null,
+            "updatedBy": null
+          },
+          "note": "",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        }
+      ],
+      "name": "월세고객1",
+      "phone": "010-9999-1000",
+      "peopleCount": 2,
+      "stayStartAt": "2025-12-10",
+      "stayEndAt": "2026-01-10",
+      "price": 3000000,
+      "deposit": 3000000,
+      "paymentAmount": 3000000,
+      "refundAmount": 0,
+      "brokerFee": 0,
+      "note": "월세 예약",
+      "status": "NORMAL",
+      "type": "MONTHLY_RENT",
+      "createdBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      },
+      "updatedBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      }
+    },
+    {
+      "id": 69,
+      "paymentMethodId": 2,
+      "paymentMethod": {
+        "id": 2,
+        "name": "통장입금",
+        "commissionRate": 0,
+        "requireUnpaidAmountCheck": true,
+        "isDefaultSelect": true,
+        "status": "ACTIVE"
+      },
+      "rooms": [
+        {
+          "id": 49,
+          "number": "213호",
+          "roomGroupId": 4,
+          "roomGroup": {
+            "id": 4,
+            "name": "2층 투룸",
+            "peekPrice": 120000,
+            "offPeekPrice": 90000,
+            "description": "2층 투룸 객실",
+            "rooms": null,
+            "createdBy": null,
+            "updatedBy": null
+          },
+          "note": "",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        }
+      ],
+      "name": "장기고객4",
+      "phone": "010-5678-1003",
+      "peopleCount": 4,
+      "stayStartAt": "2026-01-10",
+      "stayEndAt": "2026-01-12",
+      "checkInAt": "2026-01-10T00:00:00",
+      "checkOutAt": "2026-01-12T00:00:00",
+      "price": 200000,
+      "deposit": 100000,
+      "paymentAmount": 100000,
+      "refundAmount": 0,
+      "brokerFee": 0,
+      "note": "2박 3일 테스트 예약",
+      "status": "NORMAL",
+      "type": "STAY",
+      "createdBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      },
+      "updatedBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      }
+    },
+    {
+      "id": 68,
+      "paymentMethodId": 2,
+      "paymentMethod": {
+        "id": 2,
+        "name": "통장입금",
+        "commissionRate": 0,
+        "requireUnpaidAmountCheck": true,
+        "isDefaultSelect": true,
+        "status": "ACTIVE"
+      },
+      "rooms": [
+        {
+          "id": 48,
+          "number": "212호",
+          "roomGroupId": 4,
+          "roomGroup": {
+            "id": 4,
+            "name": "2층 투룸",
+            "peekPrice": 120000,
+            "offPeekPrice": 90000,
+            "description": "2층 투룸 객실",
+            "rooms": null,
+            "createdBy": null,
+            "updatedBy": null
+          },
+          "note": "",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        }
+      ],
+      "name": "장기고객3",
+      "phone": "010-5678-1002",
+      "peopleCount": 4,
+      "stayStartAt": "2026-01-10",
+      "stayEndAt": "2026-01-12",
+      "checkInAt": "2026-01-10T00:00:00",
+      "checkOutAt": "2026-01-12T00:00:00",
+      "price": 200000,
+      "deposit": 100000,
+      "paymentAmount": 100000,
+      "refundAmount": 0,
+      "brokerFee": 0,
+      "note": "2박 3일 테스트 예약",
+      "status": "NORMAL",
+      "type": "STAY",
+      "createdBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      },
+      "updatedBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      }
+    },
+    {
+      "id": 67,
+      "paymentMethodId": 2,
+      "paymentMethod": {
+        "id": 2,
+        "name": "통장입금",
+        "commissionRate": 0,
+        "requireUnpaidAmountCheck": true,
+        "isDefaultSelect": true,
+        "status": "ACTIVE"
+      },
+      "rooms": [
+        {
+          "id": 47,
+          "number": "211호",
+          "roomGroupId": 4,
+          "roomGroup": {
+            "id": 4,
+            "name": "2층 투룸",
+            "peekPrice": 120000,
+            "offPeekPrice": 90000,
+            "description": "2층 투룸 객실",
+            "rooms": null,
+            "createdBy": null,
+            "updatedBy": null
+          },
+          "note": "",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        }
+      ],
+      "name": "장기고객2",
+      "phone": "010-5678-1001",
+      "peopleCount": 4,
+      "stayStartAt": "2026-01-10",
+      "stayEndAt": "2026-01-12",
+      "checkInAt": "2026-01-10T00:00:00",
+      "checkOutAt": "2026-01-12T00:00:00",
+      "price": 200000,
+      "deposit": 100000,
+      "paymentAmount": 100000,
+      "refundAmount": 0,
+      "brokerFee": 0,
+      "note": "2박 3일 테스트 예약",
+      "status": "NORMAL",
+      "type": "STAY",
+      "createdBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      },
+      "updatedBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      }
+    },
+    {
+      "id": 66,
+      "paymentMethodId": 2,
+      "paymentMethod": {
+        "id": 2,
+        "name": "통장입금",
+        "commissionRate": 0,
+        "requireUnpaidAmountCheck": true,
+        "isDefaultSelect": true,
+        "status": "ACTIVE"
+      },
+      "rooms": [
+        {
+          "id": 46,
+          "number": "210호",
+          "roomGroupId": 4,
+          "roomGroup": {
+            "id": 4,
+            "name": "2층 투룸",
+            "peekPrice": 120000,
+            "offPeekPrice": 90000,
+            "description": "2층 투룸 객실",
+            "rooms": null,
+            "createdBy": null,
+            "updatedBy": null
+          },
+          "note": "",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        }
+      ],
+      "name": "장기고객1",
+      "phone": "010-5678-1000",
+      "peopleCount": 4,
+      "stayStartAt": "2026-01-10",
+      "stayEndAt": "2026-01-12",
+      "checkInAt": "2026-01-10T00:00:00",
+      "checkOutAt": "2026-01-12T00:00:00",
+      "price": 200000,
+      "deposit": 100000,
+      "paymentAmount": 100000,
+      "refundAmount": 0,
+      "brokerFee": 0,
+      "note": "2박 3일 테스트 예약",
+      "status": "NORMAL",
+      "type": "STAY",
+      "createdBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      },
+      "updatedBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      }
+    },
+    {
+      "id": 65,
+      "paymentMethodId": 2,
+      "paymentMethod": {
+        "id": 2,
+        "name": "통장입금",
+        "commissionRate": 0,
+        "requireUnpaidAmountCheck": true,
+        "isDefaultSelect": true,
+        "status": "ACTIVE"
+      },
+      "rooms": [
+        {
+          "id": 45,
+          "number": "209호",
+          "roomGroupId": 4,
+          "roomGroup": {
+            "id": 4,
+            "name": "2층 투룸",
+            "peekPrice": 120000,
+            "offPeekPrice": 90000,
+            "description": "2층 투룸 객실",
+            "rooms": null,
+            "createdBy": null,
+            "updatedBy": null
+          },
+          "note": "",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        }
+      ],
+      "name": "테스트고객10",
+      "phone": "010-1234-1009",
+      "peopleCount": 2,
+      "stayStartAt": "2026-01-10",
+      "stayEndAt": "2026-01-11",
+      "checkInAt": "2026-01-10T00:00:00",
+      "checkOutAt": "2026-01-11T00:00:00",
+      "price": 100000,
+      "deposit": 50000,
+      "paymentAmount": 50000,
+      "refundAmount": 0,
+      "brokerFee": 0,
+      "note": "1박 2일 테스트 예약",
+      "status": "NORMAL",
+      "type": "STAY",
+      "createdBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      },
+      "updatedBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      }
+    },
+    {
+      "id": 64,
+      "paymentMethodId": 2,
+      "paymentMethod": {
+        "id": 2,
+        "name": "통장입금",
+        "commissionRate": 0,
+        "requireUnpaidAmountCheck": true,
+        "isDefaultSelect": true,
+        "status": "ACTIVE"
+      },
+      "rooms": [
+        {
+          "id": 57,
+          "number": "207호208호",
+          "roomGroupId": 7,
+          "roomGroup": {
+            "id": 7,
+            "name": "대형룸",
+            "peekPrice": 200000,
+            "offPeekPrice": 160000,
+            "description": "대형룸",
+            "rooms": null,
+            "createdBy": null,
+            "updatedBy": null
+          },
+          "note": "",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        }
+      ],
+      "name": "테스트고객9",
+      "phone": "010-1234-1008",
+      "peopleCount": 2,
+      "stayStartAt": "2026-01-10",
+      "stayEndAt": "2026-01-11",
+      "checkInAt": "2026-01-10T00:00:00",
+      "checkOutAt": "2026-01-11T00:00:00",
+      "price": 100000,
+      "deposit": 50000,
+      "paymentAmount": 50000,
+      "refundAmount": 0,
+      "brokerFee": 0,
+      "note": "1박 2일 테스트 예약",
+      "status": "NORMAL",
+      "type": "STAY",
+      "createdBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      },
+      "updatedBy": {
+        "id": 2,
+        "userId": "testadmin",
+        "email": "testadmin@test.com",
+        "name": "Test Admin",
+        "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+      }
+    }
+  ],
+  "page": {
+    "index": 0,
+    "size": 10,
+    "totalElements": 19,
+    "totalPages": 2
+  },
+  "filter": {}
+}

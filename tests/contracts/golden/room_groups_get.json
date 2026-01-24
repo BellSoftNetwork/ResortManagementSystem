@@ -1,0 +1,397 @@
+{
+  "value": {
+    "id": 1,
+    "name": "수정된 그룹",
+    "peekPrice": 150000,
+    "offPeekPrice": 120000,
+    "description": "5층 투룸 객실",
+    "rooms": [
+      {
+        "room": {
+          "id": 2,
+          "number": "502호",
+          "roomGroupId": 1,
+          "note": "수정된 노트",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 4,
+            "userId": "testmanager",
+            "email": "testmanager@example.com",
+            "name": "Test Manager",
+            "profileImageUrl": "https://gravatar.com/avatar/519469694b5de5bc4600e4ba907a2d2e"
+          }
+        },
+        "lastReservation": {
+          "id": 55,
+          "paymentMethodId": 1,
+          "paymentMethod": {
+            "id": 1,
+            "name": "수정된 결제수단",
+            "commissionRate": 0.15,
+            "requireUnpaidAmountCheck": false,
+            "isDefaultSelect": false,
+            "status": "ACTIVE"
+          },
+          "rooms": [
+            {
+              "id": 2,
+              "number": "502호",
+              "roomGroupId": 1,
+              "roomGroup": {
+                "id": 1,
+                "name": "수정된 그룹",
+                "peekPrice": 150000,
+                "offPeekPrice": 120000,
+                "description": "5층 투룸 객실",
+                "rooms": null,
+                "createdBy": null,
+                "updatedBy": null
+              },
+              "note": "수정된 노트",
+              "status": "NORMAL",
+              "createdBy": {
+                "id": 2,
+                "userId": "testadmin",
+                "email": "testadmin@test.com",
+                "name": "Test Admin",
+                "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+              },
+              "updatedBy": {
+                "id": 4,
+                "userId": "testmanager",
+                "email": "testmanager@example.com",
+                "name": "Test Manager",
+                "profileImageUrl": "https://gravatar.com/avatar/519469694b5de5bc4600e4ba907a2d2e"
+              }
+            }
+          ],
+          "name": "테스트 고객",
+          "phone": "010-1234-5678",
+          "peopleCount": 2,
+          "stayStartAt": "2026-02-01",
+          "stayEndAt": "2026-02-03",
+          "price": 200000,
+          "deposit": 50000,
+          "paymentAmount": 150000,
+          "refundAmount": 0,
+          "brokerFee": 30000,
+          "note": "",
+          "status": "PENDING",
+          "type": "STAY",
+          "createdBy": {
+            "id": 4,
+            "userId": "testmanager",
+            "email": "testmanager@example.com",
+            "name": "Test Manager",
+            "profileImageUrl": "https://gravatar.com/avatar/519469694b5de5bc4600e4ba907a2d2e"
+          },
+          "updatedBy": {
+            "id": 4,
+            "userId": "testmanager",
+            "email": "testmanager@example.com",
+            "name": "Test Manager",
+            "profileImageUrl": "https://gravatar.com/avatar/519469694b5de5bc4600e4ba907a2d2e"
+          }
+        }
+      },
+      {
+        "room": {
+          "id": 3,
+          "number": "503호",
+          "roomGroupId": 1,
+          "note": "",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        },
+        "lastReservation": null
+      },
+      {
+        "room": {
+          "id": 4,
+          "number": "504호",
+          "roomGroupId": 1,
+          "note": "",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        },
+        "lastReservation": null
+      },
+      {
+        "room": {
+          "id": 5,
+          "number": "505호",
+          "roomGroupId": 1,
+          "note": "",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        },
+        "lastReservation": null
+      },
+      {
+        "room": {
+          "id": 6,
+          "number": "506호",
+          "roomGroupId": 1,
+          "note": "",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        },
+        "lastReservation": null
+      },
+      {
+        "room": {
+          "id": 7,
+          "number": "507호",
+          "roomGroupId": 1,
+          "note": "",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        },
+        "lastReservation": null
+      },
+      {
+        "room": {
+          "id": 8,
+          "number": "508호",
+          "roomGroupId": 1,
+          "note": "",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        },
+        "lastReservation": null
+      },
+      {
+        "room": {
+          "id": 9,
+          "number": "509호",
+          "roomGroupId": 1,
+          "note": "",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        },
+        "lastReservation": null
+      },
+      {
+        "room": {
+          "id": 10,
+          "number": "510호",
+          "roomGroupId": 1,
+          "note": "",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        },
+        "lastReservation": null
+      },
+      {
+        "room": {
+          "id": 58,
+          "number": "201",
+          "roomGroupId": 1,
+          "note": "테스트 객실",
+          "status": "NORMAL",
+          "createdBy": {
+            "id": 4,
+            "userId": "testmanager",
+            "email": "testmanager@example.com",
+            "name": "Test Manager",
+            "profileImageUrl": "https://gravatar.com/avatar/519469694b5de5bc4600e4ba907a2d2e"
+          },
+          "updatedBy": {
+            "id": 4,
+            "userId": "testmanager",
+            "email": "testmanager@example.com",
+            "name": "Test Manager",
+            "profileImageUrl": "https://gravatar.com/avatar/519469694b5de5bc4600e4ba907a2d2e"
+          }
+        },
+        "lastReservation": {
+          "id": 56,
+          "paymentMethodId": 2,
+          "paymentMethod": {
+            "id": 2,
+            "name": "통장입금",
+            "commissionRate": 0,
+            "requireUnpaidAmountCheck": true,
+            "isDefaultSelect": true,
+            "status": "ACTIVE"
+          },
+          "rooms": [
+            {
+              "id": 58,
+              "number": "201",
+              "roomGroupId": 1,
+              "roomGroup": {
+                "id": 1,
+                "name": "수정된 그룹",
+                "peekPrice": 150000,
+                "offPeekPrice": 120000,
+                "description": "5층 투룸 객실",
+                "rooms": null,
+                "createdBy": null,
+                "updatedBy": null
+              },
+              "note": "테스트 객실",
+              "status": "NORMAL",
+              "createdBy": {
+                "id": 4,
+                "userId": "testmanager",
+                "email": "testmanager@example.com",
+                "name": "Test Manager",
+                "profileImageUrl": "https://gravatar.com/avatar/519469694b5de5bc4600e4ba907a2d2e"
+              },
+              "updatedBy": {
+                "id": 4,
+                "userId": "testmanager",
+                "email": "testmanager@example.com",
+                "name": "Test Manager",
+                "profileImageUrl": "https://gravatar.com/avatar/519469694b5de5bc4600e4ba907a2d2e"
+              }
+            }
+          ],
+          "name": "테스트고객1",
+          "phone": "010-1234-1000",
+          "peopleCount": 2,
+          "stayStartAt": "2026-01-10",
+          "stayEndAt": "2026-01-11",
+          "checkInAt": "2026-01-10T00:00:00",
+          "checkOutAt": "2026-01-11T00:00:00",
+          "price": 100000,
+          "deposit": 50000,
+          "paymentAmount": 50000,
+          "refundAmount": 0,
+          "brokerFee": 0,
+          "note": "1박 2일 테스트 예약",
+          "status": "NORMAL",
+          "type": "STAY",
+          "createdBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          },
+          "updatedBy": {
+            "id": 2,
+            "userId": "testadmin",
+            "email": "testadmin@test.com",
+            "name": "Test Admin",
+            "profileImageUrl": "https://gravatar.com/avatar/b2460a5bb961e26c85a0a38fd9513836"
+          }
+        }
+      }
+    ],
+    "createdBy": null,
+    "updatedBy": null
+  }
+}

@@ -35,3 +35,5 @@ yarn-error.log*
 # Ionic Capacitor
 android/
 ios/
+
+coverage/

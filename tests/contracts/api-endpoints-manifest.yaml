@@ -1,0 +1,506 @@
+# API Endpoints Manifest
+# api-legacy(Kotlin/Spring) vs api-core(Go/Gin) 호환성 검증용 매니페스트
+#
+# 이 파일은 두 API 서버의 엔드포인트를 정의하고 비교 테스트에 사용됩니다.
+# status: verified(검증완료), pending(미검증), legacy-only(레거시전용), core-only(코어전용)
+
+version: "1.0.0"
+created: "2026-01-11"
+updated: "2026-01-11"
+
+servers:
+  legacy:
+    base_url: "http://localhost:8081"
+    description: "Kotlin + Spring Boot API"
+  core:
+    base_url: "http://localhost:8080"
+    description: "Go + Gin API"
+
+# 테스트 계정 정보
+test_accounts:
+  super_admin:
+    username: "testadmin"
+    password: "testadmin123"
+    role: "SUPER_ADMIN"
+  admin:
+    username: "testmanager"
+    password: "testmanager123"
+    role: "ADMIN"
+  user:
+    username: "testuser"
+    password: "testuser123"
+    role: "USER"
+
+# 엔드포인트 정의
+endpoints:
+  # ===== Health Check =====
+  - id: health
+    path: /actuator/health
+    method: GET
+    auth: false
+    description: "전체 헬스 상태"
+    status: pending
+    
+  - id: health_liveness
+    path: /actuator/health/liveness
+    method: GET
+    auth: false
+    description: "Liveness probe"
+    status: pending
+    
+  - id: health_readiness
+    path: /actuator/health/readiness
+    method: GET
+    auth: false
+    description: "Readiness probe"
+    status: pending
+
+  # ===== Authentication =====
+  - id: auth_register
+    path: /api/v1/auth/register
+    method: POST
+    auth: false
+    description: "회원가입"
+    request_body:
+      userId: "newuser"
+      email: "user@example.com"
+      name: "홍길동"
+      password: "password123"
+    expected_status: [201, 409]  # 409 if user already exists
+    status: pending
+    
+  - id: auth_login
+    path: /api/v1/auth/login
+    method: POST
+    auth: false
+    description: "로그인"
+    request_body:
+      username: "testadmin"
+      password: "testadmin123"
+    status: pending
+    
+  - id: auth_refresh
+    path: /api/v1/auth/refresh
+    method: POST
+    auth: false
+    description: "토큰 갱신"
+    request_body:
+      refreshToken: "{token}"
+    expected_status: [200, 401]  # 401 if token is invalid/placeholder
+    status: pending
+
+  # ===== Main/Config =====
+  - id: env
+    path: /api/v1/env
+    method: GET
+    auth: false
+    description: "환경 정보 조회"
+    status: pending
+    
+  - id: config
+    path: /api/v1/config
+    method: GET
+    auth: false
+    description: "앱 설정 조회"
+    status: pending
+
+  # ===== My Profile =====
+  - id: my_get
+    path: /api/v1/my
+    method: GET
+    auth: true
+    role: USER
+    description: "내 정보 조회"
+    status: pending
+    
+  - id: my_post
+    path: /api/v1/my
+    method: POST
+    auth: true
+    role: USER
+    description: "내 정보 조회 (호환용)"
+    status: pending
+    
+  - id: my_patch
+    path: /api/v1/my
+    method: PATCH
+    auth: true
+    role: USER
+    description: "내 정보 수정"
+    request_body:
+      name: "새 이름"
+    status: pending
+
+  # ===== Admin Accounts =====
+  - id: admin_accounts_list
+    path: /api/v1/admin/accounts
+    method: GET
+    auth: true
+    role: SUPER_ADMIN
+    description: "사용자 목록"
+    params:
+      page: 0
+      size: 10
+    status: pending
+    
+  - id: admin_accounts_create
+    path: /api/v1/admin/accounts
+    method: POST
+    auth: true
+    role: SUPER_ADMIN
+    description: "사용자 생성"
+    request_body:
+      userId: "newadmin"
+      email: "newadmin@example.com"
+      name: "새 관리자"
+      password: "password123"
+      role: "ADMIN"
+      status: "ACTIVE"
+    expected_status: [201, 409]  # 409 if user already exists
+    status: pending
+    
+  - id: admin_accounts_update
+    path: /api/v1/admin/accounts/{id}
+    method: PATCH
+    auth: true
+    role: SUPER_ADMIN
+    description: "사용자 수정"
+    path_params:
+      id: 1
+    request_body:
+      name: "수정된 이름"
+    status: pending
+
+  # ===== Rooms =====
+  - id: rooms_list
+    path: /api/v1/rooms
+    method: GET
+    auth: true
+    role: USER
+    description: "객실 목록"
+    params:
+      page: 0
+      size: 10
+    status: pending
+    
+  - id: rooms_get
+    path: /api/v1/rooms/{id}
+    method: GET
+    auth: true
+    role: USER
+    description: "객실 상세"
+    path_params:
+      id: 2
+    status: pending
+    
+  - id: rooms_create
+    path: /api/v1/rooms
+    method: POST
+    auth: true
+    role: ADMIN
+    description: "객실 생성"
+    request_body:
+      number: "201"
+      roomGroupId: 1
+      note: "테스트 객실"
+      status: "NORMAL"
+    expected_status: [200, 201, 409]
+    status: pending
+    
+  - id: rooms_update
+    path: /api/v1/rooms/{id}
+    method: PATCH
+    auth: true
+    role: ADMIN
+    description: "객실 수정"
+    path_params:
+      id: 2
+    request_body:
+      note: "수정된 노트"
+    status: pending
+    
+  - id: rooms_delete
+    path: /api/v1/rooms/{id}
+    method: DELETE
+    auth: true
+    role: ADMIN
+    description: "객실 삭제"
+    path_params:
+      id: 99999
+    expected_status: [200, 204, 404]
+    status: pending
+    
+  - id: rooms_histories
+    path: /api/v1/rooms/{id}/histories
+    method: GET
+    auth: true
+    role: ADMIN
+    description: "객실 이력"
+    path_params:
+      id: 2
+    params:
+      page: 0
+      size: 10
+    status: pending
+
+  # ===== Room Groups =====
+  - id: room_groups_list
+    path: /api/v1/room-groups
+    method: GET
+    auth: true
+    role: USER
+    description: "객실 그룹 목록"
+    params:
+      page: 0
+      size: 10
+    status: pending
+    
+  - id: room_groups_get
+    path: /api/v1/room-groups/{id}
+    method: GET
+    auth: true
+    role: USER
+    description: "객실 그룹 상세"
+    path_params:
+      id: 1
+    status: pending
+    
+  - id: room_groups_create
+    path: /api/v1/room-groups
+    method: POST
+    auth: true
+    role: ADMIN
+    description: "객실 그룹 생성"
+    request_body:
+      name: "테스트 그룹"
+      peekPrice: 200000
+      offPeekPrice: 150000
+      description: "테스트 설명"
+    expected_status: [200, 201, 409]
+    status: pending
+    
+  - id: room_groups_update
+    path: /api/v1/room-groups/{id}
+    method: PATCH
+    auth: true
+    role: ADMIN
+    description: "객실 그룹 수정"
+    path_params:
+      id: 1
+    request_body:
+      name: "수정된 그룹"
+    status: pending
+    
+  - id: room_groups_delete
+    path: /api/v1/room-groups/{id}
+    method: DELETE
+    auth: true
+    role: ADMIN
+    description: "객실 그룹 삭제"
+    path_params:
+      id: 99999
+    expected_status: [200, 204, 404]
+    status: pending
+
+  # ===== Reservations =====
+  - id: reservations_list
+    path: /api/v1/reservations
+    method: GET
+    auth: true
+    role: USER
+    description: "예약 목록"
+    params:
+      page: 0
+      size: 10
+    status: pending
+    
+  - id: reservations_get
+    path: /api/v1/reservations/{id}
+    method: GET
+    auth: true
+    role: USER
+    description: "예약 상세"
+    path_params:
+      id: 99999
+    expected_status: [200, 404]
+    status: pending
+    
+  - id: reservations_create
+    path: /api/v1/reservations
+    method: POST
+    auth: true
+    role: ADMIN
+    description: "예약 생성"
+    request_body:
+      paymentMethodId: 1
+      roomIds: [2]
+      name: "테스트 고객"
+      phone: "010-1234-5678"
+      peopleCount: 2
+      stayStartAt: "2026-02-01"
+      stayEndAt: "2026-02-03"
+      price: 200000
+      deposit: 50000
+      paymentAmount: 150000
+      type: "STAY"
+    expected_status: [200, 201, 400, 422]
+    status: pending
+    
+  - id: reservations_update
+    path: /api/v1/reservations/{id}
+    method: PATCH
+    auth: true
+    role: ADMIN
+    description: "예약 수정"
+    path_params:
+      id: 99999
+    request_body:
+      name: "수정된 고객명"
+    expected_status: [200, 404]
+    status: pending
+    
+  - id: reservations_delete
+    path: /api/v1/reservations/{id}
+    method: DELETE
+    auth: true
+    role: ADMIN
+    description: "예약 삭제"
+    path_params:
+      id: 99999
+    expected_status: [200, 204, 404]
+    status: pending
+    
+  - id: reservations_histories
+    path: /api/v1/reservations/{id}/histories
+    method: GET
+    auth: true
+    role: ADMIN
+    description: "예약 이력"
+    path_params:
+      id: 99999
+    params:
+      page: 0
+      size: 10
+    expected_status: [200, 404]
+    status: pending
+
+  # ===== Reservation Statistics =====
+  - id: reservation_statistics
+    path: /api/v1/reservation-statistics
+    method: GET
+    auth: true
+    role: USER
+    description: "예약 통계"
+    params:
+      startDate: "2026-01-01"
+      endDate: "2026-12-31"
+      periodType: "MONTHLY"
+    status: pending
+
+  # ===== Payment Methods =====
+  - id: payment_methods_list
+    path: /api/v1/payment-methods
+    method: GET
+    auth: true
+    role: USER
+    description: "결제 수단 목록"
+    params:
+      page: 0
+      size: 10
+    status: pending
+    
+  - id: payment_methods_get
+    path: /api/v1/payment-methods/{id}
+    method: GET
+    auth: true
+    role: USER
+    description: "결제 수단 상세"
+    path_params:
+      id: 1
+    status: pending
+    
+  - id: payment_methods_create
+    path: /api/v1/payment-methods
+    method: POST
+    auth: true
+    role: ADMIN
+    description: "결제 수단 생성"
+    request_body:
+      name: "테스트 결제수단"
+      commissionRate: 0.03
+      requireUnpaidAmountCheck: false
+    expected_status: [200, 201, 409]
+    status: pending
+    
+  - id: payment_methods_update
+    path: /api/v1/payment-methods/{id}
+    method: PATCH
+    auth: true
+    role: ADMIN
+    description: "결제 수단 수정"
+    path_params:
+      id: 1
+    request_body:
+      name: "수정된 결제수단"
+    status: pending
+    
+  - id: payment_methods_delete
+    path: /api/v1/payment-methods/{id}
+    method: DELETE
+    auth: true
+    role: ADMIN
+    description: "결제 수단 삭제"
+    path_params:
+      id: 99999
+    expected_status: [200, 204, 404]
+    status: pending
+
+  # ===== Development (api-core only) =====
+  - id: dev_test_data
+    path: /api/v1/dev/test-data
+    method: POST
+    auth: true
+    role: SUPER_ADMIN
+    description: "테스트 데이터 생성"
+    request_body:
+      type: "all"
+    status: core-only
+
+  # ===== Documentation (api-core only) =====
+  - id: docs_schema
+    path: /docs/schema
+    method: GET
+    auth: false
+    description: "OpenAPI 스펙"
+    status: core-only
+    
+  - id: docs_swagger
+    path: /docs/swagger-ui
+    method: GET
+    auth: false
+    description: "Swagger UI"
+    status: core-only
+
+# 비교 시 무시할 필드 (동적 값)
+ignore_fields:
+  - createdAt
+  - updatedAt
+  - deletedAt
+  - lastLoginAt
+  - timestamp
+  - accessToken
+  - refreshToken
+  - accessTokenExpiresIn
+  - responseTime
+
+# 날짜 형식 정규화
+date_format: "%Y-%m-%dT%H:%M:%S"  # 타임존 없는 ISO 형식
+
+# 총 엔드포인트 수
+summary:
+  total: 40
+  auth_required: 28
+  admin_only: 15
+  core_only: 3
+  legacy_only: 0
+  golden_files_saved: 25

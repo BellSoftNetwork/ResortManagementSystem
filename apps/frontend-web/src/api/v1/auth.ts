@@ -48,6 +48,14 @@ export type RefreshTokenResponse = {
 };
 
 export async function postRefreshToken(params: RefreshTokenParams) {
-  const result = await api.post<SingleResponse<RefreshTokenResponse>>("/api/v1/auth/refresh", params);
+  // refresh token API는 인터셉터에서 자동 재시도하지 않도록 특별한 플래그 추가
+  const result = await api.post<SingleResponse<RefreshTokenResponse>>("/api/v1/auth/refresh", params, {
+    // refresh 요청은 인터셉터에서 재시도하지 않음
+    _retry: true,
+    // Authorization 헤더를 비워서 refresh token만 사용하도록 함
+    headers: {
+      Authorization: undefined,
+    },
+  } as any);
   return result.data;
 }

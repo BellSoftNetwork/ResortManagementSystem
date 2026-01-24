@@ -1,0 +1,118 @@
+# frontend-web (Vue.js/Quasar) CI/CD 구성
+
+# 프론트엔드 테스트 환경 변수
+.frontend-test-vars: &frontend-test-vars
+  variables:
+    NODE_ENV: test
+
+# frontend-web 의존성 설치 잡 (캐시 재사용 및 업데이트)
+dependencies:frontend-web:
+  stage: dependencies
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:$NODE_VERSION-alpine
+  extends:
+    - .node-cache-with-fallback
+  before_script:
+    - cd apps/frontend-web
+  script:
+    - echo "Checking Node.js dependencies cache..."
+    - |
+      # yarn.lock이 변경되었는지 확인하고 캐시 유효성 검사
+      if [ -d "node_modules" ] && [ -f "yarn.lock" ]; then
+        echo "📦 Cache found, verifying dependencies..."
+        yarn check --verify-tree 2>/dev/null && CACHE_VALID=true || CACHE_VALID=false
+        if [ "$CACHE_VALID" = "true" ]; then
+          echo "✅ Cache is valid, dependencies up to date"
+        else
+          echo "🔄 Cache invalid or outdated, installing fresh dependencies..."
+          yarn install --frozen-lockfile
+        fi
+      else
+        echo "📥 No cache found, installing dependencies..."
+        yarn install --frozen-lockfile
+      fi
+  rules:
+    - changes:
+        - apps/frontend-web/package.json
+        - apps/frontend-web/yarn.lock
+        - apps/frontend-web/**/*
+        - .gitlab-ci.yml
+        - .gitlab/ci/apps/frontend-web.gitlab-ci.yaml
+
+# frontend-web 테스트 잡
+test:frontend-web:
+  stage: test
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:$NODE_VERSION-alpine
+  extends:
+    - .node-cache-with-fallback
+    - .allow-failure-temp
+  <<: *frontend-test-vars
+  needs:
+    - job: dependencies:frontend-web
+      optional: true
+  before_script:
+    - cd apps/frontend-web
+    - yarn install --frozen-lockfile
+  script:
+    - echo "Running frontend-web tests..."
+    - yarn lint:prettier  # prettier 검사
+    - yarn test:unit:coverage  # 유닛 테스트 및 커버리지
+    - yarn build  # 빌드 가능 여부 확인
+  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: apps/frontend-web/coverage/cobertura-coverage.xml
+    paths:
+      - apps/frontend-web/coverage/
+      - apps/frontend-web/dist/
+    expire_in: 1 week
+  rules:
+    - if: "$TEST_DISABLED"
+      when: never
+    - changes:
+        - apps/frontend-web/**/*
+        - .gitlab-ci.yml
+        - .gitlab/ci/apps/frontend-web.gitlab-ci.yaml
+
+# frontend-web 빌드 잡
+build:frontend-web:
+  extends:
+    - .docker-build-base
+    - .node-cache-with-fallback
+  variables:
+    IMAGE_REGISTRY: $FRONTEND_IMAGE
+  script:
+    - echo "Building frontend-web Docker image..."
+    - cd apps/frontend-web
+    # 브랜치별 이미지 태그 생성
+    - |
+      # GitLab CI 사전 정의 변수 사용 (브랜치명 정규화)
+      BRANCH_NAME=$(echo "$CI_COMMIT_REF_SLUG" | sed 's/\//-/g')
+
+      # 이미지 태그 생성
+      IMAGE_TAG="${BRANCH_NAME}-${CI_COMMIT_SHORT_SHA}"
+      IMAGE_TAG_LATEST="${IMAGE_REGISTRY}:${IMAGE_TAG}"
+      IMAGE_TAG_BRANCH_LATEST="${IMAGE_REGISTRY}:${BRANCH_NAME}-latest"
+    # 이미지 빌드 및 푸시
+    - echo "Building Docker image..."
+    # 이전 브랜치 이미지 pull 시도 (캐시로 활용)
+    - docker pull $IMAGE_TAG_BRANCH_LATEST || true
+    - docker build --platform=linux/amd64 --cache-from $IMAGE_TAG_BRANCH_LATEST --build-arg BUILDKIT_INLINE_CACHE=1 -t $IMAGE_TAG_LATEST -t $IMAGE_TAG_BRANCH_LATEST .
+    - docker push $IMAGE_TAG_LATEST
+    - docker push $IMAGE_TAG_BRANCH_LATEST
+    # 빌드 정보 저장
+    - echo "FRONTEND_IMAGE_TAG=${IMAGE_TAG}" > build.env
+  artifacts:
+    reports:
+      dotenv: apps/frontend-web/build.env
+  needs:
+    - job: dependencies:frontend-web
+      optional: true
+  rules:
+    - if: "$BUILD_DISABLED"
+      when: never
+    - changes:
+        - apps/frontend-web/**/*
+        - .gitlab-ci.yml
+        - .gitlab/ci/apps/frontend-web.gitlab-ci.yaml

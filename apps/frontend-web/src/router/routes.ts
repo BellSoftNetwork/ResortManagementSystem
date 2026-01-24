@@ -192,6 +192,14 @@ const routes: RouteRecordRaw[] = [
         name: "AdminAccounts",
         component: () => import("pages/admin/AccountList.vue"),
       },
+      {
+        path: "dev-test",
+        name: "DevTest",
+        component: () => import("pages/admin/DevTest.vue"),
+        meta: {
+          roles: ["SUPER_ADMIN"],
+        },
+      },
     ],
   },
   {

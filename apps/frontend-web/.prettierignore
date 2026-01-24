@@ -1,0 +1,25 @@
+# Build outputs
+dist/
+.quasar/
+src-*/**
+
+# Dependencies
+node_modules/
+
+# Coverage
+coverage/
+
+# Test files
+*.test.*
+*.spec.*
+
+# Config files
+*.config.*
+eslint.config.js
+
+# Lock files
+yarn.lock
+package-lock.json
+
+# Generated files
+.eslintrc.cjs

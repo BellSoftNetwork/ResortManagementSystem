@@ -1,0 +1,22 @@
+{
+  "status": "UP",
+  "components": {
+    "db": {
+      "status": "UP",
+      "details": {
+        "idle": 1,
+        "inUse": 0,
+        "openConnections": 1,
+        "responseTime": 0
+      }
+    },
+    "redis": {
+      "status": "UP",
+      "details": {
+        "response": "PONG",
+        "responseTime": 0,
+        "version": "7.4.7"
+      }
+    }
+  }
+}

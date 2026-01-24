@@ -12,17 +12,6 @@
     "noEmit": true,
     "lib": ["esnext", "dom", "dom.iterable"]
   },
-  "include": [
-    "./**/*.ts",
-    "./**/*.d.ts",
-    "./**/*.tsx",
-    "./**/*.vue"
-  ],
-  "exclude": [
-    "dist",
-    "node_modules",
-    "src-capacitor",
-    "src-cordova",
-    ".quasar"
-  ]
+  "include": ["./**/*.ts", "./**/*.d.ts", "./**/*.tsx", "./**/*.vue"],
+  "exclude": ["dist", "node_modules", "src-capacitor", "src-cordova", ".quasar"]
 }

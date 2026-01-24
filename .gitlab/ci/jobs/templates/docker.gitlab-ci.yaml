@@ -1,3 +1,17 @@
+# Docker 데몬 대기 스크립트 (TLS 없는 버전)
+.wait_docker_daemon_notls: &wait_docker_daemon_notls
+  - |
+    echo "Waiting for docker daemon..."
+    timeout=300
+    passed=0
+    until docker info >/dev/null 2>&1 || [ ${timeout} -lt ${passed} ]; do
+      passed=`expr $passed + 1`
+      sleep 1
+      echo "Waiting... ($passed/$timeout)"
+    done
+    echo "Docker daemon is ready!"
+
+# Docker 데몬 대기 스크립트 (TLS 버전)
 .wait_docker_process_running: &wait_docker_process_running
   # NOTE: https://gitlab.com/gitlab-org/gitlab-runner/-/issues/27384#note_880351909
   - |
@@ -9,6 +23,21 @@
       sleep 1
     done
     echo "Docker daemon is fully started!"
+
+# Docker in Docker (TLS 없는 버전) - 대부분의 빌드에서 사용
+.docker-dind-notls:
+  services:
+    - name: docker:24-dind
+      alias: docker
+      command: ["--tls=false"]
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_DRIVER: overlay2
+    DOCKER_BUILDKIT: 1
+  before_script:
+    - *wait_docker_daemon_notls
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
 
 # NOTE: 사용 시 GitLab Runner 설정에서 docker in docker TLS 설정 필요
 # NOTE: https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#docker-in-docker-with-tls-enabled-in-kubernetes
