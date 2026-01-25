@@ -57,6 +57,7 @@ import { convertTableColumnDef } from "src/util/table-util";
 import { deleteRoom, fetchRooms } from "src/api/v1/room";
 import { formatSortParam } from "src/util/query-string-util";
 import { useRoute, useRouter } from "vue-router";
+import { getErrorMessage } from "src/util/errorHandler";
 
 const $q = useQuasar();
 const status = ref({
@@ -185,7 +186,7 @@ function onRequest(props) {
 
       console.error(error);
       $q.notify({
-        message: error.response.data.message,
+        message: getErrorMessage(error),
         type: "negative",
         actions: [
           {
@@ -229,7 +230,7 @@ function deleteItem(row: Room) {
       })
       .catch((error) => {
         $q.notify({
-          message: error.response.data.message,
+          message: getErrorMessage(error),
           type: "negative",
           actions: [
             {

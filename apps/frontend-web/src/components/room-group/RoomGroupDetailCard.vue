@@ -40,6 +40,7 @@ import { useQuasar } from "quasar";
 import { RoomGroup } from "src/schema/room-group";
 import { deleteRoomGroup } from "src/api/v1/room-group";
 import { formatPrice } from "src/util/format-util";
+import { getErrorMessage } from "src/util/errorHandler";
 
 const router = useRouter();
 const $q = useQuasar();
@@ -71,7 +72,7 @@ function deleteItem() {
       })
       .catch((error) => {
         $q.notify({
-          message: error.response.data.message,
+          message: getErrorMessage(error),
           type: "negative",
           actions: [
             {

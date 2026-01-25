@@ -182,6 +182,7 @@ import { getReservationFieldDetail, Reservation, ReservationType } from "src/sch
 import { convertTableColumnDef } from "src/util/table-util";
 import { deleteReservation, fetchReservations } from "src/api/v1/reservation";
 import { formatSortParam } from "src/util/query-string-util";
+import { getErrorMessage } from "src/util/errorHandler";
 import { useRoute, useRouter } from "vue-router";
 
 const $q = useQuasar();
@@ -487,7 +488,7 @@ function onRequest(tableProps) {
 
       console.error(error);
       $q.notify({
-        message: error.response.data.message,
+        message: getErrorMessage(error),
         type: "negative",
         actions: [
           {
@@ -531,7 +532,7 @@ function deleteItem(row: Reservation) {
       })
       .catch((error) => {
         $q.notify({
-          message: error.response.data.message,
+          message: getErrorMessage(error),
           type: "negative",
           actions: [
             {

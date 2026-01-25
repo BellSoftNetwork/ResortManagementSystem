@@ -113,6 +113,7 @@ import { convertTableColumnDef } from "src/util/table-util";
 import { formatCommissionRate } from "src/util/format-util";
 import { deletePaymentMethod, fetchPaymentMethods, patchPaymentMethod } from "src/api/v1/payment-method";
 import { formatSortParam } from "src/util/query-string-util";
+import { getErrorMessage } from "src/util/errorHandler";
 
 const $q = useQuasar();
 const status = ref({
@@ -233,7 +234,7 @@ function updateScope(row, scope, key, formatter) {
     })
     .catch((error) => {
       $q.notify({
-        message: error.response.data.message,
+        message: getErrorMessage(error),
         type: "negative",
         actions: [
           {
@@ -273,7 +274,7 @@ function deleteItem(row: PaymentMethod) {
       })
       .catch((error) => {
         $q.notify({
-          message: error.response.data.message,
+          message: getErrorMessage(error),
           type: "negative",
           actions: [
             {

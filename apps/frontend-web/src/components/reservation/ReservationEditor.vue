@@ -230,6 +230,7 @@ import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import dayjs from "dayjs";
 import { formatDate } from "src/util/format-util";
+import { getErrorMessage } from "src/util/errorHandler";
 import { Reservation, reservationDynamicRules, reservationStaticRules, ReservationType } from "src/schema/reservation";
 import {
   createReservation,
@@ -406,7 +407,7 @@ function create() {
     })
     .catch((error) => {
       $q.notify({
-        message: error.response.data.message,
+        message: getErrorMessage(error),
         type: "negative",
         actions: [
           {
@@ -466,7 +467,7 @@ function update() {
     })
     .catch((error) => {
       $q.notify({
-        message: error.response.data.message,
+        message: getErrorMessage(error),
         type: "negative",
         actions: [
           {
@@ -507,7 +508,7 @@ function deleteItem() {
       })
       .catch((error) => {
         $q.notify({
-          message: error.response.data.message,
+          message: getErrorMessage(error),
           type: "negative",
           actions: [
             {

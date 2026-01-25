@@ -42,6 +42,7 @@ import { ref } from "vue";
 import { useQuasar } from "quasar";
 import { paymentMethodStaticRules } from "src/schema/payment-method";
 import { createPaymentMethod } from "src/api/v1/payment-method";
+import { getErrorMessage } from "src/util/errorHandler";
 
 const $q = useQuasar();
 
@@ -74,7 +75,7 @@ function create() {
     })
     .catch((error) => {
       $q.notify({
-        message: error.response.data.message,
+        message: getErrorMessage(error),
         type: "negative",
         actions: [
           {

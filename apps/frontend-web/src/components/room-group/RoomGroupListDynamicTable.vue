@@ -55,6 +55,7 @@ import { onMounted, ref } from "vue";
 import { useQuasar } from "quasar";
 import { convertTableColumnDef } from "src/util/table-util";
 import { formatSortParam } from "src/util/query-string-util";
+import { getErrorMessage } from "src/util/errorHandler";
 import { getRoomGroupFieldDetail, RoomGroup } from "src/schema/room-group";
 import { deleteRoomGroup, fetchRoomGroups } from "src/api/v1/room-group";
 
@@ -178,7 +179,7 @@ function deleteItem(row: RoomGroup) {
       })
       .catch((error) => {
         $q.notify({
-          message: error.response.data.message,
+          message: getErrorMessage(error),
           type: "negative",
           actions: [
             {

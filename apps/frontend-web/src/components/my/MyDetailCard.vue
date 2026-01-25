@@ -37,6 +37,7 @@ import { ref } from "vue";
 import { useQuasar } from "quasar";
 import { User, userDynamicRules, userStaticRules } from "src/schema/user";
 import { MyPatchParams, patchMy } from "src/api/v1/main";
+import { getErrorMessage } from "src/util/errorHandler";
 
 const $q = useQuasar();
 
@@ -87,7 +88,7 @@ function update() {
     })
     .catch((error) => {
       $q.notify({
-        message: error.response.data.message,
+        message: getErrorMessage(error),
         type: "negative",
         actions: [
           {
