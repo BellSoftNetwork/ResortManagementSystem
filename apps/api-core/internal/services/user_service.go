@@ -46,8 +46,8 @@ func (s *userService) GetAll(ctx context.Context, page, size int) ([]models.User
 }
 
 func (s *userService) Create(ctx context.Context, user *models.User) error {
-	if user.Email != "" {
-		exists, err := s.userRepo.ExistsByEmail(ctx, user.Email)
+	if user.Email != nil && *user.Email != "" {
+		exists, err := s.userRepo.ExistsByEmail(ctx, *user.Email)
 		if err != nil {
 			return err
 		}
@@ -81,12 +81,12 @@ func (s *userService) Update(ctx context.Context, id uint, updates map[string]in
 			if err != nil {
 				return nil, err
 			}
-			if exists && user.Email != email {
+			if exists && (user.Email == nil || *user.Email != email) {
 				return nil, ErrUserAlreadyExists
 			}
-			user.Email = email
+			user.Email = &email
 		} else {
-			user.Email = ""
+			user.Email = nil
 		}
 	}
 

@@ -152,10 +152,14 @@ func (s *historyService) getUserSummary(ctx context.Context, userID uint) *dto.U
 		return nil
 	}
 	if user, err := s.userService.GetByID(ctx, userID); err == nil {
+		email := ""
+		if user.Email != nil {
+			email = *user.Email
+		}
 		return &dto.UserSummaryResponse{
 			ID:     user.ID,
 			UserID: user.UserID,
-			Email:  user.Email,
+			Email:  email,
 			Name:   user.Name,
 		}
 	}

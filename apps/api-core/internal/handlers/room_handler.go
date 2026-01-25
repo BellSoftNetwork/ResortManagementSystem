@@ -13,8 +13,9 @@ import (
 	"gitlab.bellsoft.net/rms/api-core/internal/models"
 	"gitlab.bellsoft.net/rms/api-core/internal/repositories"
 	"gitlab.bellsoft.net/rms/api-core/internal/services"
+	"gitlab.bellsoft.net/rms/api-core/internal/utils"
 	"gitlab.bellsoft.net/rms/api-core/pkg/response"
-	"gitlab.bellsoft.net/rms/api-core/pkg/utils"
+	pkgutils "gitlab.bellsoft.net/rms/api-core/pkg/utils"
 )
 
 type RoomHandler struct {
@@ -388,12 +389,12 @@ func (h *RoomHandler) getUserSummary(ctx context.Context, userID uint) *dto.User
 		return nil
 	}
 	if user, err := h.userService.GetByID(ctx, userID); err == nil {
-		profileImageURL := utils.GenerateGravatarURL(user.Email)
+		profileImageURL := pkgutils.GenerateGravatarURL(utils.StringPtrToString(user.Email))
 
 		return &dto.UserSummaryResponse{
 			ID:              user.ID,
 			UserID:          user.UserID,
-			Email:           user.Email,
+			Email:           utils.StringPtrToString(user.Email),
 			Name:            user.Name,
 			ProfileImageURL: profileImageURL,
 		}

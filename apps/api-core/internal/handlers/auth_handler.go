@@ -7,8 +7,9 @@ import (
 	"gitlab.bellsoft.net/rms/api-core/internal/dto"
 	"gitlab.bellsoft.net/rms/api-core/internal/middleware"
 	"gitlab.bellsoft.net/rms/api-core/internal/services"
+	"gitlab.bellsoft.net/rms/api-core/internal/utils"
 	"gitlab.bellsoft.net/rms/api-core/pkg/response"
-	"gitlab.bellsoft.net/rms/api-core/pkg/utils"
+	pkgutils "gitlab.bellsoft.net/rms/api-core/pkg/utils"
 )
 
 type AuthHandler struct {
@@ -41,11 +42,11 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	userResponse := dto.UserResponse{
 		ID:              user.ID,
 		UserID:          user.UserID,
-		Email:           user.Email,
+		Email:           utils.StringPtrToString(user.Email),
 		Name:            user.Name,
 		Status:          user.Status.String(),
 		Role:            user.Role.String(),
-		ProfileImageURL: utils.GenerateGravatarURL(user.Email),
+		ProfileImageURL: pkgutils.GenerateGravatarURL(utils.StringPtrToString(user.Email)),
 		CreatedAt:       dto.CustomTime{Time: user.CreatedAt},
 		UpdatedAt:       dto.CustomTime{Time: user.UpdatedAt},
 	}

@@ -87,7 +87,7 @@ func (s *UserStatus) Scan(value interface{}) error {
 
 type User struct {
 	BaseTimeEntity
-	Email    string     `gorm:"type:varchar(100);not null;uniqueIndex:uc_user_email"`
+	Email    *string    `gorm:"type:varchar(100);uniqueIndex:uc_user_email"`
 	Name     string     `gorm:"type:varchar(20);not null" json:"name"`
 	Password string     `gorm:"type:varchar(100);not null" json:"-"`
 	Status   UserStatus `gorm:"type:tinyint;not null" json:"status"`

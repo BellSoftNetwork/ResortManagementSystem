@@ -117,7 +117,7 @@ func TestAuthService_LoginAndTokenUsage(t *testing.T) {
 	// 테스트 사용자 설정
 	testUser := &models.User{
 		UserID:   "testadmin",
-		Email:    "testadmin@example.com",
+		Email:    stringPtr("testadmin@example.com"),
 		Name:     "Test Admin",
 		Password: "{bcrypt}$2a$10$yS/Y3Y0OcBZ9VFaNeTmpEuI6Vk1jbl5dke9prZNYZOduhmy2xu7T2", // password: password123
 		Status:   models.UserStatusActive,
@@ -292,7 +292,7 @@ func TestAuthService_LoginFailureCases(t *testing.T) {
 
 		testUser := &models.User{
 			UserID:   "testuser",
-			Email:    "testuser@example.com",
+			Email:    stringPtr("testuser@example.com"),
 			Name:     "Test User",
 			Password: "{bcrypt}$2a$10$yS/Y3Y0OcBZ9VFaNeTmpEuI6Vk1jbl5dke9prZNYZOduhmy2xu7T2", // password: password123
 			Status:   models.UserStatusActive,
@@ -322,7 +322,7 @@ func TestAuthService_LoginFailureCases(t *testing.T) {
 
 		inactiveUser := &models.User{
 			UserID:   "inactiveuser",
-			Email:    "inactive@example.com",
+			Email:    stringPtr("inactive@example.com"),
 			Name:     "Inactive User",
 			Password: "{bcrypt}$2a$10$yS/Y3Y0OcBZ9VFaNeTmpEuI6Vk1jbl5dke9prZNYZOduhmy2xu7T2", // password: password123
 			Status:   models.UserStatusInactive,
@@ -352,7 +352,7 @@ func TestAuthService_LoginFailureCases(t *testing.T) {
 
 		testUser := &models.User{
 			UserID:   "testuser",
-			Email:    "testuser@example.com",
+			Email:    stringPtr("testuser@example.com"),
 			Name:     "Test User",
 			Password: "{bcrypt}$2a$10$yS/Y3Y0OcBZ9VFaNeTmpEuI6Vk1jbl5dke9prZNYZOduhmy2xu7T2", // password: password123
 			Status:   models.UserStatusActive,

@@ -87,9 +87,14 @@ func (s *authService) Register(ctx context.Context, userID, email, name, passwor
 		return nil, err
 	}
 
+	var emailPtr *string
+	if email != "" {
+		emailPtr = &email
+	}
+
 	user := &models.User{
 		UserID:   userID,
-		Email:    email,
+		Email:    emailPtr,
 		Name:     name,
 		Password: "{bcrypt}" + string(hashedPassword),
 		Status:   models.UserStatusActive,

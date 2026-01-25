@@ -31,7 +31,7 @@ func (suite *UserServiceTestSuite) TestGetByID() {
 	// Given - 사용자가 등록된 상황에서
 	user := &models.User{
 		UserID: "testuser",
-		Email:  "test@example.com",
+		Email:  stringPtr("test@example.com"),
 		Name:   "Test User",
 		Role:   models.UserRoleNormal,
 		Status: models.UserStatusActive,
@@ -83,9 +83,10 @@ func (suite *UserServiceTestSuite) TestGetAll_Multiple() {
 	// Given - 50개의 계정이 생성된 상태에서
 	users := make([]models.User, 20)
 	for i := 0; i < 20; i++ {
+		email := "user" + string(rune(i)) + "@example.com"
 		users[i] = models.User{
 			UserID: "user" + string(rune(i)),
-			Email:  "user" + string(rune(i)) + "@example.com",
+			Email:  &email,
 			Name:   "User " + string(rune(i)),
 			Role:   models.UserRoleNormal,
 			Status: models.UserStatusActive,
@@ -111,7 +112,7 @@ func (suite *UserServiceTestSuite) TestCreate() {
 	// Given - 새로운 사용자 정보가 주어지면
 	newUser := &models.User{
 		UserID:   "newuser",
-		Email:    "newuser@example.com",
+		Email:    stringPtr("newuser@example.com"),
 		Name:     "New User",
 		Password: "hashed_password",
 		Role:     models.UserRoleNormal,
@@ -134,7 +135,7 @@ func (suite *UserServiceTestSuite) TestCreate_DuplicateUserID() {
 	// Given - 기존에 동일한 사용자 ID가 있는 상황에서
 	newUser := &models.User{
 		UserID: "existinguser",
-		Email:  "new@example.com",
+		Email:  stringPtr("new@example.com"),
 	}
 
 	// UserService는 email만 체크하므로
@@ -153,7 +154,7 @@ func (suite *UserServiceTestSuite) TestCreate_DuplicateEmail() {
 	// Given - 기존에 동일한 이메일이 있는 상황에서
 	newUser := &models.User{
 		UserID: "newuser",
-		Email:  "existing@example.com",
+		Email:  stringPtr("existing@example.com"),
 	}
 
 	// UserService는 email만 체크함
@@ -172,7 +173,7 @@ func (suite *UserServiceTestSuite) TestUpdate() {
 	// Given - 기존 계정이 있는 상태에서
 	existingUser := &models.User{
 		UserID: "testuser",
-		Email:  "test@example.com",
+		Email:  stringPtr("test@example.com"),
 		Name:   "Original Name",
 		Role:   models.UserRoleNormal,
 		Status: models.UserStatusActive,
@@ -181,7 +182,7 @@ func (suite *UserServiceTestSuite) TestUpdate() {
 
 	updatedUser := &models.User{
 		UserID: "testuser",
-		Email:  "test@example.com",
+		Email:  stringPtr("test@example.com"),
 		Name:   "변경된 이름",
 		Role:   models.UserRoleNormal,
 		Status: models.UserStatusActive,
