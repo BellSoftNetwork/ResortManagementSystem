@@ -28,9 +28,7 @@
               />
             </div>
             <div class="col-12 text-right q-mt-sm">
-              <q-badge color="blue" class="q-pa-xs">
-                기준일: {{ formatSimpleDate(today.toISOString().split("T")[0]) }}
-              </q-badge>
+              <q-badge color="blue" class="q-pa-xs"> 기준일: {{ formatSimpleDate(todayStr) }} </q-badge>
             </div>
           </div>
         </div>
@@ -131,6 +129,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import dayjs from "dayjs";
 import { fetchRooms } from "src/api/v1/room";
 import { fetchReservations } from "src/api/v1/reservation";
 import { Room, roomStatusValueToName } from "src/schema/room";
@@ -141,10 +140,10 @@ const rooms = ref<Room[]>([]);
 const reservations = ref<Reservation[]>([]);
 const loading = ref(true);
 
-const today = new Date();
+const todayStr = dayjs().format("YYYY-MM-DD");
 const dateRange = ref({
-  from: today.toISOString().split("T")[0],
-  to: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+  from: dayjs().format("YYYY-MM-DD"),
+  to: dayjs().add(7, "day").format("YYYY-MM-DD"),
 });
 
 const roomReservations = computed(() => {
@@ -214,13 +213,13 @@ function getStatusBadgeColor(status: string): string {
 
 // Check if a reservation has check-in today
 function isCheckInToday(reservation: Reservation): boolean {
-  const today = new Date().toISOString().split("T")[0];
+  const today = dayjs().format("YYYY-MM-DD");
   return reservation.stayStartAt === today;
 }
 
 // Check if a reservation has check-out today
 function isCheckOutToday(reservation: Reservation): boolean {
-  const today = new Date().toISOString().split("T")[0];
+  const today = dayjs().format("YYYY-MM-DD");
   return reservation.stayEndAt === today;
 }
 
@@ -231,7 +230,7 @@ function isCheckInOrOutToday(reservation: Reservation): boolean {
 
 // Check if a room is currently occupied (has an active reservation that includes today)
 function isRoomOccupiedToday(roomId: number): boolean {
-  const today = new Date().toISOString().split("T")[0];
+  const today = dayjs().format("YYYY-MM-DD");
 
   if (!roomReservations.value[roomId]) return false;
 
