@@ -22,6 +22,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "stores/auth";
 import { useQuasar } from "quasar";
+import { getErrorMessage } from "src/util/errorHandler";
 
 defineExpose({
   openDialog,
@@ -54,7 +55,7 @@ function logout() {
     })
     .catch((error) => {
       $q.notify({
-        message: error.response.data.message,
+        message: getErrorMessage(error),
         type: "negative",
         actions: [
           {

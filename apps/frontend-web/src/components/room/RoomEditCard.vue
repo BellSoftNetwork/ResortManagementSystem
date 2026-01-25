@@ -64,6 +64,7 @@ import { patchRoom } from "src/api/v1/room";
 import { getPatchedFormData, isFormValueChanged } from "src/util/data-util";
 import { RoomGroup } from "src/schema/room-group";
 import { fetchRoomGroups } from "src/api/v1/room-group";
+import { getErrorMessage } from "src/util/errorHandler";
 
 const router = useRouter();
 const $q = useQuasar();
@@ -121,7 +122,7 @@ function update() {
     })
     .catch((error) => {
       $q.notify({
-        message: error.response.data.message,
+        message: getErrorMessage(error),
         type: "negative",
         actions: [
           {

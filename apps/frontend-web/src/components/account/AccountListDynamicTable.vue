@@ -44,6 +44,7 @@ import { getUserFieldDetail, User } from "src/schema/user";
 import { convertTableColumnDef } from "src/util/table-util";
 import { deleteAdminAccount, fetchAdminAccounts } from "src/api/v1/admin/account";
 import { formatSortParam } from "src/util/query-string-util";
+import { getErrorMessage } from "src/util/errorHandler";
 
 const $q = useQuasar();
 const status = ref({
@@ -171,7 +172,7 @@ function deleteItem(row: User) {
       })
       .catch((error) => {
         $q.notify({
-          message: error.response.data.message,
+          message: getErrorMessage(error),
           type: "negative",
           actions: [
             {

@@ -62,6 +62,7 @@ import { onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import { getPatchedFormData, isFormValueChanged } from "src/util/data-util";
+import { getErrorMessage } from "src/util/errorHandler";
 import { RoomGroup, roomGroupStaticRules } from "src/schema/room-group";
 import { patchRoomGroup } from "src/api/v1/room-group";
 
@@ -105,7 +106,7 @@ function update() {
     })
     .catch((error) => {
       $q.notify({
-        message: error.response.data.message,
+        message: getErrorMessage(error),
         type: "negative",
         actions: [
           {

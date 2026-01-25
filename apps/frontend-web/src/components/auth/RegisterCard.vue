@@ -76,6 +76,7 @@ import { useAuthStore } from "stores/auth";
 import { useQuasar } from "quasar";
 import { userDynamicRules, userStaticRules } from "src/schema/user";
 import { postRegister } from "src/api/v1/auth";
+import { getErrorMessage } from "src/util/errorHandler";
 
 const router = useRouter();
 const $q = useQuasar();
@@ -107,7 +108,7 @@ function register() {
         })
         .catch((error) => {
           $q.notify({
-            message: `로그인 실패 (${error.response.data.message})`,
+            message: `로그인 실패 (${getErrorMessage(error)})`,
             type: "negative",
             actions: [
               {
@@ -126,7 +127,7 @@ function register() {
     })
     .catch((error) => {
       $q.notify({
-        message: `회원 가입 실패 (${error.response.data.message})`,
+        message: `회원 가입 실패 (${getErrorMessage(error)})`,
         type: "negative",
         actions: [
           {

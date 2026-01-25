@@ -41,6 +41,7 @@ import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import { deleteRoom } from "src/api/v1/room";
 import { Room, roomStatusValueToName } from "src/schema/room";
+import { getErrorMessage } from "src/util/errorHandler";
 
 const router = useRouter();
 const $q = useQuasar();
@@ -72,7 +73,7 @@ function deleteItem() {
       })
       .catch((error) => {
         $q.notify({
-          message: error.response.data.message,
+          message: getErrorMessage(error),
           type: "negative",
           actions: [
             {

@@ -56,6 +56,7 @@ import { useQuasar } from "quasar";
 import { roomGroupStaticRules } from "src/schema/room-group";
 import { createRoomGroup } from "src/api/v1/room-group";
 import { roomStaticRules } from "src/schema/room";
+import { getErrorMessage } from "src/util/errorHandler";
 
 const router = useRouter();
 const $q = useQuasar();
@@ -81,7 +82,7 @@ function create() {
     })
     .catch((error) => {
       $q.notify({
-        message: error.response.data.message,
+        message: getErrorMessage(error),
         type: "negative",
         actions: [
           {

@@ -48,6 +48,7 @@ import { useAuthStore } from "stores/auth";
 import { useQuasar } from "quasar";
 import { userStaticRules } from "src/schema/user";
 import { createAdminAccount } from "src/api/v1/admin/account";
+import { getErrorMessage } from "src/util/errorHandler";
 
 const authStore = useAuthStore();
 const $q = useQuasar();
@@ -86,7 +87,7 @@ function create() {
     })
     .catch((error) => {
       $q.notify({
-        message: error.response.data.message,
+        message: getErrorMessage(error),
         type: "negative",
         actions: [
           {
