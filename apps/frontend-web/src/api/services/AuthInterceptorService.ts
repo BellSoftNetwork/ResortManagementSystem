@@ -99,8 +99,11 @@ class AuthInterceptorService {
         return api(originalRequest);
       })
       .catch((refreshError) => {
-        // 리프레시 실패 시 처리
-        this.handleRefreshFailure(authStore);
+        // 401/403 인증 오류에서만 로그아웃 처리, 네트워크 오류는 토큰 유지
+        const status = refreshError?.response?.status;
+        if (status === 401 || status === 403) {
+          this.handleRefreshFailure(authStore);
+        }
         return Promise.reject(refreshError);
       })
       .finally(() => {
