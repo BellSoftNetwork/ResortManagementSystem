@@ -53,6 +53,26 @@ class NotificationService {
       timeout: NOTIFICATION_TIMEOUT,
     });
   }
+
+  /**
+   * API 에러 알림 표시 (일반 API 5xx 에러용)
+   * 페이지는 유지되고 Toast만 표시됨
+   * @param message 표시할 메시지 (선택)
+   */
+  showApiErrorNotification(message?: string): void {
+    Notify.create({
+      type: "warning",
+      message: message || "요청을 처리할 수 없습니다. 잠시 후 다시 시도해주세요.",
+      position: "bottom",
+      timeout: NOTIFICATION_TIMEOUT,
+      actions: [
+        {
+          label: "닫기",
+          color: "white",
+        },
+      ],
+    });
+  }
 }
 
 // 싱글톤 인스턴스 생성
