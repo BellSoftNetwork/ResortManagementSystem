@@ -1,6 +1,6 @@
 import { boot } from "quasar/wrappers";
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { TIMEOUT_DURATION } from "src/api/constants";
+import { TIMEOUT_DURATION, CRITICAL_APIS } from "src/api/constants";
 import { networkStatusService } from "src/api/services/NetworkStatusService";
 import { notificationService } from "src/api/services/NotificationService";
 import { authInterceptorService } from "src/api/services/AuthInterceptorService";
@@ -33,9 +33,25 @@ function setupInterceptors(): void {
     },
     async (error: AxiosError) => {
       const originalRequest = error.config || {};
+      const status = error.response?.status;
+
+      // 5xx 서버 오류 처리 (500-599)
+      if (status && status >= 500 && status < 600) {
+        const requestUrl = originalRequest.url || "";
+        const isCriticalApi = CRITICAL_APIS.some((url) => requestUrl.includes(url));
+
+        if (isCriticalApi) {
+          // Critical API 실패 → 서버 전체 장애로 판단
+          networkStatusService.setServerError(status, "서버에 문제가 발생했습니다");
+        } else {
+          // 일반 API 실패 → Toast 알림만 (페이지 유지)
+          notificationService.showApiErrorNotification();
+        }
+        return Promise.reject(error);
+      }
 
       // 401 에러인 경우 토큰 갱신 시도
-      if (error.response?.status === 401 && !originalRequest._retry) {
+      if (status === 401 && !originalRequest._retry) {
         // refresh token API 호출인 경우 재시도하지 않음
         if (originalRequest.url?.includes("/auth/refresh")) {
           return Promise.reject(error);

@@ -74,8 +74,23 @@ function login() {
       router.push({ name: "Home" });
     })
     .catch((error) => {
+      // 서버 오류 (5xx) 또는 네트워크 오류 감지
+      const status = error.response?.status;
+      const isServerError = status && status >= 500;
+      const isNetworkError = !error.response;
+
+      let message: string;
+      if (isServerError) {
+        message = `서버에 문제가 발생했습니다 (오류 코드: ${status})`;
+      } else if (isNetworkError) {
+        message = "서버에 연결할 수 없습니다";
+      } else {
+        // 일반 인증 오류 (400, 401, 403 등)
+        message = error.response?.data?.message || "로그인에 실패했습니다";
+      }
+
       $q.notify({
-        message: `로그인 실패 (${error.response.data.message})`,
+        message: `로그인 실패: ${message}`,
         type: "negative",
         actions: [
           {

@@ -1,5 +1,5 @@
 import { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from "axios";
-import { EXCLUDE_RETRY_URLS, MAX_RETRY_COUNT, RETRY_DELAY_BASE } from "../constants";
+import { CRITICAL_APIS, EXCLUDE_RETRY_URLS, MAX_RETRY_COUNT, RETRY_DELAY_BASE } from "../constants";
 import { networkStatusService } from "./NetworkStatusService";
 import { notificationService } from "./NotificationService";
 
@@ -35,9 +35,18 @@ class RetryService {
     if (!shouldRetry) {
       // 모든 재시도가 실패한 경우 사용자에게 알림
       if ((isTimeout || isNetworkError) && originalRequest.retryCount >= MAX_RETRY_COUNT) {
-        notificationService.showOfflineNotification(-1); // -1은 모든 재시도 실패를 나타냄
-        if (!networkStatusService.isOffline) {
-          networkStatusService.setOffline();
+        const requestUrl = originalRequest.url || "";
+        const isCriticalApi = CRITICAL_APIS.some((url) => requestUrl.includes(url));
+
+        if (isCriticalApi) {
+          // Critical API 재시도 모두 실패 → 서버 전체 장애
+          notificationService.showOfflineNotification(-1); // -1은 모든 재시도 실패를 나타냄
+          if (!networkStatusService.isOffline) {
+            networkStatusService.setNetworkError();
+          }
+        } else {
+          // 일반 API 재시도 모두 실패 → Toast만
+          notificationService.showApiErrorNotification("서버에 연결할 수 없습니다.");
         }
       }
 
@@ -52,7 +61,7 @@ class RetryService {
 
     // 오프라인 상태 설정 및 알림 표시
     if (!networkStatusService.isOffline) {
-      networkStatusService.setOffline();
+      networkStatusService.setNetworkError();
     }
 
     // 재시도 중임을 통합된 알림으로 표시
