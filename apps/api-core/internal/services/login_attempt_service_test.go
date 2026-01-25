@@ -44,7 +44,7 @@ func (suite *LoginAttemptServiceTestSuite) SetupTest() {
 	// 테스트 사용자 설정
 	suite.testUser = &models.User{
 		UserID:   "testuser",
-		Email:    "testuser@example.com",
+		Email:    stringPtr("testuser@example.com"),
 		Name:     "Test User",
 		Password: "{bcrypt}$2a$10$yS/Y3Y0OcBZ9VFaNeTmpEuI6Vk1jbl5dke9prZNYZOduhmy2xu7T2", // password: password123
 		Status:   models.UserStatusActive,
@@ -210,7 +210,7 @@ func (suite *LoginAttemptServiceTestSuite) TestLoginAttemptLimit_DifferentIPs() 
 	// 2번 IP에서는 동일 ID로 정상 로그인이 가능해야 한다
 	adminUser := &models.User{
 		UserID:   "admin",
-		Email:    "admin@example.com",
+		Email:    stringPtr("admin@example.com"),
 		Name:     "Admin User",
 		Password: "{bcrypt}$2a$10$yS/Y3Y0OcBZ9VFaNeTmpEuI6Vk1jbl5dke9prZNYZOduhmy2xu7T2",
 		Status:   models.UserStatusActive,
@@ -237,7 +237,7 @@ func (suite *LoginAttemptServiceTestSuite) TestLoginAttemptLimit_BruteForceProte
 
 	adminUser := &models.User{
 		UserID:   "admin",
-		Email:    "admin@example.com",
+		Email:    stringPtr("admin@example.com"),
 		Name:     "Admin User",
 		Password: "{bcrypt}$2a$10$yS/Y3Y0OcBZ9VFaNeTmpEuI6Vk1jbl5dke9prZNYZOduhmy2xu7T2",
 		Status:   models.UserStatusActive,
@@ -272,7 +272,7 @@ func (suite *LoginAttemptServiceTestSuite) TestLoginAttemptReset_AfterSuccess() 
 
 	resetUser := &models.User{
 		UserID:   "resetuser",
-		Email:    "resetuser@example.com",
+		Email:    stringPtr("resetuser@example.com"),
 		Name:     "Reset User",
 		Password: "{bcrypt}$2a$10$yS/Y3Y0OcBZ9VFaNeTmpEuI6Vk1jbl5dke9prZNYZOduhmy2xu7T2",
 		Status:   models.UserStatusActive,

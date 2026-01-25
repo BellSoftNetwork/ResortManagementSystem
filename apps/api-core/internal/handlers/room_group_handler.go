@@ -13,8 +13,9 @@ import (
 	"gitlab.bellsoft.net/rms/api-core/internal/models"
 	"gitlab.bellsoft.net/rms/api-core/internal/repositories"
 	"gitlab.bellsoft.net/rms/api-core/internal/services"
+	"gitlab.bellsoft.net/rms/api-core/internal/utils"
 	"gitlab.bellsoft.net/rms/api-core/pkg/response"
-	"gitlab.bellsoft.net/rms/api-core/pkg/utils"
+	pkgutils "gitlab.bellsoft.net/rms/api-core/pkg/utils"
 )
 
 type RoomGroupHandler struct {
@@ -330,18 +331,18 @@ func (h *RoomGroupHandler) toRoomGroupResponseWithUsers(roomGroup *models.RoomGr
 	if roomGroup.CreatedByUser != nil {
 		resp.CreatedBy = &dto.UserSummaryResponse{
 			ID:              roomGroup.CreatedByUser.ID,
-			Email:           roomGroup.CreatedByUser.Email,
+			Email:           utils.StringPtrToString(roomGroup.CreatedByUser.Email),
 			Name:            roomGroup.CreatedByUser.Name,
-			ProfileImageURL: utils.GenerateGravatarURL(roomGroup.CreatedByUser.Email),
+			ProfileImageURL: pkgutils.GenerateGravatarURL(utils.StringPtrToString(roomGroup.CreatedByUser.Email)),
 		}
 	}
 
 	if roomGroup.UpdatedByUser != nil {
 		resp.UpdatedBy = &dto.UserSummaryResponse{
 			ID:              roomGroup.UpdatedByUser.ID,
-			Email:           roomGroup.UpdatedByUser.Email,
+			Email:           utils.StringPtrToString(roomGroup.UpdatedByUser.Email),
 			Name:            roomGroup.UpdatedByUser.Name,
-			ProfileImageURL: utils.GenerateGravatarURL(roomGroup.UpdatedByUser.Email),
+			ProfileImageURL: pkgutils.GenerateGravatarURL(utils.StringPtrToString(roomGroup.UpdatedByUser.Email)),
 		}
 	}
 
@@ -354,13 +355,12 @@ func (h *RoomGroupHandler) getUserSummary(ctx context.Context, userID uint) *dto
 		return nil
 	}
 	if user, err := h.userService.GetByID(ctx, userID); err == nil {
-		// Gravatar URL 생성
-		profileImageURL := utils.GenerateGravatarURL(user.Email)
+		profileImageURL := pkgutils.GenerateGravatarURL(utils.StringPtrToString(user.Email))
 
 		return &dto.UserSummaryResponse{
 			ID:              user.ID,
 			UserID:          user.UserID,
-			Email:           user.Email,
+			Email:           utils.StringPtrToString(user.Email),
 			Name:            user.Name,
 			ProfileImageURL: profileImageURL,
 		}
