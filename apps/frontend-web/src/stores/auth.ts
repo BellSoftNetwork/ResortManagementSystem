@@ -61,9 +61,13 @@ export const useAuthStore = defineStore("auth", {
         .then((response) => {
           this.user = response.value;
         })
-        .catch(() => {
+        .catch((error) => {
           this.user = null;
-          this.clearTokens();
+          // 401/403 인증 오류에서만 토큰 제거, 네트워크 오류는 토큰 유지
+          const status = error?.response?.status;
+          if (status === 401 || status === 403) {
+            this.clearTokens();
+          }
         })
         .finally(() => {
           this.status.isFirstRequest = false;
@@ -271,8 +275,12 @@ export const useAuthStore = defineStore("auth", {
 
       // 토큰이 있지만 사용자 정보가 없는 경우 사용자 정보 로드
       if (storeState.accessToken && !storeState.user) {
-        this.loadAccountInfo().catch(() => {
-          this.clearTokens();
+        this.loadAccountInfo().catch((error) => {
+          // 401/403 인증 오류에서만 토큰 제거, 네트워크 오류는 토큰 유지
+          const status = error?.response?.status;
+          if (status === 401 || status === 403) {
+            this.clearTokens();
+          }
         });
       }
 
