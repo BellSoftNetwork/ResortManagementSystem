@@ -49,7 +49,7 @@ const props = defineProps<{
 
 function deleteItem() {
   const itemId = props.roomGroup.id;
-  const itemName = props.roomGroup.number;
+  const itemName = props.roomGroup.name;
 
   $q.dialog({
     title: "삭제",
