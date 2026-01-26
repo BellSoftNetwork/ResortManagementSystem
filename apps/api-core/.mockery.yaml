@@ -1,0 +1,11 @@
+with-expecter: true
+dir: internal/mocks
+packages:
+  gitlab.bellsoft.net/rms/api-core/internal/repositories:
+    interfaces:
+      RoomRepository:
+      ReservationRepository:
+      RoomGroupRepository:
+      UserRepository:
+      PaymentMethodRepository:
+      LoginAttemptRepository:

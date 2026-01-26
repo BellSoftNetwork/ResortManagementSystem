@@ -16,6 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/suite"
+	"gitlab.bellsoft.net/rms/api-core/internal/config"
 	"gitlab.bellsoft.net/rms/api-core/internal/database"
 	"gitlab.bellsoft.net/rms/api-core/internal/dto"
 	"gitlab.bellsoft.net/rms/api-core/internal/handlers"
@@ -63,7 +64,14 @@ func (suite *AuthIntegrationTestSuite) SetupSuite() {
 	userRepo := repositories.NewUserRepository(db)
 	loginAttemptRepo := repositories.NewLoginAttemptRepository(db)
 
-	suite.authService = services.NewAuthService(userRepo, loginAttemptRepo, suite.jwtService, suite.redis)
+	testConfig := &config.Config{
+		Security: config.SecurityConfig{
+			MaxLoginAttempts: 5,
+			LockoutDuration:  15 * time.Minute,
+		},
+	}
+
+	suite.authService = services.NewAuthService(userRepo, loginAttemptRepo, suite.jwtService, testConfig)
 	suite.userService = services.NewUserService(userRepo)
 
 	// Setup handlers

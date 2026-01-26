@@ -34,7 +34,7 @@ func TestUserHandler_GetCurrentUser(t *testing.T) {
 			mockUser: &models.User{
 				BaseTimeEntity: models.BaseTimeEntity{BaseEntity: models.BaseEntity{ID: 1}},
 				UserID:         "testuser",
-				Email:          "test@example.com",
+				Email:          stringPtr("test@example.com"),
 				Name:           "Test User",
 				Role:           models.UserRoleNormal,
 			},
@@ -103,7 +103,9 @@ func TestUserHandler_GetCurrentUser(t *testing.T) {
 						assert.Equal(t, tt.mockUser.UserID, userID)
 					}
 					if email, exists := data["email"]; exists {
-						assert.Equal(t, tt.mockUser.Email, email)
+						if tt.mockUser.Email != nil {
+							assert.Equal(t, *tt.mockUser.Email, email)
+						}
 					}
 					if name, exists := data["name"]; exists {
 						assert.Equal(t, tt.mockUser.Name, name)
@@ -147,7 +149,7 @@ func TestUserHandler_UpdateCurrentUser(t *testing.T) {
 			mockUser: &models.User{
 				BaseTimeEntity: models.BaseTimeEntity{BaseEntity: models.BaseEntity{ID: 1}},
 				UserID:         "testuser",
-				Email:          "test@example.com",
+				Email:          stringPtr("test@example.com"),
 				Name:           "Updated Name",
 				Role:           models.UserRoleNormal,
 			},
@@ -163,7 +165,7 @@ func TestUserHandler_UpdateCurrentUser(t *testing.T) {
 			mockUser: &models.User{
 				BaseTimeEntity: models.BaseTimeEntity{BaseEntity: models.BaseEntity{ID: 2}},
 				UserID:         "testuser2",
-				Email:          "test2@example.com",
+				Email:          stringPtr("test2@example.com"),
 				Name:           "New Name Only",
 				Role:           models.UserRoleNormal,
 			},
@@ -179,7 +181,7 @@ func TestUserHandler_UpdateCurrentUser(t *testing.T) {
 			mockUser: &models.User{
 				BaseTimeEntity: models.BaseTimeEntity{BaseEntity: models.BaseEntity{ID: 3}},
 				UserID:         "testuser3",
-				Email:          "test3@example.com",
+				Email:          stringPtr("test3@example.com"),
 				Name:           "Test User 3",
 				Role:           models.UserRoleNormal,
 			},
@@ -304,14 +306,14 @@ func TestUserHandler_ListUsers(t *testing.T) {
 				{
 					BaseTimeEntity: models.BaseTimeEntity{BaseEntity: models.BaseEntity{ID: 1}},
 					UserID:         "user1",
-					Email:          "user1@example.com",
+					Email:          stringPtr("user1@example.com"),
 					Name:           "User 1",
 					Role:           models.UserRoleNormal,
 				},
 				{
 					BaseTimeEntity: models.BaseTimeEntity{BaseEntity: models.BaseEntity{ID: 2}},
 					UserID:         "user2",
-					Email:          "user2@example.com",
+					Email:          stringPtr("user2@example.com"),
 					Name:           "User 2",
 					Role:           models.UserRoleAdmin,
 				},
@@ -343,7 +345,7 @@ func TestUserHandler_ListUsers(t *testing.T) {
 				{
 					BaseTimeEntity: models.BaseTimeEntity{BaseEntity: models.BaseEntity{ID: 21}},
 					UserID:         "user21",
-					Email:          "user21@example.com",
+					Email:          stringPtr("user21@example.com"),
 					Name:           "User 21",
 					Role:           models.UserRoleNormal,
 				},
@@ -448,7 +450,7 @@ func TestUserHandler_CreateUser(t *testing.T) {
 			},
 			setupMock: func(m *MockUserService) {
 				m.On("Create", mock.Anything, mock.MatchedBy(func(user *models.User) bool {
-					return user.UserID == "newuser" && user.Email == "newuser@example.com"
+					return user.UserID == "newuser" && user.Email != nil && *user.Email == "newuser@example.com"
 				})).Return(nil)
 			},
 			expectedStatus: http.StatusCreated,
@@ -561,7 +563,7 @@ func TestUserHandler_UpdateUser(t *testing.T) {
 			mockUser: &models.User{
 				BaseTimeEntity: models.BaseTimeEntity{BaseEntity: models.BaseEntity{ID: 2}},
 				UserID:         "user2",
-				Email:          "user2@example.com",
+				Email:          stringPtr("user2@example.com"),
 				Name:           "Updated User",
 				Role:           models.UserRoleAdmin,
 			},

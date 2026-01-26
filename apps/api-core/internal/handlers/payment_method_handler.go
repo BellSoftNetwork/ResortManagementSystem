@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gitlab.bellsoft.net/rms/api-core/internal/dto"
+	"gitlab.bellsoft.net/rms/api-core/internal/mappers"
 	"gitlab.bellsoft.net/rms/api-core/internal/models"
 	"gitlab.bellsoft.net/rms/api-core/internal/services"
 	"gitlab.bellsoft.net/rms/api-core/pkg/response"
@@ -36,7 +37,7 @@ func (h *PaymentMethodHandler) ListPaymentMethods(c *gin.Context) {
 
 	paymentMethodResponses := make([]dto.PaymentMethodResponse, len(paymentMethods))
 	for i, paymentMethod := range paymentMethods {
-		paymentMethodResponses[i] = h.toPaymentMethodResponse(&paymentMethod)
+		paymentMethodResponses[i] = mappers.ToPaymentMethodResponse(&paymentMethod)
 	}
 
 	totalPages := int(total) / query.Size
@@ -75,7 +76,7 @@ func (h *PaymentMethodHandler) GetPaymentMethod(c *gin.Context) {
 		return
 	}
 
-	paymentMethodResponse := h.toPaymentMethodResponse(paymentMethod)
+	paymentMethodResponse := mappers.ToPaymentMethodResponse(paymentMethod)
 	response.Success(c, paymentMethodResponse)
 }
 
@@ -105,7 +106,7 @@ func (h *PaymentMethodHandler) CreatePaymentMethod(c *gin.Context) {
 		return
 	}
 
-	paymentMethodResponse := h.toPaymentMethodResponse(paymentMethod)
+	paymentMethodResponse := mappers.ToPaymentMethodResponse(paymentMethod)
 	response.Created(c, paymentMethodResponse)
 }
 
@@ -159,7 +160,7 @@ func (h *PaymentMethodHandler) UpdatePaymentMethod(c *gin.Context) {
 		return
 	}
 
-	paymentMethodResponse := h.toPaymentMethodResponse(paymentMethod)
+	paymentMethodResponse := mappers.ToPaymentMethodResponse(paymentMethod)
 	response.Success(c, paymentMethodResponse)
 }
 
@@ -185,17 +186,4 @@ func (h *PaymentMethodHandler) DeletePaymentMethod(c *gin.Context) {
 	}
 
 	response.NoContent(c)
-}
-
-func (h *PaymentMethodHandler) toPaymentMethodResponse(paymentMethod *models.PaymentMethod) dto.PaymentMethodResponse {
-	return dto.PaymentMethodResponse{
-		ID:                       paymentMethod.ID,
-		Name:                     paymentMethod.Name,
-		CommissionRate:           paymentMethod.CommissionRate,
-		RequireUnpaidAmountCheck: bool(paymentMethod.RequireUnpaidAmountCheck),
-		IsDefaultSelect:          bool(paymentMethod.IsDefaultSelect),
-		Status:                   paymentMethod.Status.String(),
-		CreatedAt:                dto.CustomTime{Time: paymentMethod.CreatedAt},
-		UpdatedAt:                dto.CustomTime{Time: paymentMethod.UpdatedAt},
-	}
 }

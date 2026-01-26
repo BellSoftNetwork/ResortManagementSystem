@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"gitlab.bellsoft.net/rms/api-core/internal/config"
 	"gitlab.bellsoft.net/rms/api-core/internal/models"
 	"gitlab.bellsoft.net/rms/api-core/internal/services"
 	"gitlab.bellsoft.net/rms/api-core/pkg/auth"
@@ -112,7 +113,14 @@ func TestAuthService_LoginAndTokenUsage(t *testing.T) {
 	mockUserRepo := new(MockUserRepository)
 	mockLoginAttemptRepo := new(MockLoginAttemptRepository)
 
-	authService := services.NewAuthService(mockUserRepo, mockLoginAttemptRepo, jwtService)
+	testConfig := &config.Config{
+		Security: config.SecurityConfig{
+			MaxLoginAttempts: 5,
+			LockoutDuration:  15 * time.Minute,
+		},
+	}
+
+	authService := services.NewAuthService(mockUserRepo, mockLoginAttemptRepo, jwtService, testConfig)
 
 	// 테스트 사용자 설정
 	testUser := &models.User{
@@ -263,11 +271,18 @@ func TestAuthService_LoginFailureCases(t *testing.T) {
 	ctx := context.Background()
 	jwtService := auth.NewJWTService("test-secret", 15*time.Minute, 7*24*time.Hour)
 
+	testConfig := &config.Config{
+		Security: config.SecurityConfig{
+			MaxLoginAttempts: 5,
+			LockoutDuration:  15 * time.Minute,
+		},
+	}
+
 	t.Run("존재하지 않는 사용자로 로그인 시도 시 실패한다", func(t *testing.T) {
 		// Given: 존재하지 않는 사용자
 		mockUserRepo := new(MockUserRepository)
 		mockLoginAttemptRepo := new(MockLoginAttemptRepository)
-		authService := services.NewAuthService(mockUserRepo, mockLoginAttemptRepo, jwtService)
+		authService := services.NewAuthService(mockUserRepo, mockLoginAttemptRepo, jwtService, testConfig)
 
 		mockLoginAttemptRepo.On("CountRecentFailedAttempts", ctx, "nonexistent", "127.0.0.1", mock.Anything).Return(int64(0), nil)
 		mockUserRepo.On("FindByUserID", ctx, "nonexistent").Return(nil, assert.AnError)
@@ -288,7 +303,7 @@ func TestAuthService_LoginFailureCases(t *testing.T) {
 		// Given: 올바른 사용자이지만 잘못된 비밀번호
 		mockUserRepo := new(MockUserRepository)
 		mockLoginAttemptRepo := new(MockLoginAttemptRepository)
-		authService := services.NewAuthService(mockUserRepo, mockLoginAttemptRepo, jwtService)
+		authService := services.NewAuthService(mockUserRepo, mockLoginAttemptRepo, jwtService, testConfig)
 
 		testUser := &models.User{
 			UserID:   "testuser",
@@ -318,7 +333,7 @@ func TestAuthService_LoginFailureCases(t *testing.T) {
 		// Given: 비활성화된 사용자
 		mockUserRepo := new(MockUserRepository)
 		mockLoginAttemptRepo := new(MockLoginAttemptRepository)
-		authService := services.NewAuthService(mockUserRepo, mockLoginAttemptRepo, jwtService)
+		authService := services.NewAuthService(mockUserRepo, mockLoginAttemptRepo, jwtService, testConfig)
 
 		inactiveUser := &models.User{
 			UserID:   "inactiveuser",
@@ -348,7 +363,7 @@ func TestAuthService_LoginFailureCases(t *testing.T) {
 		// Given: 이메일로 로그인 시도
 		mockUserRepo := new(MockUserRepository)
 		mockLoginAttemptRepo := new(MockLoginAttemptRepository)
-		authService := services.NewAuthService(mockUserRepo, mockLoginAttemptRepo, jwtService)
+		authService := services.NewAuthService(mockUserRepo, mockLoginAttemptRepo, jwtService, testConfig)
 
 		testUser := &models.User{
 			UserID:   "testuser",

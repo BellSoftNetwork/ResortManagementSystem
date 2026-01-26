@@ -17,7 +17,6 @@ import (
 	"gitlab.bellsoft.net/rms/api-core/internal/dto"
 	"gitlab.bellsoft.net/rms/api-core/internal/middleware"
 	"gitlab.bellsoft.net/rms/api-core/internal/models"
-	"gitlab.bellsoft.net/rms/api-core/internal/repositories"
 	"gitlab.bellsoft.net/rms/api-core/internal/services"
 )
 
@@ -63,7 +62,7 @@ func (m *MockRoomService) GetByIDWithGroup(ctx context.Context, id uint) (*model
 	return args.Get(0).(*models.Room), args.Error(1)
 }
 
-func (m *MockRoomService) GetAll(ctx context.Context, filter repositories.RoomFilter, page, size int, sort string) ([]models.Room, int64, error) {
+func (m *MockRoomService) GetAll(ctx context.Context, filter dto.RoomRepositoryFilter, page, size int, sort string) ([]models.Room, int64, error) {
 	args := m.Called(ctx, filter, page, size, sort)
 	if args.Get(0) == nil {
 		return nil, args.Get(1).(int64), args.Error(2)
@@ -229,7 +228,7 @@ func TestRoomHandler_ListRooms(t *testing.T) {
 
 			mockService.On("GetAll",
 				mock.Anything,
-				mock.AnythingOfType("repositories.RoomFilter"),
+				mock.AnythingOfType("dto.RoomRepositoryFilter"),
 				tt.expectedPage,
 				tt.expectedSize,
 				tt.expectedSort,

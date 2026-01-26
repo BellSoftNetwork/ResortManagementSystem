@@ -41,7 +41,7 @@ func (m *MockReservationService) GetByIDWithDetails(ctx context.Context, id uint
 	return args.Get(0).(*models.Reservation), args.Error(1)
 }
 
-func (m *MockReservationService) GetAll(ctx context.Context, filter repositories.ReservationFilter, page, size int, sort string) ([]models.Reservation, int64, error) {
+func (m *MockReservationService) GetAll(ctx context.Context, filter dto.ReservationRepositoryFilter, page, size int, sort string) ([]models.Reservation, int64, error) {
 	args := m.Called(ctx, filter, page, size, sort)
 	if args.Get(0) == nil {
 		return nil, args.Get(1).(int64), args.Error(2)
@@ -240,7 +240,7 @@ func TestReservationHandler_ListReservations_Sorting(t *testing.T) {
 			// Set up mock expectations
 			mockReservationService.On("GetAll",
 				mock.Anything,
-				mock.AnythingOfType("repositories.ReservationFilter"),
+				mock.AnythingOfType("dto.ReservationRepositoryFilter"),
 				0,
 				15,
 				tt.expectedSort,
@@ -250,7 +250,7 @@ func TestReservationHandler_ListReservations_Sorting(t *testing.T) {
 			mockUserService.On("GetByID", mock.Anything, mock.AnythingOfType("uint")).Return(&models.User{
 				BaseTimeEntity: models.BaseTimeEntity{BaseEntity: models.BaseEntity{ID: 1}},
 				UserID:         "testuser",
-				Email:          "test@example.com",
+				Email:          stringPtr("test@example.com"),
 				Name:           "Test User",
 			}, nil).Maybe()
 
@@ -307,7 +307,7 @@ func TestReservationHandler_ListReservations_WithFiltersAndSort(t *testing.T) {
 	reservationType := models.ReservationTypeStay
 
 	// expectedFilter는 mock 매칭에 사용됨
-	_ = repositories.ReservationFilter{
+	_ = dto.ReservationRepositoryFilter{
 		Status:    &status,
 		Type:      &reservationType,
 		StartDate: &stayStartAt,
@@ -336,7 +336,7 @@ func TestReservationHandler_ListReservations_WithFiltersAndSort(t *testing.T) {
 	// Set up mock expectations
 	mockReservationService.On("GetAll",
 		mock.Anything,
-		mock.MatchedBy(func(filter repositories.ReservationFilter) bool {
+		mock.MatchedBy(func(filter dto.ReservationRepositoryFilter) bool {
 			return filter.Status != nil && *filter.Status == status &&
 				filter.Type != nil && *filter.Type == reservationType
 		}),
@@ -349,7 +349,7 @@ func TestReservationHandler_ListReservations_WithFiltersAndSort(t *testing.T) {
 	mockUserService.On("GetByID", mock.Anything, mock.AnythingOfType("uint")).Return(&models.User{
 		BaseTimeEntity: models.BaseTimeEntity{BaseEntity: models.BaseEntity{ID: 1}},
 		UserID:         "testuser",
-		Email:          "test@example.com",
+		Email:          stringPtr("test@example.com"),
 		Name:           "Test User",
 	}, nil).Maybe()
 

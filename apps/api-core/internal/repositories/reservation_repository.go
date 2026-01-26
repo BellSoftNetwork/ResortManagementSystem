@@ -6,6 +6,7 @@ import (
 	"time"
 
 	appContext "gitlab.bellsoft.net/rms/api-core/internal/context"
+	"gitlab.bellsoft.net/rms/api-core/internal/dto"
 	"gitlab.bellsoft.net/rms/api-core/internal/models"
 	"gorm.io/gorm"
 )
@@ -17,17 +18,9 @@ type ReservationRepository interface {
 	DeleteRooms(ctx context.Context, reservationID uint) error
 	FindByID(ctx context.Context, id uint) (*models.Reservation, error)
 	FindByIDWithDetails(ctx context.Context, id uint) (*models.Reservation, error)
-	FindAll(ctx context.Context, filter ReservationFilter, offset, limit int, sort string) ([]models.Reservation, int64, error)
+	FindAll(ctx context.Context, filter dto.ReservationRepositoryFilter, offset, limit int, sort string) ([]models.Reservation, int64, error)
 	GetStatistics(ctx context.Context, startDate, endDate time.Time, periodType string) ([]ReservationStatistics, error)
-}
-
-type ReservationFilter struct {
-	Status    *models.ReservationStatus
-	Type      *models.ReservationType
-	RoomID    *uint
-	StartDate *time.Time
-	EndDate   *time.Time
-	Search    string
+	FindLastReservationForRoom(ctx context.Context, roomID uint) (*models.Reservation, error)
 }
 
 type ReservationStatistics struct {
@@ -102,7 +95,7 @@ func (r *reservationRepository) FindByIDWithDetails(ctx context.Context, id uint
 	return &reservation, nil
 }
 
-func (r *reservationRepository) FindAll(ctx context.Context, filter ReservationFilter, offset, limit int, sort string) ([]models.Reservation, int64, error) {
+func (r *reservationRepository) FindAll(ctx context.Context, filter dto.ReservationRepositoryFilter, offset, limit int, sort string) ([]models.Reservation, int64, error) {
 	var reservations []models.Reservation
 	var total int64
 
@@ -256,4 +249,32 @@ func (r *reservationRepository) GetStatistics(ctx context.Context, startDate, en
 		Scan(&stats).Error
 
 	return stats, err
+}
+
+func (r *reservationRepository) FindLastReservationForRoom(ctx context.Context, roomID uint) (*models.Reservation, error) {
+	defaultDeletedAt := time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
+	var reservation models.Reservation
+
+	// Find the last reservation for the room based on stay_end_at date
+	err := r.db.WithContext(ctx).
+		Model(&models.Reservation{}).
+		Preload("PaymentMethod", "deleted_at = ?", defaultDeletedAt).
+		Preload("Rooms", "deleted_at = ?", defaultDeletedAt).
+		Preload("Rooms.Room", "deleted_at = ?", defaultDeletedAt).
+		Preload("Rooms.Room.RoomGroup", "deleted_at = ?", defaultDeletedAt).
+		Joins("JOIN reservation_room ON reservation_room.reservation_id = reservation.id").
+		Where("reservation_room.room_id = ? AND reservation_room.deleted_at = ?", roomID, defaultDeletedAt).
+		Where("reservation.deleted_at = ?", defaultDeletedAt).
+		Where("reservation.status IN ?", []models.ReservationStatus{models.ReservationStatusNormal, models.ReservationStatusPending}).
+		Order("reservation.stay_end_at DESC").
+		First(&reservation).Error
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil // No reservation found is not an error
+		}
+		return nil, err
+	}
+
+	return &reservation, nil
 }

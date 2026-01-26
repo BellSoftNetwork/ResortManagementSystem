@@ -3,10 +3,9 @@
     @request="onRequest"
     ref="tableRef"
     v-model:pagination="pagination"
-    :loading="status.isLoading"
+    :loading="loading"
     :columns="columns"
-    :rows="roomGroups"
-    :filter="filter"
+    :rows="rows"
     style="height: 90vh"
     row-key="id"
     title="객실 그룹"
@@ -54,26 +53,37 @@
 import { onMounted, ref } from "vue";
 import { useQuasar } from "quasar";
 import { convertTableColumnDef } from "src/util/table-util";
-import { formatSortParam } from "src/util/query-string-util";
 import { getErrorMessage } from "src/util/errorHandler";
 import { getRoomGroupFieldDetail, RoomGroup } from "src/schema/room-group";
 import { deleteRoomGroup, fetchRoomGroups } from "src/api/v1/room-group";
+import { useTable } from "src/composables/useTable";
 
 const $q = useQuasar();
-const status = ref({
-  isLoading: false,
-  isLoaded: false,
-  isPatching: false,
-});
 const tableRef = ref();
-const filter = ref("");
-const pagination = ref({
-  sortBy: "name",
-  descending: false,
-  page: 1,
-  rowsPerPage: 15,
-  rowsNumber: 10,
+
+const { pagination, loading, rows, onRequest } = useTable<RoomGroup>({
+  fetchFn: fetchRoomGroups,
+  defaultPagination: {
+    sortBy: "name",
+    descending: false,
+    page: 1,
+    rowsPerPage: 15,
+  },
+  onError: (error) => {
+    $q.notify({
+      message: getErrorMessage(error),
+      type: "negative",
+      actions: [
+        {
+          icon: "close",
+          color: "white",
+          round: true,
+        },
+      ],
+    });
+  },
 });
+
 const columns = [
   {
     ...getColumnDef("name"),
@@ -116,39 +126,9 @@ const columns = [
     headerStyle: "width: 5%",
   },
 ];
-const roomGroups = ref<RoomGroup[]>([]);
 
 function getColumnDef(field: string) {
   return convertTableColumnDef(getRoomGroupFieldDetail(field));
-}
-
-function onRequest(props) {
-  const { page, rowsPerPage, sortBy, descending } = props.pagination;
-
-  status.value.isLoading = true;
-  status.value.isLoaded = false;
-
-  fetchRoomGroups({
-    page: page - 1,
-    size: rowsPerPage,
-    sort: formatSortParam({ field: sortBy, isDescending: descending }),
-  })
-    .then((response) => {
-      roomGroups.value = response.values;
-
-      const page = response.page;
-
-      pagination.value.rowsNumber = page.totalElements;
-      pagination.value.page = page.index + 1;
-      pagination.value.rowsPerPage = page.size;
-      pagination.value.sortBy = sortBy;
-      pagination.value.descending = descending;
-
-      status.value.isLoaded = true;
-    })
-    .finally(() => {
-      status.value.isLoading = false;
-    });
 }
 
 function reloadData() {

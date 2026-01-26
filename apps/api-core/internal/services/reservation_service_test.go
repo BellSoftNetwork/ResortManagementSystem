@@ -2,16 +2,17 @@ package services_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"gitlab.bellsoft.net/rms/api-core/internal/dto"
 	"gitlab.bellsoft.net/rms/api-core/internal/models"
 	"gitlab.bellsoft.net/rms/api-core/internal/repositories"
 	"gitlab.bellsoft.net/rms/api-core/internal/services"
-	"gorm.io/gorm"
 )
 
 // MockReservationRepository is a mock implementation of ReservationRepository
@@ -53,7 +54,7 @@ func (m *MockReservationRepository) FindByIDWithDetails(ctx context.Context, id 
 	return args.Get(0).(*models.Reservation), args.Error(1)
 }
 
-func (m *MockReservationRepository) FindAll(ctx context.Context, filter repositories.ReservationFilter, offset, limit int, sort string) ([]models.Reservation, int64, error) {
+func (m *MockReservationRepository) FindAll(ctx context.Context, filter dto.ReservationRepositoryFilter, offset, limit int, sort string) ([]models.Reservation, int64, error) {
 	args := m.Called(ctx, filter, offset, limit, sort)
 	if args.Get(0) == nil {
 		return nil, 0, args.Error(2)
@@ -74,6 +75,14 @@ func (m *MockReservationRepository) DeleteRooms(ctx context.Context, reservation
 	return args.Error(0)
 }
 
+func (m *MockReservationRepository) FindLastReservationForRoom(ctx context.Context, roomID uint) (*models.Reservation, error) {
+	args := m.Called(ctx, roomID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.Reservation), args.Error(1)
+}
+
 type ReservationServiceTestSuite struct {
 	suite.Suite
 	ctx                   context.Context
@@ -81,7 +90,6 @@ type ReservationServiceTestSuite struct {
 	mockReservationRepo   *MockReservationRepository
 	mockRoomRepo          *MockRoomRepository
 	mockPaymentMethodRepo *MockPaymentMethodRepository
-	db                    *gorm.DB
 }
 
 func (suite *ReservationServiceTestSuite) SetupTest() {
@@ -90,14 +98,10 @@ func (suite *ReservationServiceTestSuite) SetupTest() {
 	suite.mockRoomRepo = new(MockRoomRepository)
 	suite.mockPaymentMethodRepo = new(MockPaymentMethodRepository)
 
-	// Create a dummy DB for the service (it won't be used in tests)
-	suite.db = &gorm.DB{}
-
 	suite.service = services.NewReservationService(
 		suite.mockReservationRepo,
 		suite.mockRoomRepo,
 		suite.mockPaymentMethodRepo,
-		suite.db,
 	)
 }
 
@@ -131,7 +135,7 @@ func (suite *ReservationServiceTestSuite) TestGetByID() {
 
 func (suite *ReservationServiceTestSuite) TestGetByID_NotFound() {
 	// Given - 존재하지 않는 예약 ID로
-	suite.mockReservationRepo.On("FindByID", suite.ctx, uint(999)).Return(nil, gorm.ErrRecordNotFound)
+	suite.mockReservationRepo.On("FindByID", suite.ctx, uint(999)).Return(nil, errors.New("record not found"))
 
 	// When - 조회하면
 	result, err := suite.service.GetByID(suite.ctx, 999)
@@ -145,7 +149,7 @@ func (suite *ReservationServiceTestSuite) TestGetByID_NotFound() {
 
 func (suite *ReservationServiceTestSuite) TestGetAll_Empty() {
 	// Given - 예약 정보가 없는 상황에서
-	filter := repositories.ReservationFilter{}
+	filter := dto.ReservationRepositoryFilter{}
 	suite.mockReservationRepo.On("FindAll", suite.ctx, filter, 0, 10, "").Return([]models.Reservation{}, int64(0), nil)
 
 	// When - 전체 예약 정보를 조회하면 (page 0부터 시작 - Spring Boot 호환)
@@ -160,7 +164,7 @@ func (suite *ReservationServiceTestSuite) TestGetAll_Empty() {
 
 func (suite *ReservationServiceTestSuite) TestGetAll_Pagination() {
 	// Given - 여러 예약이 있는 상황에서
-	filter := repositories.ReservationFilter{}
+	filter := dto.ReservationRepositoryFilter{}
 	mockReservations := []models.Reservation{
 		{Name: "예약1"},
 		{Name: "예약2"},
@@ -356,7 +360,7 @@ func (suite *ReservationServiceTestSuite) TestUpdate_NotFound() {
 	// Given - 존재하지 않는 예약에 대해
 	updates := map[string]interface{}{}
 
-	suite.mockReservationRepo.On("FindByIDWithDetails", suite.ctx, uint(999)).Return(nil, gorm.ErrRecordNotFound)
+	suite.mockReservationRepo.On("FindByIDWithDetails", suite.ctx, uint(999)).Return(nil, errors.New("record not found"))
 
 	// When - 수정 시도 시
 	result, err := suite.service.Update(suite.ctx, 999, updates, nil, false)
@@ -418,7 +422,7 @@ func (suite *ReservationServiceTestSuite) TestDelete() {
 
 func (suite *ReservationServiceTestSuite) TestDelete_NotFound() {
 	// Given - 존재하지 않는 예약에 대해
-	suite.mockReservationRepo.On("FindByID", suite.ctx, uint(999)).Return(nil, gorm.ErrRecordNotFound)
+	suite.mockReservationRepo.On("FindByID", suite.ctx, uint(999)).Return(nil, errors.New("record not found"))
 
 	// When - 삭제 시도 시
 	err := suite.service.Delete(suite.ctx, 999)
@@ -476,7 +480,7 @@ func (suite *ReservationServiceTestSuite) TestGetAvailableRooms_InvalidDateRange
 
 func (suite *ReservationServiceTestSuite) TestGetAll_DateFiltering() {
 	// Given - 다양한 날짜 범위의 예약들이 있는 상황에서
-	filter := repositories.ReservationFilter{
+	filter := dto.ReservationRepositoryFilter{
 		StartDate: &time.Time{}, // 2025-08-17로 설정할 예정
 		EndDate:   &time.Time{}, // 2025-11-17로 설정할 예정
 	}
@@ -513,7 +517,7 @@ func (suite *ReservationServiceTestSuite) TestGetAll_DateFiltering() {
 
 func (suite *ReservationServiceTestSuite) TestGetAll_DateFiltering_OnlyStartDate() {
 	// Given - 시작일만 필터가 있는 상황에서
-	filter := repositories.ReservationFilter{}
+	filter := dto.ReservationRepositoryFilter{}
 	startDate := time.Date(2025, 8, 17, 0, 0, 0, 0, time.UTC)
 	filter.StartDate = &startDate
 
@@ -536,7 +540,7 @@ func (suite *ReservationServiceTestSuite) TestGetAll_DateFiltering_OnlyStartDate
 
 func (suite *ReservationServiceTestSuite) TestGetAll_DateFiltering_OnlyEndDate() {
 	// Given - 종료일만 필터가 있는 상황에서
-	filter := repositories.ReservationFilter{}
+	filter := dto.ReservationRepositoryFilter{}
 	endDate := time.Date(2025, 11, 17, 0, 0, 0, 0, time.UTC)
 	filter.EndDate = &endDate
 
@@ -674,6 +678,95 @@ func (suite *ReservationServiceTestSuite) TestGetStatistics_일별통계() {
 	assert.Len(suite.T(), stats, 2)
 	assert.Equal(suite.T(), "2023-11-01", stats[0].Period)
 	assert.Equal(suite.T(), float64(200000), stats[0].TotalRevenue)
+	suite.mockReservationRepo.AssertExpectations(suite.T())
+}
+
+func (suite *ReservationServiceTestSuite) TestGetByIDWithDetails() {
+	// Given - 예약이 등록된 상황에서
+	reservation := &models.Reservation{
+		Name:            "홍길동",
+		Phone:           "010-1234-5678",
+		PeopleCount:     2,
+		StayStartAt:     time.Date(2024, 3, 20, 0, 0, 0, 0, time.UTC),
+		StayEndAt:       time.Date(2024, 3, 22, 0, 0, 0, 0, time.UTC),
+		Price:           200000,
+		Status:          models.ReservationStatusNormal,
+		Type:            models.ReservationTypeStay,
+		PaymentMethodID: 1,
+		Rooms: []models.ReservationRoom{
+			{RoomID: 1},
+			{RoomID: 2},
+		},
+	}
+	reservation.ID = 1
+
+	suite.mockReservationRepo.On("FindByIDWithDetails", suite.ctx, uint(1)).Return(reservation, nil)
+
+	// When - 특정 예약의 상세 정보를 조회하면
+	result, err := suite.service.GetByIDWithDetails(suite.ctx, 1)
+
+	// Then - 정상적으로 조회되고 연관 데이터도 포함된다
+	assert.NoError(suite.T(), err)
+	assert.NotNil(suite.T(), result)
+	assert.Equal(suite.T(), reservation.Name, result.Name)
+	assert.Equal(suite.T(), reservation.Phone, result.Phone)
+	assert.Len(suite.T(), result.Rooms, 2)
+	assert.Equal(suite.T(), uint(1), result.Rooms[0].RoomID)
+	assert.Equal(suite.T(), uint(2), result.Rooms[1].RoomID)
+	suite.mockReservationRepo.AssertExpectations(suite.T())
+}
+
+func (suite *ReservationServiceTestSuite) TestGetByIDWithDetails_NotFound() {
+	// Given - 존재하지 않는 예약 ID로
+	suite.mockReservationRepo.On("FindByIDWithDetails", suite.ctx, uint(999)).Return(nil, errors.New("record not found"))
+
+	// When - 상세 정보를 조회하면
+	result, err := suite.service.GetByIDWithDetails(suite.ctx, 999)
+
+	// Then - ErrReservationNotFound 에러가 발생한다
+	assert.Error(suite.T(), err)
+	assert.Equal(suite.T(), services.ErrReservationNotFound, err)
+	assert.Nil(suite.T(), result)
+	suite.mockReservationRepo.AssertExpectations(suite.T())
+}
+
+func (suite *ReservationServiceTestSuite) TestGetLastReservationForRoom() {
+	// Given - 특정 객실에 예약이 있는 상황에서
+	lastReservation := &models.Reservation{
+		Name:        "최근 예약",
+		Phone:       "010-1111-2222",
+		StayStartAt: time.Date(2024, 3, 25, 0, 0, 0, 0, time.UTC),
+		StayEndAt:   time.Date(2024, 3, 27, 0, 0, 0, 0, time.UTC),
+		Status:      models.ReservationStatusNormal,
+		Rooms: []models.ReservationRoom{
+			{RoomID: 1},
+		},
+	}
+	lastReservation.ID = 5
+
+	suite.mockReservationRepo.On("FindLastReservationForRoom", suite.ctx, uint(1)).Return(lastReservation, nil)
+
+	// When - 해당 객실의 마지막 예약을 조회하면
+	result, err := suite.service.GetLastReservationForRoom(suite.ctx, 1)
+
+	// Then - 정상적으로 조회된다
+	assert.NoError(suite.T(), err)
+	assert.NotNil(suite.T(), result)
+	assert.Equal(suite.T(), lastReservation.Name, result.Name)
+	assert.Equal(suite.T(), lastReservation.ID, result.ID)
+	suite.mockReservationRepo.AssertExpectations(suite.T())
+}
+
+func (suite *ReservationServiceTestSuite) TestGetLastReservationForRoom_NoReservation() {
+	// Given - 예약이 없는 객실에 대해
+	suite.mockReservationRepo.On("FindLastReservationForRoom", suite.ctx, uint(999)).Return(nil, errors.New("record not found"))
+
+	// When - 마지막 예약을 조회하면
+	result, err := suite.service.GetLastReservationForRoom(suite.ctx, 999)
+
+	// Then - 에러가 발생한다
+	assert.Error(suite.T(), err)
+	assert.Nil(suite.T(), result)
 	suite.mockReservationRepo.AssertExpectations(suite.T())
 }
 

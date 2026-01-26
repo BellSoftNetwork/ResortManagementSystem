@@ -6,6 +6,7 @@ import (
 	"time"
 
 	appContext "gitlab.bellsoft.net/rms/api-core/internal/context"
+	"gitlab.bellsoft.net/rms/api-core/internal/dto"
 	"gitlab.bellsoft.net/rms/api-core/internal/models"
 	"gorm.io/gorm"
 )
@@ -16,18 +17,12 @@ type RoomRepository interface {
 	Delete(ctx context.Context, id uint) error
 	FindByID(ctx context.Context, id uint) (*models.Room, error)
 	FindByIDWithGroup(ctx context.Context, id uint) (*models.Room, error)
-	FindAll(ctx context.Context, filter RoomFilter, offset, limit int, sort string) ([]models.Room, int64, error)
+	FindAll(ctx context.Context, filter dto.RoomRepositoryFilter, offset, limit int, sort string) ([]models.Room, int64, error)
 	FindAvailableRooms(ctx context.Context, startDate, endDate time.Time, excludeReservationID *uint) ([]models.Room, error)
 	ExistsByNumber(ctx context.Context, number string, excludeID *uint) (bool, error)
 	IsRoomAvailable(ctx context.Context, roomID uint, startDate, endDate time.Time, excludeReservationID *uint) (bool, error)
 	FindByNumber(ctx context.Context, number string) (*models.Room, error)
 	FindByStatus(ctx context.Context, status models.RoomStatus) ([]models.Room, error)
-}
-
-type RoomFilter struct {
-	RoomGroupID *uint
-	Status      *models.RoomStatus
-	Search      string
 }
 
 type roomRepository struct {
@@ -81,7 +76,7 @@ func (r *roomRepository) FindByIDWithGroup(ctx context.Context, id uint) (*model
 	return &room, nil
 }
 
-func (r *roomRepository) FindAll(ctx context.Context, filter RoomFilter, offset, limit int, sort string) ([]models.Room, int64, error) {
+func (r *roomRepository) FindAll(ctx context.Context, filter dto.RoomRepositoryFilter, offset, limit int, sort string) ([]models.Room, int64, error) {
 	var rooms []models.Room
 	var total int64
 

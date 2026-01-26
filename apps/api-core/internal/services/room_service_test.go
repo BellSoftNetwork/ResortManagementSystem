@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"gitlab.bellsoft.net/rms/api-core/internal/dto"
 	"gitlab.bellsoft.net/rms/api-core/internal/models"
 	"gitlab.bellsoft.net/rms/api-core/internal/repositories"
 	"gitlab.bellsoft.net/rms/api-core/internal/services"
@@ -61,7 +62,7 @@ func (m *MockRoomRepository) FindByNumber(ctx context.Context, number string) (*
 	return args.Get(0).(*models.Room), args.Error(1)
 }
 
-func (m *MockRoomRepository) FindAll(ctx context.Context, filter repositories.RoomFilter, offset, limit int, sort string) ([]models.Room, int64, error) {
+func (m *MockRoomRepository) FindAll(ctx context.Context, filter dto.RoomRepositoryFilter, offset, limit int, sort string) ([]models.Room, int64, error) {
 	args := m.Called(ctx, filter, offset, limit, sort)
 	if args.Get(0) == nil {
 		return nil, 0, args.Error(2)
@@ -266,7 +267,7 @@ func (suite *RoomServiceTestSuite) TestGetByIDWithGroup() {
 
 func (suite *RoomServiceTestSuite) TestGetAll_Empty() {
 	// Given - 객실 정보가 없는 상황에서
-	filter := repositories.RoomFilter{}
+	filter := dto.RoomRepositoryFilter{}
 	suite.mockRoomRepo.On("FindAll", suite.ctx, filter, 0, 10, "").Return([]models.Room{}, int64(0), nil)
 
 	// When - 전체 객실 정보를 조회하면 (page 0부터 시작 - Spring Boot 호환)
@@ -292,7 +293,7 @@ func (suite *RoomServiceTestSuite) TestGetAll_Multiple() {
 		rooms[i].ID = uint(i + 1)
 	}
 
-	filter := repositories.RoomFilter{}
+	filter := dto.RoomRepositoryFilter{}
 	suite.mockRoomRepo.On("FindAll", suite.ctx, filter, 0, 10, "").Return(rooms, int64(10), nil)
 
 	// When - 전체 객실 정보를 조회하면 (page 0부터 시작 - Spring Boot 호환)
@@ -314,7 +315,7 @@ func (suite *RoomServiceTestSuite) TestGetAll_WithFilter() {
 	activeRoom.ID = 1
 
 	statusNormal := models.RoomStatusNormal
-	filter := repositories.RoomFilter{
+	filter := dto.RoomRepositoryFilter{
 		Status: &statusNormal,
 	}
 	suite.mockRoomRepo.On("FindAll", suite.ctx, filter, 0, 10, "").Return([]models.Room{activeRoom}, int64(1), nil)
