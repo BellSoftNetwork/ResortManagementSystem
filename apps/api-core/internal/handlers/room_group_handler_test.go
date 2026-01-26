@@ -20,11 +20,6 @@ import (
 	"gitlab.bellsoft.net/rms/api-core/internal/services"
 )
 
-// stringPtr은 문자열에 대한 포인터를 반환하는 헬퍼 함수
-func stringPtr(s string) *string {
-	return &s
-}
-
 // MockRoomGroupService는 RoomGroupService의 모킹 구현
 type MockRoomGroupService struct {
 	mock.Mock

@@ -10,7 +10,6 @@ import (
 	"gitlab.bellsoft.net/rms/api-core/internal/dto"
 	"gitlab.bellsoft.net/rms/api-core/internal/middleware"
 	"gitlab.bellsoft.net/rms/api-core/internal/models"
-	"gitlab.bellsoft.net/rms/api-core/internal/repositories"
 	"gitlab.bellsoft.net/rms/api-core/internal/services"
 	"gitlab.bellsoft.net/rms/api-core/internal/utils"
 	"gitlab.bellsoft.net/rms/api-core/pkg/response"
@@ -44,7 +43,7 @@ func (h *ReservationHandler) ListReservations(c *gin.Context) {
 		return
 	}
 
-	filter := repositories.ReservationFilter{
+	filter := dto.ReservationRepositoryFilter{
 		RoomID:    filterQuery.RoomID,
 		StartDate: filterQuery.StayStartAt,
 		EndDate:   filterQuery.StayEndAt,

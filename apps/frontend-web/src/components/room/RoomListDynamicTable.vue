@@ -3,9 +3,9 @@
     @request="onRequest"
     ref="tableRef"
     v-model:pagination="pagination"
-    :loading="status.isLoading"
+    :loading="loading"
     :columns="columns"
-    :rows="rooms"
+    :rows="rows"
     style="height: 90vh"
     row-key="id"
     title="객실"
@@ -50,38 +50,40 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 import { useQuasar } from "quasar";
 import { getRoomFieldDetail, Room } from "src/schema/room";
 import { convertTableColumnDef } from "src/util/table-util";
 import { deleteRoom, fetchRooms } from "src/api/v1/room";
-import { formatSortParam } from "src/util/query-string-util";
-import { useRoute, useRouter } from "vue-router";
 import { getErrorMessage } from "src/util/errorHandler";
+import { useTable } from "src/composables/useTable";
 
 const $q = useQuasar();
-const status = ref({
-  isLoading: false,
-});
 const tableRef = ref();
-const route = useRoute();
-const router = useRouter();
 
-const defaultConfig = {
-  pagination: {
+const { pagination, loading, rows, onRequest } = useTable<Room>({
+  fetchFn: fetchRooms,
+  defaultPagination: {
     sortBy: "number",
     descending: false,
     page: 1,
     rowsPerPage: 15,
   },
-};
-const pagination = ref({
-  sortBy: defaultConfig.pagination.sortBy,
-  descending: defaultConfig.pagination.descending,
-  page: defaultConfig.pagination.page,
-  rowsPerPage: defaultConfig.pagination.rowsPerPage,
-  rowsNumber: 0,
+  onError: (error) => {
+    $q.notify({
+      message: getErrorMessage(error),
+      type: "negative",
+      actions: [
+        {
+          icon: "close",
+          color: "white",
+          round: true,
+        },
+      ],
+    });
+  },
 });
+
 const columns = [
   {
     ...getColumnDef("roomGroup"),
@@ -123,83 +125,9 @@ const columns = [
     headerStyle: "width: 5%",
   },
 ];
-const rooms = ref<Room[]>([]);
-
-loadQueryString();
-
-watch(route, () => {
-  loadQueryString();
-});
-
-function loadQueryString() {
-  pagination.value.sortBy = route.query.sortBy?.toString() ?? defaultConfig.pagination.sortBy;
-  pagination.value.descending = Boolean(route.query.descending ?? defaultConfig.pagination.descending);
-  pagination.value.page = Number(route.query.page ?? defaultConfig.pagination.page);
-  pagination.value.rowsPerPage = Number(route.query.rowsPerPage ?? defaultConfig.pagination.rowsPerPage);
-}
-
-function setPaginationQuery() {
-  router.push({
-    query: {
-      ...route.query,
-      page: pagination.value.page !== defaultConfig.pagination.page ? pagination.value.page : undefined,
-      rowsPerPage:
-        pagination.value.rowsPerPage !== defaultConfig.pagination.rowsPerPage
-          ? pagination.value.rowsPerPage
-          : undefined,
-      sortBy: pagination.value.sortBy !== defaultConfig.pagination.sortBy ? pagination.value.sortBy : undefined,
-      descending:
-        pagination.value.descending !== defaultConfig.pagination.descending ? pagination.value.descending : undefined,
-    },
-  });
-}
 
 function getColumnDef(field: string) {
   return convertTableColumnDef(getRoomFieldDetail(field));
-}
-
-function onRequest(props) {
-  const { page, rowsPerPage, sortBy, descending } = props.pagination;
-
-  status.value.isLoading = true;
-
-  fetchRooms({
-    page: page - 1,
-    size: rowsPerPage,
-    sort: formatSortParam({ field: sortBy, isDescending: descending }),
-  })
-    .then((response) => {
-      rooms.value = response.values;
-
-      const page = response.page;
-
-      pagination.value.rowsNumber = page.totalElements;
-      pagination.value.page = page.index + 1;
-      pagination.value.rowsPerPage = page.size;
-      pagination.value.sortBy = sortBy;
-      pagination.value.descending = descending;
-
-      setPaginationQuery();
-    })
-    .catch((error) => {
-      rooms.value = [];
-
-      console.error(error);
-      $q.notify({
-        message: getErrorMessage(error),
-        type: "negative",
-        actions: [
-          {
-            icon: "close",
-            color: "white",
-            round: true,
-          },
-        ],
-      });
-    })
-    .finally(() => {
-      status.value.isLoading = false;
-    });
 }
 
 function reloadData() {

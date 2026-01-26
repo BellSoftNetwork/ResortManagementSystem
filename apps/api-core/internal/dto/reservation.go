@@ -2,6 +2,8 @@ package dto
 
 import (
 	"time"
+
+	"gitlab.bellsoft.net/rms/api-core/internal/models"
 )
 
 type ReservationResponse struct {
@@ -155,6 +157,15 @@ type ReservationFilterResponse struct {
 	StayStartAt *JSONDate `json:"stayStartAt,omitempty"`
 	StayEndAt   *JSONDate `json:"stayEndAt,omitempty"`
 	Search      string    `json:"search,omitempty"`
+}
+
+type ReservationRepositoryFilter struct {
+	Status    *models.ReservationStatus
+	Type      *models.ReservationType
+	RoomID    *uint
+	StartDate *time.Time
+	EndDate   *time.Time
+	Search    string
 }
 
 // ReservationStatisticsResponse represents the response for reservation statistics

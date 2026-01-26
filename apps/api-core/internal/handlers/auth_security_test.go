@@ -100,7 +100,7 @@ func TestAuthHandler_SecurityTests(t *testing.T) {
 		expectedUser := &models.User{
 			UserID: "testuser",
 			Name:   "Test User",
-			Email:  "test@example.com",
+			Email:  stringPtr("test@example.com"),
 			Role:   models.UserRoleNormal,
 		}
 		expectedUser.ID = 1

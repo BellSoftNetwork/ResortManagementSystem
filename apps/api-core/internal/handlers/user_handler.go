@@ -6,12 +6,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gitlab.bellsoft.net/rms/api-core/internal/dto"
+	"gitlab.bellsoft.net/rms/api-core/internal/mappers"
 	"gitlab.bellsoft.net/rms/api-core/internal/middleware"
 	"gitlab.bellsoft.net/rms/api-core/internal/models"
 	"gitlab.bellsoft.net/rms/api-core/internal/services"
-	"gitlab.bellsoft.net/rms/api-core/internal/utils"
 	"gitlab.bellsoft.net/rms/api-core/pkg/response"
-	pkgutils "gitlab.bellsoft.net/rms/api-core/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -38,7 +37,7 @@ func (h *UserHandler) GetCurrentUser(c *gin.Context) {
 		return
 	}
 
-	userResponse := h.toUserResponse(user)
+	userResponse := mappers.ToUserResponse(user)
 	response.Success(c, userResponse)
 }
 
@@ -73,7 +72,7 @@ func (h *UserHandler) UpdateCurrentUser(c *gin.Context) {
 		return
 	}
 
-	userResponse := h.toUserResponse(user)
+	userResponse := mappers.ToUserResponse(user)
 	response.Success(c, userResponse)
 }
 
@@ -124,7 +123,7 @@ func (h *UserHandler) ListUsers(c *gin.Context) {
 
 	userResponses := make([]dto.UserResponse, len(users))
 	for i, user := range users {
-		userResponses[i] = h.toUserResponse(&user)
+		userResponses[i] = mappers.ToUserResponse(&user)
 	}
 
 	totalPages := int(total) / query.Size
@@ -192,7 +191,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	userResponse := h.toUserResponse(user)
+	userResponse := mappers.ToUserResponse(user)
 	response.Created(c, userResponse)
 }
 
@@ -250,20 +249,6 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	userResponse := h.toUserResponse(user)
+	userResponse := mappers.ToUserResponse(user)
 	response.Success(c, userResponse)
-}
-
-func (h *UserHandler) toUserResponse(user *models.User) dto.UserResponse {
-	return dto.UserResponse{
-		ID:              user.ID,
-		UserID:          user.UserID,
-		Email:           utils.StringPtrToString(user.Email),
-		Name:            user.Name,
-		Status:          user.Status.String(),
-		Role:            user.Role.String(),
-		ProfileImageURL: pkgutils.GenerateGravatarURL(utils.StringPtrToString(user.Email)),
-		CreatedAt:       dto.CustomTime{Time: user.CreatedAt},
-		UpdatedAt:       dto.CustomTime{Time: user.UpdatedAt},
-	}
 }

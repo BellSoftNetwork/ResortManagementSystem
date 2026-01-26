@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"gitlab.bellsoft.net/rms/api-core/internal/config"
 	"gitlab.bellsoft.net/rms/api-core/internal/models"
 	"gitlab.bellsoft.net/rms/api-core/internal/services"
 	"gitlab.bellsoft.net/rms/api-core/pkg/auth"
@@ -35,10 +36,17 @@ func (suite *LoginAttemptServiceTestSuite) SetupTest() {
 	suite.mockLoginAttemptRepo = new(MockLoginAttemptRepository)
 
 	// AuthService 생성
+	testConfig := &config.Config{
+		Security: config.SecurityConfig{
+			MaxLoginAttempts: 5,
+			LockoutDuration:  15 * time.Minute,
+		},
+	}
 	suite.authService = services.NewAuthService(
 		suite.mockUserRepo,
 		suite.mockLoginAttemptRepo,
 		suite.jwtService,
+		testConfig,
 	)
 
 	// 테스트 사용자 설정

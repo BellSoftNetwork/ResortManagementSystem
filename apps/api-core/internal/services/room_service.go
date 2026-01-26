@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"gitlab.bellsoft.net/rms/api-core/internal/audit"
+	"gitlab.bellsoft.net/rms/api-core/internal/dto"
 	"gitlab.bellsoft.net/rms/api-core/internal/models"
 	"gitlab.bellsoft.net/rms/api-core/internal/repositories"
 	"gorm.io/gorm"
@@ -20,7 +21,7 @@ var (
 type RoomService interface {
 	GetByID(ctx context.Context, id uint) (*models.Room, error)
 	GetByIDWithGroup(ctx context.Context, id uint) (*models.Room, error)
-	GetAll(ctx context.Context, filter repositories.RoomFilter, page, size int, sort string) ([]models.Room, int64, error)
+	GetAll(ctx context.Context, filter dto.RoomRepositoryFilter, page, size int, sort string) ([]models.Room, int64, error)
 	GetAvailableRooms(ctx context.Context, startDate, endDate time.Time, excludeReservationID *uint) ([]models.Room, error)
 	Create(ctx context.Context, room *models.Room) error
 	Update(ctx context.Context, id uint, updates map[string]interface{}) (*models.Room, error)
@@ -57,7 +58,7 @@ func (s *roomService) GetByIDWithGroup(ctx context.Context, id uint) (*models.Ro
 	return room, nil
 }
 
-func (s *roomService) GetAll(ctx context.Context, filter repositories.RoomFilter, page, size int, sort string) ([]models.Room, int64, error) {
+func (s *roomService) GetAll(ctx context.Context, filter dto.RoomRepositoryFilter, page, size int, sort string) ([]models.Room, int64, error) {
 	offset := page * size
 	return s.roomRepo.FindAll(ctx, filter, offset, size, sort)
 }

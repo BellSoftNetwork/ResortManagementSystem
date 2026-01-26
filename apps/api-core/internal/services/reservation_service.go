@@ -5,9 +5,9 @@ import (
 	"errors"
 	"time"
 
+	"gitlab.bellsoft.net/rms/api-core/internal/dto"
 	"gitlab.bellsoft.net/rms/api-core/internal/models"
 	"gitlab.bellsoft.net/rms/api-core/internal/repositories"
-	"gorm.io/gorm"
 )
 
 var (
@@ -20,7 +20,7 @@ var (
 type ReservationService interface {
 	GetByID(ctx context.Context, id uint) (*models.Reservation, error)
 	GetByIDWithDetails(ctx context.Context, id uint) (*models.Reservation, error)
-	GetAll(ctx context.Context, filter repositories.ReservationFilter, page, size int, sort string) ([]models.Reservation, int64, error)
+	GetAll(ctx context.Context, filter dto.ReservationRepositoryFilter, page, size int, sort string) ([]models.Reservation, int64, error)
 	GetStatistics(ctx context.Context, startDate, endDate time.Time, periodType string) ([]repositories.ReservationStatistics, error)
 	Create(ctx context.Context, reservation *models.Reservation, roomIDs []uint) error
 	Update(ctx context.Context, id uint, updates map[string]interface{}, roomIDs []uint, hasRoomsUpdate bool) (*models.Reservation, error)
@@ -33,16 +33,14 @@ type reservationService struct {
 	reservationRepo   repositories.ReservationRepository
 	roomRepo          repositories.RoomRepository
 	paymentMethodRepo repositories.PaymentMethodRepository
-	db                *gorm.DB
 }
 
 func NewReservationService(reservationRepo repositories.ReservationRepository, roomRepo repositories.RoomRepository,
-	paymentMethodRepo repositories.PaymentMethodRepository, db *gorm.DB) ReservationService {
+	paymentMethodRepo repositories.PaymentMethodRepository) ReservationService {
 	return &reservationService{
 		reservationRepo:   reservationRepo,
 		roomRepo:          roomRepo,
 		paymentMethodRepo: paymentMethodRepo,
-		db:                db,
 	}
 }
 
@@ -62,7 +60,7 @@ func (s *reservationService) GetByIDWithDetails(ctx context.Context, id uint) (*
 	return reservation, nil
 }
 
-func (s *reservationService) GetAll(ctx context.Context, filter repositories.ReservationFilter, page, size int, sort string) ([]models.Reservation, int64, error) {
+func (s *reservationService) GetAll(ctx context.Context, filter dto.ReservationRepositoryFilter, page, size int, sort string) ([]models.Reservation, int64, error) {
 	offset := page * size
 	return s.reservationRepo.FindAll(ctx, filter, offset, size, sort)
 }
@@ -242,29 +240,5 @@ func (s *reservationService) GetAvailableRooms(ctx context.Context, startDate, e
 }
 
 func (s *reservationService) GetLastReservationForRoom(ctx context.Context, roomID uint) (*models.Reservation, error) {
-	defaultDeletedAt := time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
-	var reservation models.Reservation
-
-	// Find the last reservation for the room based on stay_end_at date
-	err := s.db.WithContext(ctx).
-		Model(&models.Reservation{}).
-		Preload("PaymentMethod", "deleted_at = ?", defaultDeletedAt).
-		Preload("Rooms", "deleted_at = ?", defaultDeletedAt).
-		Preload("Rooms.Room", "deleted_at = ?", defaultDeletedAt).
-		Preload("Rooms.Room.RoomGroup", "deleted_at = ?", defaultDeletedAt).
-		Joins("JOIN reservation_room ON reservation_room.reservation_id = reservation.id").
-		Where("reservation_room.room_id = ? AND reservation_room.deleted_at = ?", roomID, defaultDeletedAt).
-		Where("reservation.deleted_at = ?", defaultDeletedAt).
-		Where("reservation.status IN ?", []models.ReservationStatus{models.ReservationStatusNormal, models.ReservationStatusPending}).
-		Order("reservation.stay_end_at DESC").
-		First(&reservation).Error
-
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil // No reservation found is not an error
-		}
-		return nil, err
-	}
-
-	return &reservation, nil
+	return s.reservationRepo.FindLastReservationForRoom(ctx, roomID)
 }

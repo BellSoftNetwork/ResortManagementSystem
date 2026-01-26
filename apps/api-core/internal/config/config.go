@@ -16,6 +16,7 @@ type Config struct {
 	JWT         JWTConfig
 	CORS        CORSConfig
 	App         AppConfig
+	Security    SecurityConfig
 }
 
 type ServerConfig struct {
@@ -63,6 +64,11 @@ type DeployConfig struct {
 	CommitTimestamp string
 }
 
+type SecurityConfig struct {
+	MaxLoginAttempts int           `yaml:"maxLoginAttempts" env:"SECURITY_MAX_LOGIN_ATTEMPTS" env-default:"5"`
+	LockoutDuration  time.Duration `yaml:"lockoutDuration" env:"SECURITY_LOCKOUT_DURATION" env-default:"15m"`
+}
+
 func Load() *Config {
 	viper.SetConfigName("application")
 	viper.SetConfigType("yaml")
@@ -82,6 +88,8 @@ func Load() *Config {
 	viper.BindEnv("redis.port", "REDIS_PORT")
 	viper.BindEnv("redis.password", "REDIS_PASSWORD")
 	viper.BindEnv("jwt.secret", "JWT_SECRET")
+	viper.BindEnv("security.max_login_attempts", "SECURITY_MAX_LOGIN_ATTEMPTS")
+	viper.BindEnv("security.lockout_duration", "SECURITY_LOCKOUT_DURATION")
 
 	profile := viper.GetString("PROFILE")
 	if profile == "" {
@@ -217,6 +225,20 @@ func Load() *Config {
 
 	if cfg.App.Version == "" {
 		cfg.App.Version = "1.0.0"
+	}
+
+	cfg.Security = SecurityConfig{
+		MaxLoginAttempts: viper.GetInt("security.max_login_attempts"),
+		LockoutDuration:  viper.GetDuration("security.lockout_duration"),
+	}
+
+	// Set defaults for Security configuration if not provided
+	if cfg.Security.MaxLoginAttempts == 0 {
+		cfg.Security.MaxLoginAttempts = 5
+	}
+
+	if cfg.Security.LockoutDuration == 0 {
+		cfg.Security.LockoutDuration = 15 * time.Minute
 	}
 
 	return cfg

@@ -1,5 +1,9 @@
 package dto
 
+import (
+	"gitlab.bellsoft.net/rms/api-core/internal/models"
+)
+
 type RoomResponse struct {
 	ID          uint                 `json:"id"`
 	Number      string               `json:"number"`
@@ -46,4 +50,10 @@ type RoomFilterResponse struct {
 	StayStartAt          *string `json:"stayStartAt,omitempty"`
 	StayEndAt            *string `json:"stayEndAt,omitempty"`
 	ExcludeReservationID *uint   `json:"excludeReservationId,omitempty"`
+}
+
+type RoomRepositoryFilter struct {
+	RoomGroupID *uint
+	Status      *models.RoomStatus
+	Search      string
 }

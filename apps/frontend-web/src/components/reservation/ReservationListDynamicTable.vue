@@ -3,9 +3,9 @@
     @request="onRequest"
     ref="tableRef"
     v-model:pagination="pagination"
-    :loading="status.isLoading"
+    :loading="loading"
     :columns="columns"
-    :rows="reservations"
+    :rows="rows"
     :filter="filter"
     style="height: 90vh"
     row-key="id"
@@ -174,16 +174,17 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref } from "vue";
 import dayjs from "dayjs";
 import { useQuasar } from "quasar";
 import { formatDate } from "src/util/format-util";
+import { calculateDateRange, type DueOption } from "src/util/date-preset-util";
 import { getReservationFieldDetail, Reservation, ReservationType } from "src/schema/reservation";
 import { convertTableColumnDef } from "src/util/table-util";
 import { deleteReservation, fetchReservations } from "src/api/v1/reservation";
-import { formatSortParam } from "src/util/query-string-util";
 import { getErrorMessage } from "src/util/errorHandler";
 import { useRoute, useRouter } from "vue-router";
+import { useTable } from "src/composables/useTable";
 
 const $q = useQuasar();
 const props = withDefaults(
@@ -195,9 +196,6 @@ const props = withDefaults(
     title: "다가오는 예약",
   },
 );
-const status = ref({
-  isLoading: false,
-});
 const tableRef = ref();
 const route = useRoute();
 const router = useRouter();
@@ -217,23 +215,26 @@ const defaultConfig = {
     status: "NORMAL",
   },
 };
+// Load filter from URL query string
 const filter = ref({
-  peopleInfo: defaultConfig.filter.peopleInfo,
+  peopleInfo: route.query.peopleInfo?.toString() ?? defaultConfig.filter.peopleInfo,
   dueOption: defaultConfig.filter.dueOption,
-  stayStartAt: defaultConfig.filter.stayStartAt,
-  stayEndAt: defaultConfig.filter.stayEndAt,
-  status: defaultConfig.filter.status,
+  stayStartAt: route.query.stayStartAt?.toString() ?? defaultConfig.filter.stayStartAt,
+  stayEndAt: route.query.stayEndAt?.toString() ?? defaultConfig.filter.stayEndAt,
+  status: route.query.status?.toString().toUpperCase() ?? defaultConfig.filter.status,
 });
 const filterBuffer = ref({
   ...filter.value,
 });
-const pagination = ref({
-  sortBy: defaultConfig.pagination.sortBy,
-  descending: defaultConfig.pagination.descending,
-  page: defaultConfig.pagination.page,
-  rowsPerPage: defaultConfig.pagination.rowsPerPage,
-  rowsNumber: 0,
-});
+
+// Create a computed filter for the API call
+const apiFilter = computed(() => ({
+  stayStartAt: filter.value.stayStartAt || undefined,
+  stayEndAt: filter.value.stayEndAt || undefined,
+  searchText: filter.value.peopleInfo || undefined,
+  status: filter.value.status === "ALL" ? undefined : filter.value.status,
+  type: props.reservationType,
+}));
 const statusOptions = [
   { label: "전체", value: "ALL" },
   { label: "예약 대기", value: "PENDING" },
@@ -249,6 +250,31 @@ const dueOptions = [
   { label: "6개월", value: "6M" },
   { label: "직접 선택", value: "CUSTOM" },
 ];
+// Use the useTable composable
+const { pagination, loading, rows, onRequest } = useTable<Reservation>({
+  fetchFn: fetchReservations,
+  defaultPagination: {
+    sortBy: "stayStartAt",
+    descending: false,
+    page: 1,
+    rowsPerPage: 15,
+  },
+  filter: apiFilter,
+  onError: (error) => {
+    $q.notify({
+      message: getErrorMessage(error),
+      type: "negative",
+      actions: [
+        {
+          icon: "close",
+          color: "white",
+          round: true,
+        },
+      ],
+    });
+  },
+});
+
 const filterDialog = ref(false);
 const columns = [
   {
@@ -354,13 +380,6 @@ const columns = [
     headerStyle: "width: 5%",
   },
 ];
-const reservations = ref<Reservation[]>([]);
-
-loadQueryString();
-
-watch(route, () => {
-  loadQueryString();
-});
 
 function createPageLink() {
   if (props.reservationType === "MONTHLY_RENT") return { name: "CreateMonthlyRent" };
@@ -380,43 +399,14 @@ function objectPageLink(reservationId: number) {
   return { name: "Reservation", params: { id: reservationId } };
 }
 
-function loadQueryString() {
-  filter.value.peopleInfo = route.query.peopleInfo?.toString() ?? defaultConfig.filter.peopleInfo;
-  filter.value.stayStartAt = route.query.stayStartAt?.toString() ?? defaultConfig.filter.stayStartAt;
-  filter.value.stayEndAt = route.query.stayEndAt?.toString() ?? defaultConfig.filter.stayEndAt;
-  filter.value.status = route.query.status?.toString().toUpperCase() ?? defaultConfig.filter.status;
-
-  pagination.value.sortBy = route.query.sortBy?.toString() ?? defaultConfig.pagination.sortBy;
-  pagination.value.descending = Boolean(route.query.descending ?? defaultConfig.pagination.descending);
-  pagination.value.page = Number(route.query.page ?? defaultConfig.pagination.page);
-  pagination.value.rowsPerPage = Number(route.query.rowsPerPage ?? defaultConfig.pagination.rowsPerPage);
-}
-
 function resetFilterBuffer() {
   Object.assign(filterBuffer.value, filter.value);
 }
 
 function updateDueDate(dueOption: string) {
-  if (dueOption === "ALL") {
-    filterBuffer.value.stayStartAt = "";
-    filterBuffer.value.stayEndAt = "";
-
-    return;
-  }
-
-  if (dueOption !== "CUSTOM") {
-    filterBuffer.value.stayStartAt = defaultConfig.filter.stayStartAt;
-  }
-
-  if (dueOption === "1M") {
-    filterBuffer.value.stayEndAt = dayjs().add(1, "M").format("YYYY-MM-DD");
-  } else if (dueOption === "2M") {
-    filterBuffer.value.stayEndAt = dayjs().add(2, "M").format("YYYY-MM-DD");
-  } else if (dueOption === "3M") {
-    filterBuffer.value.stayEndAt = dayjs().add(3, "M").format("YYYY-MM-DD");
-  } else if (dueOption === "6M") {
-    filterBuffer.value.stayEndAt = dayjs().add(6, "M").format("YYYY-MM-DD");
-  }
+  const range = calculateDateRange(dueOption as DueOption, defaultConfig.filter.stayStartAt);
+  filterBuffer.value.stayStartAt = range.startAt;
+  filterBuffer.value.stayEndAt = range.endAt;
 }
 
 function setFilterQuery() {
@@ -435,73 +425,8 @@ function setFilterQuery() {
   filterDialog.value = false;
 }
 
-function setPaginationQuery() {
-  router.push({
-    query: {
-      ...route.query,
-      page: pagination.value.page !== defaultConfig.pagination.page ? pagination.value.page : undefined,
-      rowsPerPage:
-        pagination.value.rowsPerPage !== defaultConfig.pagination.rowsPerPage
-          ? pagination.value.rowsPerPage
-          : undefined,
-      sortBy: pagination.value.sortBy !== defaultConfig.pagination.sortBy ? pagination.value.sortBy : undefined,
-      descending:
-        pagination.value.descending !== defaultConfig.pagination.descending ? pagination.value.descending : undefined,
-    },
-  });
-}
-
 function getColumnDef(field: string) {
   return convertTableColumnDef(getReservationFieldDetail(field));
-}
-
-function onRequest(tableProps) {
-  const { page, rowsPerPage, sortBy, descending } = tableProps.pagination;
-
-  status.value.isLoading = true;
-  const statusParam = (filter.value.status || undefined) === "ALL" ? undefined : filter.value.status;
-
-  fetchReservations({
-    page: page - 1,
-    size: rowsPerPage,
-    sort: formatSortParam({ field: sortBy, isDescending: descending }),
-    stayStartAt: filter.value.stayStartAt || undefined,
-    stayEndAt: filter.value.stayEndAt || undefined,
-    searchText: filter.value.peopleInfo || undefined,
-    status: statusParam,
-    type: props.reservationType,
-  })
-    .then((response) => {
-      reservations.value = response.values;
-      const pageInfo = response.page;
-
-      pagination.value.rowsNumber = pageInfo.totalElements;
-      pagination.value.page = pageInfo.index + 1;
-      pagination.value.rowsPerPage = pageInfo.size;
-      pagination.value.sortBy = sortBy;
-      pagination.value.descending = descending;
-
-      setPaginationQuery();
-    })
-    .catch((error) => {
-      reservations.value = [];
-
-      console.error(error);
-      $q.notify({
-        message: getErrorMessage(error),
-        type: "negative",
-        actions: [
-          {
-            icon: "close",
-            color: "white",
-            round: true,
-          },
-        ],
-      });
-    })
-    .finally(() => {
-      status.value.isLoading = false;
-    });
 }
 
 function reloadData() {

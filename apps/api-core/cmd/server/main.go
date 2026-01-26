@@ -77,11 +77,11 @@ func main() {
 	// Register audit hooks for GORM - disabled due to JSON depth issue
 	// audit.RegisterHooks(db, auditService)
 
-	authService := services.NewAuthService(userRepo, loginAttemptRepo, jwtService)
+	authService := services.NewAuthService(userRepo, loginAttemptRepo, jwtService, cfg)
 	userService := services.NewUserService(userRepo)
 	roomService := services.NewRoomService(roomRepo, roomGroupRepo, auditService)
 	roomGroupService := services.NewRoomGroupService(roomGroupRepo)
-	reservationService := services.NewReservationService(reservationRepo, roomRepo, paymentMethodRepo, db)
+	reservationService := services.NewReservationService(reservationRepo, roomRepo, paymentMethodRepo)
 	paymentMethodService := services.NewPaymentMethodService(paymentMethodRepo)
 	configService := services.NewConfigService(cfg)
 	developmentService := services.NewDevelopmentServiceV2(db)

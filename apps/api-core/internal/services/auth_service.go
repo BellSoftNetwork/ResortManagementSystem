@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"gitlab.bellsoft.net/rms/api-core/internal/config"
 	"gitlab.bellsoft.net/rms/api-core/internal/models"
 	"gitlab.bellsoft.net/rms/api-core/internal/repositories"
 	"gitlab.bellsoft.net/rms/api-core/pkg/auth"
@@ -50,14 +51,16 @@ type authService struct {
 	userRepo         repositories.UserRepository
 	loginAttemptRepo repositories.LoginAttemptRepository
 	jwtService       *auth.JWTService
+	config           *config.Config
 }
 
 func NewAuthService(userRepo repositories.UserRepository, loginAttemptRepo repositories.LoginAttemptRepository,
-	jwtService *auth.JWTService) AuthService {
+	jwtService *auth.JWTService, cfg *config.Config) AuthService {
 	return &authService{
 		userRepo:         userRepo,
 		loginAttemptRepo: loginAttemptRepo,
 		jwtService:       jwtService,
+		config:           cfg,
 	}
 }
 
@@ -198,13 +201,13 @@ func (s *authService) Logout(ctx context.Context, userID uint) error {
 }
 
 func (s *authService) checkLoginAttempts(ctx context.Context, username, ipAddress string) error {
-	since := time.Now().Add(-15 * time.Minute)
+	since := time.Now().Add(-s.config.Security.LockoutDuration)
 	count, err := s.loginAttemptRepo.CountRecentFailedAttempts(ctx, username, ipAddress, since)
 	if err != nil {
 		return err
 	}
 
-	if count >= 5 {
+	if count >= int64(s.config.Security.MaxLoginAttempts) {
 		return ErrTooManyAttempts
 	}
 

@@ -78,7 +78,7 @@ func TestAuthHandler_Register(t *testing.T) {
 			mockUser: &models.User{
 				BaseTimeEntity: models.BaseTimeEntity{BaseEntity: models.BaseEntity{ID: 1}},
 				UserID:         "newuser",
-				Email:          "newuser@example.com",
+				Email:          stringPtr("newuser@example.com"),
 				Name:           "New User",
 				Role:           models.UserRoleNormal,
 				Status:         models.UserStatusActive,
@@ -173,7 +173,9 @@ func TestAuthHandler_Register(t *testing.T) {
 				err := json.Unmarshal(w.Body.Bytes(), &wrapper)
 				assert.NoError(t, err)
 				assert.Equal(t, tt.mockUser.UserID, wrapper.Value.UserID)
-				assert.Equal(t, tt.mockUser.Email, wrapper.Value.Email)
+				if tt.mockUser.Email != nil {
+					assert.Equal(t, *tt.mockUser.Email, wrapper.Value.Email)
+				}
 			}
 
 			// Verify mock expectations
@@ -202,7 +204,7 @@ func TestAuthHandler_Login(t *testing.T) {
 				User: &models.User{
 					BaseTimeEntity: models.BaseTimeEntity{BaseEntity: models.BaseEntity{ID: 1}},
 					UserID:         "testuser",
-					Email:          "test@example.com",
+					Email:          stringPtr("test@example.com"),
 					Name:           "Test User",
 					Role:           models.UserRoleNormal,
 				},

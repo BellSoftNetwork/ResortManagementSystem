@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"errors"
 	"strconv"
 	"time"
@@ -9,27 +8,28 @@ import (
 	"github.com/gin-gonic/gin"
 	appContext "gitlab.bellsoft.net/rms/api-core/internal/context"
 	"gitlab.bellsoft.net/rms/api-core/internal/dto"
+	"gitlab.bellsoft.net/rms/api-core/internal/mappers"
 	"gitlab.bellsoft.net/rms/api-core/internal/middleware"
 	"gitlab.bellsoft.net/rms/api-core/internal/models"
-	"gitlab.bellsoft.net/rms/api-core/internal/repositories"
 	"gitlab.bellsoft.net/rms/api-core/internal/services"
-	"gitlab.bellsoft.net/rms/api-core/internal/utils"
 	"gitlab.bellsoft.net/rms/api-core/pkg/response"
-	pkgutils "gitlab.bellsoft.net/rms/api-core/pkg/utils"
 )
 
 type RoomHandler struct {
-	roomService    services.RoomService
-	userService    services.UserService
-	historyService services.HistoryService
+	roomService      services.RoomService
+	userService      services.UserService
+	historyService   services.HistoryService
+	getUserSummaryFn mappers.GetUserSummaryFunc
 }
 
 func NewRoomHandler(roomService services.RoomService, userService services.UserService, historyService services.HistoryService) *RoomHandler {
-	return &RoomHandler{
+	h := &RoomHandler{
 		roomService:    roomService,
 		userService:    userService,
 		historyService: historyService,
 	}
+	h.getUserSummaryFn = mappers.GetUserSummaryHelper(userService.GetByID)
+	return h
 }
 
 func (h *RoomHandler) ListRooms(c *gin.Context) {
@@ -45,7 +45,7 @@ func (h *RoomHandler) ListRooms(c *gin.Context) {
 		return
 	}
 
-	filter := repositories.RoomFilter{
+	filter := dto.RoomRepositoryFilter{
 		RoomGroupID: filterQuery.RoomGroupID,
 		Search:      filterQuery.Search,
 	}
@@ -109,7 +109,7 @@ func (h *RoomHandler) ListRooms(c *gin.Context) {
 
 	roomResponses := make([]dto.RoomResponse, len(rooms))
 	for i, room := range rooms {
-		roomResponses[i] = h.toRoomResponse(c.Request.Context(), &room)
+		roomResponses[i] = mappers.ToRoomResponse(c.Request.Context(), &room, h.getUserSummaryFn)
 	}
 
 	totalPages := int(total) / query.Size
@@ -154,7 +154,7 @@ func (h *RoomHandler) GetRoom(c *gin.Context) {
 		return
 	}
 
-	roomResponse := h.toRoomResponse(c.Request.Context(), room)
+	roomResponse := mappers.ToRoomResponse(c.Request.Context(), room, h.getUserSummaryFn)
 	response.Success(c, roomResponse)
 }
 
@@ -215,7 +215,7 @@ func (h *RoomHandler) CreateRoom(c *gin.Context) {
 		return
 	}
 
-	roomResponse := h.toRoomResponse(ctx, room)
+	roomResponse := mappers.ToRoomResponse(ctx, room, h.getUserSummaryFn)
 	response.Created(c, roomResponse)
 }
 
@@ -281,7 +281,7 @@ func (h *RoomHandler) UpdateRoom(c *gin.Context) {
 		return
 	}
 
-	roomResponse := h.toRoomResponse(ctx, room)
+	roomResponse := mappers.ToRoomResponse(ctx, room, h.getUserSummaryFn)
 	response.Success(c, roomResponse)
 }
 
@@ -354,52 +354,4 @@ func (h *RoomHandler) GetRoomHistories(c *gin.Context) {
 	}
 
 	response.SuccessList(c, histories, pagination)
-}
-
-func (h *RoomHandler) toRoomResponse(ctx context.Context, room *models.Room) dto.RoomResponse {
-	resp := dto.RoomResponse{
-		ID:          room.ID,
-		Number:      room.Number,
-		RoomGroupID: room.RoomGroupID,
-		Note:        room.Note,
-		Status:      room.Status.String(),
-		CreatedAt:   dto.CustomTime{Time: room.CreatedAt},
-		UpdatedAt:   dto.CustomTime{Time: room.UpdatedAt},
-		CreatedBy:   h.getUserSummary(ctx, room.CreatedBy),
-		UpdatedBy:   h.getUserSummary(ctx, room.UpdatedBy),
-	}
-
-	if room.RoomGroup != nil {
-		resp.RoomGroup = &dto.RoomGroupResponse{
-			ID:           room.RoomGroup.ID,
-			Name:         room.RoomGroup.Name,
-			PeekPrice:    room.RoomGroup.PeekPrice,
-			OffPeekPrice: room.RoomGroup.OffPeekPrice,
-			Description:  room.RoomGroup.Description,
-			CreatedAt:    dto.CustomTime{Time: room.RoomGroup.CreatedAt},
-			UpdatedAt:    dto.CustomTime{Time: room.RoomGroup.UpdatedAt},
-		}
-	}
-
-	return resp
-}
-
-func (h *RoomHandler) getUserSummary(ctx context.Context, userID uint) *dto.UserSummaryResponse {
-	if userID == 0 {
-		return nil
-	}
-	if user, err := h.userService.GetByID(ctx, userID); err == nil {
-		profileImageURL := pkgutils.GenerateGravatarURL(utils.StringPtrToString(user.Email))
-
-		return &dto.UserSummaryResponse{
-			ID:              user.ID,
-			UserID:          user.UserID,
-			Email:           utils.StringPtrToString(user.Email),
-			Name:            user.Name,
-			ProfileImageURL: profileImageURL,
-		}
-	}
-	return &dto.UserSummaryResponse{
-		ID: userID,
-	}
 }
