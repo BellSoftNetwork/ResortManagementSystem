@@ -117,7 +117,8 @@ export const useAuthStore = defineStore("auth", {
 
       if (this.refreshAttempts >= MAX_ATTEMPTS) {
         console.error("Store: Refresh token retry limit exceeded");
-        this.clearTokens();
+        // 네트워크 오류인 경우 토큰을 유지하기 위해 여기서 clearTokens()를 호출하지 않음
+        // 실제 토큰 제거는 catch 블록에서 인증 오류(401/403)인 경우에만 수행
         throw new Error("리프래시 토큰 재시도 횟수 초과");
       }
 
