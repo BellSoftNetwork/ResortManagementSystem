@@ -34,14 +34,69 @@
         </div>
       </div>
 
+      <!-- Filter Toggles -->
+      <div class="row q-col-gutter-sm q-mb-md">
+        <div class="col-auto">
+          <q-toggle v-model="filterOccupiedOnly" label="입실 중만 보기" color="orange" />
+        </div>
+        <div class="col-auto">
+          <q-toggle v-model="showUnassigned" label="미배정 예약 보기" color="red" />
+        </div>
+      </div>
+
       <div class="row q-col-gutter-md">
         <div v-if="loading" class="col-12 text-center q-pa-xl">
           <q-spinner-dots size="80px" color="primary" />
           <div class="text-body1 q-mt-md">객실 정보를 불러오는 중입니다...</div>
         </div>
         <template v-else>
+          <!-- Unassigned Reservations Section -->
+          <div v-if="showUnassigned && unassignedReservations.length > 0" class="col-12 q-mb-md">
+            <q-expansion-item
+              label="미배정 예약"
+              icon="warning"
+              header-class="bg-red text-white"
+              expand-icon-class="text-white"
+              default-opened
+            >
+              <q-list bordered separator>
+                <q-item
+                  v-for="reservation in unassignedReservations"
+                  :key="reservation.id"
+                  clickable
+                  :to="{ name: 'Reservation', params: { id: reservation.id } }"
+                >
+                  <q-item-section>
+                    <q-item-label>
+                      {{ reservation.name }}
+                      <template v-if="reservation.phone">
+                        (<a :href="`tel:${reservation.phone}`" class="text-primary" @click.stop>
+                          <q-icon name="phone" size="xs" />
+                          {{ reservation.phone }} </a
+                        >)
+                      </template>
+                    </q-item-label>
+                    <q-item-label caption>
+                      {{ formatSimpleDate(reservation.stayStartAt) }} ~
+                      {{ formatSimpleDate(reservation.stayEndAt) }}
+                    </q-item-label>
+                    <q-item-label caption>
+                      <q-badge :color="getStatusColor(reservation.status)">
+                        {{ reservationStatusValueToName(reservation.status) }}
+                      </q-badge>
+                      <q-badge color="red" class="q-ml-xs">객실 미배정</q-badge>
+                    </q-item-label>
+                  </q-item-section>
+                  <q-item-section side>
+                    <q-icon name="arrow_forward_ios" color="primary" size="xs" />
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-expansion-item>
+          </div>
+
           <!-- Group rooms by roomGroup -->
-          <div v-for="(groupRooms, groupName) in roomsByGroup" :key="groupName" class="col-12 q-mb-md">
+          <div v-for="(groupRooms, groupName) in filteredRoomsByGroup" :key="groupName" class="col-12 q-mb-md">
             <q-expansion-item
               :label="groupName"
               icon="hotel"
@@ -139,6 +194,8 @@ import { formatSimpleDate } from "src/util/format-util";
 const rooms = ref<Room[]>([]);
 const reservations = ref<Reservation[]>([]);
 const loading = ref(true);
+const filterOccupiedOnly = ref(false);
+const showUnassigned = ref(false);
 
 const todayStr = dayjs().format("YYYY-MM-DD");
 const dateRange = ref({
@@ -163,6 +220,27 @@ const roomReservations = computed(() => {
     });
   });
 
+  return result;
+});
+
+// Unassigned reservations (no rooms)
+const unassignedReservations = computed(() => {
+  return reservations.value.filter((r) => r.rooms.length === 0 && (r.status === "NORMAL" || r.status === "PENDING"));
+});
+
+// Filter roomsByGroup when filterOccupiedOnly is true
+const filteredRoomsByGroup = computed(() => {
+  if (!filterOccupiedOnly.value) {
+    return roomsByGroup.value;
+  }
+
+  const result: Record<string, Room[]> = {};
+  Object.entries(roomsByGroup.value).forEach(([groupName, groupRooms]) => {
+    const filtered = groupRooms.filter((room) => isRoomOccupiedToday(room.id));
+    if (filtered.length > 0) {
+      result[groupName] = filtered;
+    }
+  });
   return result;
 });
 
