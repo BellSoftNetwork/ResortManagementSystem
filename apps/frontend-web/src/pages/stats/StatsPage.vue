@@ -74,6 +74,34 @@
               <MonthlyGuestsCard :totalGuests="totalGuests" :isLoading="isMonthlyDataLoading" />
             </div>
           </div>
+
+          <div class="row q-col-gutter-md q-mt-md">
+            <!-- 수수료 -->
+            <div class="col-12 col-md-6">
+              <q-card class="bg-orange-1">
+                <q-card-section>
+                  <div class="text-subtitle2 text-grey-8">월별 총 수수료</div>
+                  <div class="text-h5 text-orange-8">
+                    <q-skeleton v-if="isMonthlyDataLoading" type="text" />
+                    <span v-else>{{ formatPrice(totalBrokerFee) }}</span>
+                  </div>
+                </q-card-section>
+              </q-card>
+            </div>
+
+            <!-- 보증금 -->
+            <div class="col-12 col-md-6">
+              <q-card class="bg-cyan-1">
+                <q-card-section>
+                  <div class="text-subtitle2 text-grey-8">월별 총 보증금</div>
+                  <div class="text-h5 text-cyan-8">
+                    <q-skeleton v-if="isMonthlyDataLoading" type="text" />
+                    <span v-else>{{ formatPrice(totalDeposit) }}</span>
+                  </div>
+                </q-card-section>
+              </q-card>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -101,6 +129,8 @@ import MonthlyReservationCountCard from "src/components/stats/MonthlyReservation
 import RoomAllocationTable from "src/components/stats/RoomAllocationTable.vue";
 import RoomGroupOccupancyTable from "src/components/stats/RoomGroupOccupancyTable.vue";
 import MonthlyGuestsCard from "src/components/stats/MonthlyGuestsCard.vue";
+
+import { formatPrice } from "src/util/format-util";
 
 const $q = useQuasar();
 const selectedMonth = ref(dayjs().format("YYYY-MM"));
@@ -245,6 +275,20 @@ const roomGroupOccupancyStats = computed(() => {
 const totalGuests = computed(() => {
   return filteredReservations.value.reduce((total, reservation) => {
     return total + (reservation.peopleCount || 0);
+  }, 0);
+});
+
+// 월별 총 수수료 (brokerFee)
+const totalBrokerFee = computed(() => {
+  return reservations.value.reduce((total, reservation) => {
+    return total + (reservation.brokerFee || 0);
+  }, 0);
+});
+
+// 월별 총 보증금 (deposit)
+const totalDeposit = computed(() => {
+  return reservations.value.reduce((total, reservation) => {
+    return total + (reservation.deposit || 0);
   }, 0);
 });
 
