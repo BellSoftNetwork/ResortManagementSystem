@@ -118,6 +118,21 @@ const {
   loadYearlyData,
 } = useStatsData();
 
+// 부대시설인지 확인 (이름에 "부대시설" 포함 여부)
+function isFacilityRoom(room: Room): boolean {
+  return room.roomGroup.name.includes("부대시설");
+}
+
+// 부대시설만 있는 예약 제외
+const filteredReservations = computed(() => {
+  return reservations.value.filter((reservation) => {
+    // 객실이 없는 예약은 포함
+    if (reservation.rooms.length === 0) return true;
+    // 하나라도 일반 객실이 있으면 포함
+    return reservation.rooms.some((room) => !room.roomGroup.name.includes("부대시설"));
+  });
+});
+
 // 월 이동 함수
 function handleMonthChange(direction: string) {
   if (direction === "previous") {
@@ -129,22 +144,25 @@ function handleMonthChange(direction: string) {
 
 // 월별 총 매출액
 const totalSales = computed(() => {
-  return reservations.value.reduce((total, reservation) => {
+  return filteredReservations.value.reduce((total, reservation) => {
     return total + reservation.price;
   }, 0);
 });
 
 // 월별 총 예약 건수
 const totalReservations = computed(() => {
-  return reservations.value.length;
+  return filteredReservations.value.length;
 });
 
 // 월별 객실별 예약 배정 건수
 const roomAllocationStats = computed(() => {
   const roomGroups = new Map();
 
+  // 부대시설 제외한 객실만 처리
+  const filteredRooms = rooms.value.filter((room) => !isFacilityRoom(room));
+
   // 객실 그룹별로 초기화
-  rooms.value.forEach((room) => {
+  filteredRooms.forEach((room) => {
     const groupName = room.roomGroup.name;
     if (!roomGroups.has(groupName)) {
       roomGroups.set(groupName, {
@@ -158,7 +176,7 @@ const roomAllocationStats = computed(() => {
   });
 
   // 예약 데이터로 카운트
-  reservations.value.forEach((reservation) => {
+  filteredReservations.value.forEach((reservation) => {
     reservation.rooms.forEach((room) => {
       const groupName = room.roomGroup.name;
       if (roomGroups.has(groupName)) {
@@ -174,13 +192,15 @@ const roomAllocationStats = computed(() => {
 
 // 월별 객실 그룹별 평균 점유율
 const roomGroupOccupancyStats = computed(() => {
-  if (rooms.value.length === 0) return [];
+  // 부대시설 제외한 객실만 처리
+  const filteredRooms = rooms.value.filter((room) => !isFacilityRoom(room));
+  if (filteredRooms.length === 0) return [];
 
   const daysInMonth = dayjs(selectedMonth.value).daysInMonth();
   const roomGroups = new Map();
 
   // 객실 그룹별로 초기화
-  rooms.value.forEach((room) => {
+  filteredRooms.forEach((room) => {
     const groupName = room.roomGroup.name;
     const groupId = room.roomGroup.id;
 
@@ -197,7 +217,7 @@ const roomGroupOccupancyStats = computed(() => {
   });
 
   // 예약 데이터로 점유일 계산
-  reservations.value.forEach((reservation) => {
+  filteredReservations.value.forEach((reservation) => {
     const startDate = dayjs(reservation.stayStartAt);
     const endDate = dayjs(reservation.stayEndAt);
     const stayDuration = endDate.diff(startDate, "day");
@@ -223,7 +243,7 @@ const roomGroupOccupancyStats = computed(() => {
 
 // 월별 총 다녀간 인원
 const totalGuests = computed(() => {
-  return reservations.value.reduce((total, reservation) => {
+  return filteredReservations.value.reduce((total, reservation) => {
     return total + (reservation.peopleCount || 0);
   }, 0);
 });
