@@ -21,7 +21,7 @@ func NewDevelopmentHandler(developmentService services.DevelopmentService) *Deve
 
 // GenerateTestData godoc
 // @Summary Generate test data for development
-// @Description Generates test data based on the specified type (essential, reservation, or all)
+// @Description Generates test data based on the specified type (essential, reservation, all, or reset)
 // @Description Generates payment methods, room groups, and rooms for development/testing
 // @Tags Development
 // @Accept json

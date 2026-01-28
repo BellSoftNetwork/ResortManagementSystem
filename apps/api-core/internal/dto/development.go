@@ -14,6 +14,7 @@ const (
 	GenerateEssentialData   GenerateDataType = "essential"
 	GenerateReservationData GenerateDataType = "reservation"
 	GenerateAllData         GenerateDataType = "all"
+	GenerateResetData       GenerateDataType = "reset"
 )
 
 // TestDataType is an alias for GenerateDataType (for backward compatibility)
@@ -23,11 +24,12 @@ const (
 	TestDataTypeEssential   TestDataType = "essential"
 	TestDataTypeReservation TestDataType = "reservation"
 	TestDataTypeAll         TestDataType = "all"
+	TestDataTypeReset       TestDataType = "reset"
 )
 
 // GenerateTestDataRequest represents the request for generating test data
 type GenerateTestDataRequest struct {
-	Type GenerateDataType `json:"type" binding:"required,oneof=essential reservation all" example:"all"`
+	Type GenerateDataType `json:"type" binding:"required,oneof=essential reservation all reset" example:"all"`
 
 	// Reservation specific options (optional, only used when type is "reservation" or "all")
 	ReservationOptions *ReservationGenerationOptions `json:"reservationOptions,omitempty"`
