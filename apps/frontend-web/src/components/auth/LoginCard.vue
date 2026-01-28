@@ -46,13 +46,14 @@
 
 <script setup lang="ts">
 import { onBeforeMount, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "stores/auth";
 import { useQuasar } from "quasar";
 import { useAppConfigStore } from "stores/app-config";
 import { userStaticRules } from "src/schema/user";
 
 const router = useRouter();
+const route = useRoute();
 const $q = useQuasar();
 const authStore = useAuthStore();
 const appConfigStore = useAppConfigStore();
@@ -71,7 +72,12 @@ function login() {
   authStore
     .login(formData.value)
     .then(() => {
-      router.push({ name: "Home" });
+      const redirectPath = route.query.redirect as string | undefined;
+      if (redirectPath) {
+        router.push(redirectPath);
+      } else {
+        router.push({ name: "Home" });
+      }
     })
     .catch((error) => {
       // 서버 오류 (5xx) 또는 네트워크 오류 감지

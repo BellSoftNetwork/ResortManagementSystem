@@ -12,7 +12,7 @@ export default (router: Router) => {
       return next();
     }
 
-    if (!authStore.isLoggedIn) return next({ name: "Login" });
+    if (!authStore.isLoggedIn) return next({ name: "Login", query: { redirect: to.fullPath } });
 
     return next();
   });
