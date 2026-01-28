@@ -59,7 +59,9 @@ class AuthInterceptorService {
     // 재시도 횟수 초과 확인
     if (this.refreshAttempts >= this.MAX_REFRESH_ATTEMPTS) {
       console.error("Refresh token retry limit exceeded");
-      this.handleRefreshFailure(authStore);
+      // 네트워크 오류인 경우 토큰을 유지하기 위해 handleRefreshFailure()를 호출하지 않음
+      // 실제 토큰 제거는 catch 블록에서 인증 오류(401/403)인 경우에만 수행
+      this.resetRefreshAttempts();
       return Promise.reject(error);
     }
 
