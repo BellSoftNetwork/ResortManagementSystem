@@ -18,99 +18,14 @@
       <div class="row q-gutter-sm">
         <q-btn @click="filterDialog = true" color="primary" label="상세 검색" icon="search" />
 
-        <q-dialog
+        <ReservationFilterDialog
           v-model="filterDialog"
-          @before-show="resetFilterBuffer"
-          :maximized="$q.screen.lt.md"
-          transition-show="slide-up"
-          transition-hide="slide-down"
-          persistent
-        >
-          <q-card flat>
-            <q-card-section>
-              <q-input v-model="filterBuffer.peopleInfo" placeholder="홍길동" label="예약자 정보" class="fit" />
-            </q-card-section>
-
-            <q-card-section>
-              <div class="row q-col-gutter-sm">
-                <div class="col-12 col-sm-3">
-                  <q-select
-                    v-model="filterBuffer.dueOption"
-                    @update:model-value="updateDueDate"
-                    :options="dueOptions"
-                    label="검색 기간"
-                    emit-value
-                    map-options
-                    outlined
-                  />
-                </div>
-
-                <div class="col-12 col-sm-9">
-                  <div class="row no-wrap">
-                    <q-input
-                      v-model="filterBuffer.stayStartAt"
-                      mask="####-##-##"
-                      :readonly="true"
-                      :bg-color="filterBuffer.dueOption !== 'CUSTOM' ? 'grey-4' : ''"
-                      class="due-date-text"
-                      outlined
-                    >
-                      <template v-slot:append>
-                        <q-icon @click="filterBuffer.dueOption = 'CUSTOM'" name="event" class="cursor-pointer">
-                          <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                            <q-date v-model="filterBuffer.stayStartAt" mask="YYYY-MM-DD">
-                              <div class="row items-center justify-end">
-                                <q-btn v-close-popup label="Close" color="primary" flat />
-                              </div>
-                            </q-date>
-                          </q-popup-proxy>
-                        </q-icon>
-                      </template>
-                    </q-input>
-                    <span class="self-center q-mx-sm">~</span>
-                    <q-input
-                      v-model="filterBuffer.stayEndAt"
-                      mask="####-##-##"
-                      :readonly="true"
-                      :bg-color="filterBuffer.dueOption !== 'CUSTOM' ? 'grey-4' : ''"
-                      class="due-date-text"
-                      outlined
-                    >
-                      <template v-slot:append>
-                        <q-icon @click="filterBuffer.dueOption = 'CUSTOM'" name="event" class="cursor-pointer">
-                          <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                            <q-date v-model="filterBuffer.stayEndAt" mask="YYYY-MM-DD">
-                              <div class="row items-center justify-end">
-                                <q-btn v-close-popup label="Close" color="primary" flat />
-                              </div>
-                            </q-date>
-                          </q-popup-proxy>
-                        </q-icon>
-                      </template>
-                    </q-input>
-                  </div>
-                </div>
-              </div>
-            </q-card-section>
-
-            <q-card-section>
-              <q-select
-                v-model="filterBuffer.status"
-                :options="statusOptions"
-                class="full-width"
-                label="예약 상태"
-                emit-value
-                map-options
-                outlined
-              />
-            </q-card-section>
-
-            <q-card-actions align="right">
-              <q-btn @click="setFilterQuery" color="primary">적용</q-btn>
-              <q-btn @click="filterDialog = false">취소</q-btn>
-            </q-card-actions>
-          </q-card>
-        </q-dialog>
+          :filter="filter"
+          :due-options="dueOptions"
+          :status-options="statusOptions"
+          :default-stay-start-at="defaultConfig.filter.stayStartAt"
+          @apply="handleFilterApply"
+        />
 
         <q-btn :to="createPageLink()" icon="add" color="grey" dense round flat />
       </div>
@@ -178,13 +93,13 @@ import { computed, onMounted, ref } from "vue";
 import dayjs from "dayjs";
 import { useQuasar } from "quasar";
 import { formatDate } from "src/util/format-util";
-import { calculateDateRange, type DueOption } from "src/util/date-preset-util";
 import { getReservationFieldDetail, Reservation, ReservationType } from "src/schema/reservation";
 import { convertTableColumnDef } from "src/util/table-util";
 import { deleteReservation, fetchReservations } from "src/api/v1/reservation";
 import { getErrorMessage } from "src/util/errorHandler";
 import { useRoute, useRouter } from "vue-router";
 import { useTable } from "src/composables/useTable";
+import ReservationFilterDialog from "./ReservationFilterDialog.vue";
 
 const $q = useQuasar();
 const props = withDefaults(
@@ -222,9 +137,6 @@ const filter = ref({
   stayStartAt: route.query.stayStartAt?.toString() ?? defaultConfig.filter.stayStartAt,
   stayEndAt: route.query.stayEndAt?.toString() ?? defaultConfig.filter.stayEndAt,
   status: route.query.status?.toString().toUpperCase() ?? defaultConfig.filter.status,
-});
-const filterBuffer = ref({
-  ...filter.value,
 });
 
 // Create a computed filter for the API call
@@ -399,18 +311,8 @@ function objectPageLink(reservationId: number) {
   return { name: "Reservation", params: { id: reservationId } };
 }
 
-function resetFilterBuffer() {
-  Object.assign(filterBuffer.value, filter.value);
-}
-
-function updateDueDate(dueOption: string) {
-  const range = calculateDateRange(dueOption as DueOption, defaultConfig.filter.stayStartAt);
-  filterBuffer.value.stayStartAt = range.startAt;
-  filterBuffer.value.stayEndAt = range.endAt;
-}
-
-function setFilterQuery() {
-  Object.assign(filter.value, filterBuffer.value);
+function handleFilterApply(newFilter: typeof filter.value) {
+  Object.assign(filter.value, newFilter);
 
   router.push({
     query: {

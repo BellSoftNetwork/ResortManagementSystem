@@ -41,6 +41,8 @@ export default defineConfig({
       "src": fileURLToPath(new URL("./src", import.meta.url)),
       "stores": fileURLToPath(new URL("./src/stores", import.meta.url)),
       "app": fileURLToPath(new URL(".", import.meta.url)),
+      "test": fileURLToPath(new URL("./test", import.meta.url)),
+      "boot": fileURLToPath(new URL("./src/boot", import.meta.url)),
     },
   },
 });

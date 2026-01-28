@@ -1,8 +1,9 @@
 import { config } from "@vue/test-utils";
 import { Quasar } from "quasar";
+import { createTestingPinia } from "@pinia/testing";
 
 // Global configuration for Vue Test Utils
-config.global.plugins = [Quasar];
+config.global.plugins = [Quasar, createTestingPinia()];
 
 // Mock modules that might cause issues in test environment
 vi.mock("axios", () => ({

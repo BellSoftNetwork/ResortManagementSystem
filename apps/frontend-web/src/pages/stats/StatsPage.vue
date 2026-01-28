@@ -84,16 +84,11 @@
 import { computed, onMounted, ref, watch } from "vue";
 import dayjs from "dayjs";
 import { useQuasar } from "quasar";
-import {
-  fetchReservations,
-  FetchReservationsRequestParams,
-  fetchReservationStatistics,
-  ReservationStatistics,
-} from "src/api/v1/reservation";
+import { fetchReservations, FetchReservationsRequestParams } from "src/api/v1/reservation";
 import { fetchRooms } from "src/api/v1/room";
-// formatPrice is now used in the YearlyRevenueChart component
 import { Reservation } from "src/schema/reservation";
 import { Room } from "src/schema/room";
+import { useStatsData } from "src/composables/useStatsData";
 
 // Import components
 import YearlyRevenueChart from "src/components/stats/YearlyRevenueChart.vue";
@@ -112,152 +107,16 @@ const selectedMonth = ref(dayjs().format("YYYY-MM"));
 const reservations = ref<Reservation[]>([]);
 const rooms = ref<Room[]>([]);
 const isMonthlyDataLoading = ref(false);
-const isYearlyDataLoading = ref(false);
-const yearlyData = ref<{
-  currentYear: {
-    revenue: { [key: string]: number };
-    reservations: { [key: string]: number };
-    peopleCount: { [key: string]: number };
-    roomCount: { [key: string]: number };
-  };
-  previousYear: {
-    revenue: { [key: string]: number };
-    reservations: { [key: string]: number };
-    peopleCount: { [key: string]: number };
-    roomCount: { [key: string]: number };
-  };
-}>({
-  currentYear: {
-    revenue: {},
-    reservations: {},
-    peopleCount: {},
-    roomCount: {},
-  },
-  previousYear: {
-    revenue: {},
-    reservations: {},
-    peopleCount: {},
-    roomCount: {},
-  },
-});
 
-// 최근 1년간 매출액 데이터
-const yearlyRevenueData = computed(() => {
-  const currentYearData = [];
-  const previousYearData = [];
-
-  // 1월부터 12월까지 순서대로 데이터 구성
-  for (let i = 1; i <= 12; i++) {
-    const monthKey = i.toString().padStart(2, "0");
-    const monthLabel = monthKey;
-
-    currentYearData.push({
-      key: monthKey,
-      label: monthLabel,
-      value: yearlyData.value.currentYear.revenue[monthKey] || 0,
-    });
-
-    previousYearData.push({
-      key: monthKey,
-      label: monthLabel,
-      value: yearlyData.value.previousYear.revenue[monthKey] || 0,
-    });
-  }
-
-  return {
-    currentYear: currentYearData,
-    previousYear: previousYearData,
-  };
-});
-
-// 최근 1년간 예약 건수 데이터
-const yearlyReservationData = computed(() => {
-  const currentYearData = [];
-  const previousYearData = [];
-
-  // 1월부터 12월까지 순서대로 데이터 구성
-  for (let i = 1; i <= 12; i++) {
-    const monthKey = i.toString().padStart(2, "0");
-    const monthLabel = monthKey;
-
-    currentYearData.push({
-      key: monthKey,
-      label: monthLabel,
-      value: yearlyData.value.currentYear.reservations[monthKey] || 0,
-    });
-
-    previousYearData.push({
-      key: monthKey,
-      label: monthLabel,
-      value: yearlyData.value.previousYear.reservations[monthKey] || 0,
-    });
-  }
-
-  return {
-    currentYear: currentYearData,
-    previousYear: previousYearData,
-  };
-});
-
-// 최근 1년간 다녀간 인원 수 데이터
-const yearlyPeopleCountData = computed(() => {
-  const currentYearData = [];
-  const previousYearData = [];
-
-  // 1월부터 12월까지 순서대로 데이터 구성
-  for (let i = 1; i <= 12; i++) {
-    const monthKey = i.toString().padStart(2, "0");
-    const monthLabel = monthKey;
-
-    currentYearData.push({
-      key: monthKey,
-      label: monthLabel,
-      value: yearlyData.value.currentYear.peopleCount[monthKey] || 0,
-    });
-
-    previousYearData.push({
-      key: monthKey,
-      label: monthLabel,
-      value: yearlyData.value.previousYear.peopleCount[monthKey] || 0,
-    });
-  }
-
-  return {
-    currentYear: currentYearData,
-    previousYear: previousYearData,
-  };
-});
-
-// 최근 1년간 예약된 객실 수 데이터
-const yearlyRoomCountData = computed(() => {
-  const currentYearData = [];
-  const previousYearData = [];
-
-  // 1월부터 12월까지 순서대로 데이터 구성
-  for (let i = 1; i <= 12; i++) {
-    const monthKey = i.toString().padStart(2, "0");
-    const monthLabel = monthKey;
-
-    currentYearData.push({
-      key: monthKey,
-      label: monthLabel,
-      value: yearlyData.value.currentYear.roomCount[monthKey] || 0,
-    });
-
-    previousYearData.push({
-      key: monthKey,
-      label: monthLabel,
-      value: yearlyData.value.previousYear.roomCount[monthKey] || 0,
-    });
-  }
-
-  return {
-    currentYear: currentYearData,
-    previousYear: previousYearData,
-  };
-});
-
-// 최대값은 이제 각 컴포넌트 내부에서 계산됩니다.
+// Use composable for yearly data
+const {
+  isYearlyDataLoading,
+  yearlyRevenueData,
+  yearlyReservationData,
+  yearlyPeopleCountData,
+  yearlyRoomCountData,
+  loadYearlyData,
+} = useStatsData();
 
 // 월 이동 함수
 function handleMonthChange(direction: string) {
@@ -390,7 +249,7 @@ async function loadData() {
     rooms.value = roomsResponse.values;
 
     // 최근 1년간 데이터 로드 (첫 로드 시에만)
-    if (!yearlyData.value.revenue || Object.keys(yearlyData.value.revenue).length === 0) {
+    if (yearlyRevenueData.value.currentYear.length === 0) {
       await loadYearlyData();
     }
   } catch (error) {
@@ -403,106 +262,6 @@ async function loadData() {
   } finally {
     isMonthlyDataLoading.value = false;
   }
-}
-
-// 최근 2년간 데이터 로드
-async function loadYearlyData() {
-  isYearlyDataLoading.value = true;
-
-  const currentMonth = dayjs();
-  const currentYearRevenue = {};
-  const currentYearReservations = {};
-  const currentYearPeopleCount = {};
-  const currentYearRoomCount = {};
-
-  const previousYearRevenue = {};
-  const previousYearReservations = {};
-  const previousYearPeopleCount = {};
-  const previousYearRoomCount = {};
-
-  // 최근 24개월 데이터 로드 (오늘 날짜 기준)
-  const startDate = currentMonth.subtract(23, "month").startOf("month").format("YYYY-MM-DD");
-  const endDate = currentMonth.endOf("month").format("YYYY-MM-DD");
-
-  try {
-    // 통계 API를 사용하여 한 번에 모든 데이터 로드
-    const response = await fetchReservationStatistics(startDate, endDate);
-    const statistics: ReservationStatistics = response.value;
-
-    // 월별 데이터 매핑
-    statistics.stats.forEach((stat) => {
-      const statDate = dayjs(stat.period + "-01");
-      const monthKey = statDate.format("MM");
-
-      // 현재 연도와 이전 연도 구분
-      if (statDate.year() === currentMonth.year()) {
-        currentYearRevenue[monthKey] = stat.totalSales;
-        currentYearReservations[monthKey] = stat.totalReservations;
-        currentYearPeopleCount[monthKey] = stat.totalGuests || 0;
-        // Calculate room count based on reservations and average rooms per reservation
-        currentYearRoomCount[monthKey] = Math.round(stat.totalReservations * 1.2) || 0; // Assuming average 1.2 rooms per reservation
-      } else if (statDate.year() === currentMonth.year() - 1) {
-        previousYearRevenue[monthKey] = stat.totalSales;
-        previousYearReservations[monthKey] = stat.totalReservations;
-        previousYearPeopleCount[monthKey] = stat.totalGuests || 0;
-        // Calculate room count based on reservations and average rooms per reservation
-        previousYearRoomCount[monthKey] = Math.round(stat.totalReservations * 1.2) || 0; // Assuming average 1.2 rooms per reservation
-      }
-    });
-
-    // 데이터가 없는 월에 대해 0으로 초기화
-    for (let i = 1; i <= 12; i++) {
-      const monthKey = i.toString().padStart(2, "0");
-
-      if (currentYearRevenue[monthKey] === undefined) {
-        currentYearRevenue[monthKey] = 0;
-        currentYearReservations[monthKey] = 0;
-        currentYearPeopleCount[monthKey] = 0;
-        currentYearRoomCount[monthKey] = 0;
-      }
-
-      if (previousYearRevenue[monthKey] === undefined) {
-        previousYearRevenue[monthKey] = 0;
-        previousYearReservations[monthKey] = 0;
-        previousYearPeopleCount[monthKey] = 0;
-        previousYearRoomCount[monthKey] = 0;
-      }
-    }
-  } catch (error) {
-    console.error("최근 2년간 데이터 로드 중 오류 발생:", error);
-
-    // 오류 발생 시 모든 월을 0으로 초기화
-    for (let i = 1; i <= 12; i++) {
-      const monthKey = i.toString().padStart(2, "0");
-
-      currentYearRevenue[monthKey] = 0;
-      currentYearReservations[monthKey] = 0;
-      currentYearPeopleCount[monthKey] = 0;
-      currentYearRoomCount[monthKey] = 0;
-
-      previousYearRevenue[monthKey] = 0;
-      previousYearReservations[monthKey] = 0;
-      previousYearPeopleCount[monthKey] = 0;
-      previousYearRoomCount[monthKey] = 0;
-    }
-  } finally {
-    isYearlyDataLoading.value = false;
-  }
-
-  yearlyData.value = {
-    currentYear: {
-      revenue: currentYearRevenue,
-      reservations: currentYearReservations,
-      peopleCount: currentYearPeopleCount,
-      roomCount: currentYearRoomCount,
-    },
-    previousYear: {
-      revenue: previousYearRevenue,
-      reservations: previousYearReservations,
-      peopleCount: previousYearPeopleCount,
-      roomCount: previousYearRoomCount,
-    },
-  };
 }
 
 // 선택된 월이 변경될 때 데이터 다시 로드

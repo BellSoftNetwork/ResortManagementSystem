@@ -4,107 +4,18 @@
 
     <form @submit.prevent="submit">
       <q-card-section>
-        <div class="row q-gutter-md q-pa-sm">
-          <div class="col">
-            <q-input
-              :model-value="formModel.stayStartAt"
-              :readonly="true"
-              :rules="[() => true]"
-              style="min-width: 60px"
-              label="입실일"
-              dense
-            >
-              <q-popup-proxy v-if="mode !== 'view'" transition-show="scale" transition-hide="scale">
-                <q-date
-                  @update:model-value="recalculateStayEndAt"
-                  v-model="formModel.stayStartAt"
-                  mask="YYYY-MM-DD"
-                  no-unset
-                >
-                  <div class="row items-center justify-end">
-                    <q-btn v-close-popup label="Close" color="primary" flat />
-                  </div>
-                </q-date>
-              </q-popup-proxy>
-            </q-input>
-
-            <q-input
-              v-model="formModel.name"
-              :rules="reservationStaticRules.name"
-              :readonly="mode === 'view'"
-              label="예약자명"
-              placeholder="홍길동"
-              required
-            ></q-input>
-
-            <q-input
-              v-model.number="formModel.peopleCount"
-              :rules="reservationStaticRules.peopleCount"
-              :readonly="mode === 'view'"
-              label="예약인원"
-              placeholder="4"
-              type="number"
-              min="0"
-              max="1000"
-              required
-            ></q-input>
-          </div>
-
-          <div class="col">
-            <q-input
-              :model-value="formModel.stayEndAt"
-              :readonly="true"
-              :rules="[() => true]"
-              label="퇴실일"
-              style="min-width: 60px"
-              dense
-            >
-              <q-popup-proxy v-if="mode !== 'view'" transition-show="scale" transition-hide="scale">
-                <q-date
-                  @update:model-value="recalculateStayStartAt"
-                  v-model="formModel.stayEndAt"
-                  mask="YYYY-MM-DD"
-                  no-unset
-                >
-                  <div class="row items-center justify-end">
-                    <q-btn v-close-popup label="Close" color="primary" flat />
-                  </div>
-                </q-date>
-              </q-popup-proxy>
-            </q-input>
-
-            <!-- view 모드: tel: 링크 -->
-            <div v-if="mode === 'view'" class="q-field q-field--readonly">
-              <div class="q-field__label">예약자 연락처</div>
-              <div class="q-field__native">
-                <a v-if="formModel.phone" :href="`tel:${formModel.phone}`" class="text-primary">
-                  <q-icon name="phone" size="xs" class="q-mr-xs" />
-                  {{ formModel.phone }}
-                </a>
-                <span v-else>-</span>
-              </div>
-            </div>
-
-            <!-- edit/create 모드: 기존 q-input 유지 -->
-            <q-input
-              v-else
-              v-model="formModel.phone"
-              :rules="reservationStaticRules.phone"
-              label="예약자 연락처"
-              placeholder="010-0000-0000"
-            ></q-input>
-
-            <q-select
-              v-model="formModel.status"
-              :options="options.status"
-              :readonly="mode === 'view'"
-              label="예약 상태"
-              required
-              emit-value
-              map-options
-            ></q-select>
-          </div>
-        </div>
+        <ReservationGuestInfo
+          :form-model="formModel"
+          :mode="mode"
+          :rules="{
+            name: reservationStaticRules.name,
+            phone: reservationStaticRules.phone,
+            peopleCount: reservationStaticRules.peopleCount,
+          }"
+          @update:form-model="formModel = $event"
+          @recalculate-stay-start-at="recalculateStayStartAt"
+          @recalculate-stay-end-at="recalculateStayEndAt"
+        />
 
         <div class="row q-gutter-md q-pa-sm">
           <div v-if="mode !== 'view'" class="col q-ma-none">
@@ -131,73 +42,20 @@
           </div>
         </div>
 
-        <div class="row q-gutter-md q-pa-sm">
-          <div class="col">
-            <q-input
-              v-model.number="formModel.price"
-              :rules="reservationStaticRules.price"
-              @update:model-value="changePrice()"
-              :readonly="mode === 'view'"
-              label="판매 금액"
-              placeholder="100000"
-              type="number"
-              min="0"
-              max="10000000"
-              required
-            ></q-input>
-
-            <q-input
-              v-model.number="formModel.paymentAmount"
-              :rules="reservationDynamicRules.paymentAmount(formModel.price)"
-              :readonly="mode === 'view'"
-              label="누적 결제 금액"
-              placeholder="80000"
-              type="number"
-              min="0"
-              max="10000000"
-              required
-            ></q-input>
-
-            <q-input
-              v-model.number="formModel.deposit"
-              :rules="reservationDynamicRules.paymentAmount(formModel.deposit)"
-              :readonly="mode === 'view'"
-              label="보증금"
-              placeholder="100000"
-              type="number"
-              min="0"
-              max="10000000"
-              required
-            ></q-input>
-          </div>
-
-          <div class="col">
-            <q-select
-              v-model="formModel.paymentMethod"
-              @update:model-value="changePrice()"
-              :loading="paymentMethodStatus.isLoading"
-              :disable="!paymentMethodStatus.isLoaded"
-              :options="paymentMethods"
-              :readonly="mode === 'view'"
-              option-label="name"
-              label="결제 수단"
-              required
-              map-options
-            ></q-select>
-
-            <q-input
-              v-model.number="formModel.brokerFee"
-              :rules="reservationStaticRules.brokerFee"
-              :readonly="true"
-              label="결제 수단 수수료"
-              placeholder="5000"
-              type="number"
-              min="0"
-              max="10000000"
-              required
-            ></q-input>
-          </div>
-        </div>
+        <ReservationPaymentInfo
+          :form-model="formModel"
+          :mode="mode"
+          :payment-methods="paymentMethods"
+          :payment-method-status="paymentMethodStatus"
+          :rules="{
+            price: reservationStaticRules.price,
+            paymentAmount: reservationDynamicRules.paymentAmount(formModel.price),
+            deposit: reservationDynamicRules.paymentAmount(formModel.deposit),
+            brokerFee: reservationStaticRules.brokerFee,
+          }"
+          @update:form-model="formModel = $event"
+          @change-price="changePrice"
+        />
 
         <div class="row q-gutter-md q-pa-sm">
           <div class="col">
@@ -243,6 +101,8 @@ import { formatSortParam } from "src/util/query-string-util";
 import { PaymentMethod } from "src/schema/payment-method";
 import { Room } from "src/schema/room";
 import RoomGroupSelector from "components/room-group/RoomGroupSelector.vue";
+import ReservationGuestInfo from "components/reservation/ReservationGuestInfo.vue";
+import ReservationPaymentInfo from "components/reservation/ReservationPaymentInfo.vue";
 import { getPatchedFormData } from "src/util/data-util";
 import _ from "lodash";
 
@@ -305,14 +165,6 @@ const selectedRooms = ref<Room[]>([]);
 const status = ref({
   isProgress: false,
 });
-const options = {
-  status: [
-    { label: "예약 대기", value: "PENDING" },
-    { label: "예약 확정", value: "NORMAL" },
-    { label: "예약 취소", value: "CANCEL" },
-    { label: "환불 완료", value: "REFUND" },
-  ],
-};
 const paymentMethodStatus = ref({
   isLoading: false,
   isLoaded: false,
