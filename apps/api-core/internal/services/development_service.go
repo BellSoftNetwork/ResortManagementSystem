@@ -32,6 +32,31 @@ func NewDevelopmentServiceV2(db *gorm.DB) DevelopmentService {
 	}
 }
 
+func (s *developmentService) resetData() error {
+	logrus.Info("=== resetData called ===")
+
+	tables := []string{
+		"reservation_room",
+		"reservation",
+		"room",
+		"room_group",
+		"payment_method",
+	}
+
+	activeTime := time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
+
+	for _, table := range tables {
+		logrus.Infof("Soft deleting records from table: %s", table)
+		if err := s.db.Exec(fmt.Sprintf("UPDATE %s SET deleted_at = NOW() WHERE deleted_at = ?", table), activeTime).Error; err != nil {
+			logrus.Errorf("Failed to reset table %s: %v", table, err)
+			return fmt.Errorf("failed to reset table %s: %w", table, err)
+		}
+	}
+
+	logrus.Info("=== resetData completed ===")
+	return nil
+}
+
 func (s *developmentService) generateEssentialData() (map[string]interface{}, error) {
 	logrus.Info("=== GenerateEssentialData called ===")
 	result := make(map[string]interface{})
@@ -1209,6 +1234,16 @@ func (s *developmentService) GenerateTestData(dataType string, reservationOption
 
 	switch dataType {
 	case "essential":
+		essentialResult, err := s.generateEssentialData()
+		if err != nil {
+			return nil, err
+		}
+		result = essentialResult
+
+	case "reset":
+		if err := s.resetData(); err != nil {
+			return nil, err
+		}
 		essentialResult, err := s.generateEssentialData()
 		if err != nil {
 			return nil, err
