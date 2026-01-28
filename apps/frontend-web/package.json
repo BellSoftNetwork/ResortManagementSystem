@@ -47,6 +47,7 @@
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
+    "@pinia/testing": "^1.0.3",
     "@quasar/app-vite": "^2.2.0",
     "@quasar/quasar-app-extension-qcalendar": "^4.1.2",
     "@types/lodash": "^4.17.16",
