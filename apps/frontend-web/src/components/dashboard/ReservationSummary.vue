@@ -64,7 +64,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import dayjs from "dayjs";
-import { useQuasar } from "quasar";
 import { formatDate } from "src/util/format-util";
 import { convertTableColumnDef } from "src/util/table-util";
 import { getReservationFieldDetail, Reservation } from "src/schema/reservation";
@@ -73,7 +72,6 @@ import { useReservationCalendar } from "src/composables/useReservationCalendar";
 import ReservationCalendar from "src/components/dashboard/ReservationCalendar.vue";
 import ReservationDayTable from "src/components/dashboard/ReservationDayTable.vue";
 
-const $q = useQuasar();
 const { formatReservations, calculateExtendedDateRange, getRoomGroupColor } = useReservationCalendar();
 const status = ref({
   isLoading: false,

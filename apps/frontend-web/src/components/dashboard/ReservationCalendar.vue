@@ -67,7 +67,7 @@ interface Emits {
   (e: "dateSelect", date: string): void;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 const calendar = ref<QCalendarMonth>();
