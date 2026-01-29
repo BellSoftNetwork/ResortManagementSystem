@@ -106,7 +106,7 @@ function updateField(field: string, value: unknown) {
 }
 
 function handlePriceChange(value: number) {
-  updateField("price", value);
+  updateField("price", Number(value));
   emit("changePrice");
 }
 
