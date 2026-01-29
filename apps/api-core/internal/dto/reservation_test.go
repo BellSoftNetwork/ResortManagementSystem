@@ -292,3 +292,26 @@ func TestCreateReservationRequest(t *testing.T) {
 		})
 	}
 }
+
+func TestCreateReservationRequest_JSONStringTypeRejection(t *testing.T) {
+	// Given: 테스트 환경 설정
+	gin.SetMode(gin.TestMode)
+
+	t.Run("price 필드가 문자열로 전달되면 바인딩 에러가 발생한다", func(t *testing.T) {
+		// Given: price가 문자열인 JSON
+		jsonBody := `{"name":"테스트","phone":"010-1234-5678","price":"100000","stayStartAt":"2025-07-01","stayEndAt":"2025-07-03"}`
+
+		// When
+		req := httptest.NewRequest("POST", "/test", bytes.NewBufferString(jsonBody))
+		req.Header.Set("Content-Type", "application/json")
+		c, _ := gin.CreateTestContext(httptest.NewRecorder())
+		c.Request = req
+
+		var boundReq dto.CreateReservationRequest
+		err := c.ShouldBindJSON(&boundReq)
+
+		// Then
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "cannot unmarshal string")
+	})
+}
