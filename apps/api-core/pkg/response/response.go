@@ -55,7 +55,7 @@ func SuccessList[T any](c *gin.Context, data []T, pagination *Pagination) {
 	c.JSON(http.StatusOK, ListResponse[T]{
 		Values: data,
 		Page:   page,
-		Filter: nil,
+		Filter: map[string]interface{}{},
 	})
 }
 

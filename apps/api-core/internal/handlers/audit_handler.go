@@ -64,9 +64,9 @@ func (h *AuditHandler) ListAuditLogs(c *gin.Context) {
 		return
 	}
 
-	var items []dto.AuditLogListResponse
+	items := make([]dto.AuditLogListResponse, 0)
 	for _, log := range logs {
-		var changedFields []string
+		changedFields := make([]string, 0)
 		if log.ChangedFields != nil {
 			json.Unmarshal(log.ChangedFields, &changedFields)
 		}

@@ -216,7 +216,7 @@ export function useTable<T>(options: UseTableOptions<T>): UseTableReturn<T> {
       const response = await fetchFn(params);
 
       // Update rows
-      rows.value = response.values;
+      rows.value = response.values ?? [];
       totalRows.value = response.page.totalElements;
 
       // Update pagination

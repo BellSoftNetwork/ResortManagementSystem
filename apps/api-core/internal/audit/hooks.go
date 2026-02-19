@@ -30,6 +30,11 @@ func RegisterHooks(db *gorm.DB, auditService AuditService) {
 				db.Set("audit_context", db.Statement.Context)
 				db.Set("audit_service", auditService)
 			}
+			// If entity already has ID > 0, it's a FullSaveAssociations re-save of an existing record,
+			// not a genuine new creation. Set flag to skip audit logging in AfterCreate.
+			if auditable.GetAuditEntityID() > 0 {
+				db.Set("audit_skip_create", true)
+			}
 		}
 	})
 
@@ -43,6 +48,11 @@ func RegisterHooks(db *gorm.DB, auditService AuditService) {
 
 		// Skip AuditLog entities to prevent infinite recursion
 		if auditable.GetAuditEntityType() == "audit_log" {
+			return
+		}
+
+		// Skip if flagged as a re-save of an existing entity (not a genuine creation)
+		if skip, exists := db.Get("audit_skip_create"); exists && skip.(bool) {
 			return
 		}
 
@@ -123,6 +133,18 @@ func RegisterHooks(db *gorm.DB, auditService AuditService) {
 		oldValues, oldValuesExists := db.Get("audit_old_values")
 		if !oldValuesExists {
 			return
+		}
+
+		// Re-preload Reservation: reservation_service.go sets PaymentMethod=nil for GORM FullSaveAssociations; re-fetch with SkipHooks to get accurate audit fields without infinite recursion.
+		if _, isReservation := auditable.(*models.Reservation); isReservation {
+			freshDB := db.Session(&gorm.Session{SkipHooks: true, SkipDefaultTransaction: true})
+			freshReservation := &models.Reservation{}
+			if err := freshDB.Preload("PaymentMethod").Preload("Rooms.Room").
+				Where("id = ?", auditable.GetAuditEntityID()).First(freshReservation).Error; err == nil {
+				auditable = freshReservation
+			} else {
+				fmt.Printf("Audit log: failed to re-preload reservation associations: %v\n", err)
+			}
 		}
 
 		if auditSvc, ok := service.(AuditService); ok {
