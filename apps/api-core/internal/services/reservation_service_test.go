@@ -102,6 +102,7 @@ func (suite *ReservationServiceTestSuite) SetupTest() {
 		suite.mockReservationRepo,
 		suite.mockRoomRepo,
 		suite.mockPaymentMethodRepo,
+		nil,
 	)
 }
 
@@ -251,6 +252,9 @@ func (suite *ReservationServiceTestSuite) TestCreate() {
 	// 객실 가용성 확인
 	suite.mockRoomRepo.On("IsRoomAvailable", suite.ctx, uint(1), newReservation.StayStartAt, newReservation.StayEndAt, (*uint)(nil)).Return(true, nil)
 	suite.mockRoomRepo.On("IsRoomAvailable", suite.ctx, uint(2), newReservation.StayStartAt, newReservation.StayEndAt, (*uint)(nil)).Return(true, nil)
+	// 객실 정보 로드
+	suite.mockRoomRepo.On("FindByID", suite.ctx, uint(1)).Return(&models.Room{Number: "101"}, nil)
+	suite.mockRoomRepo.On("FindByID", suite.ctx, uint(2)).Return(&models.Room{Number: "102"}, nil)
 	// 생성
 	suite.mockReservationRepo.On("Create", suite.ctx, newReservation).Return(createdReservation, nil)
 
@@ -261,6 +265,10 @@ func (suite *ReservationServiceTestSuite) TestCreate() {
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), 5000, newReservation.BrokerFee) // 수수료가 계산됨
 	assert.Len(suite.T(), newReservation.Rooms, 2)
+	assert.NotNil(suite.T(), newReservation.PaymentMethod)
+	assert.Equal(suite.T(), "신용카드", newReservation.PaymentMethod.Name)
+	assert.NotNil(suite.T(), newReservation.Rooms[0].Room)
+	assert.Equal(suite.T(), "101", newReservation.Rooms[0].Room.Number)
 	suite.mockPaymentMethodRepo.AssertExpectations(suite.T())
 	suite.mockRoomRepo.AssertExpectations(suite.T())
 	suite.mockReservationRepo.AssertExpectations(suite.T())
@@ -400,6 +408,58 @@ func (suite *ReservationServiceTestSuite) TestUpdate_StatusToCanceled() {
 	assert.Equal(suite.T(), models.ReservationStatusCancel, result.Status)
 	assert.NotNil(suite.T(), result.CanceledAt)
 	suite.mockReservationRepo.AssertExpectations(suite.T())
+}
+
+func (suite *ReservationServiceTestSuite) TestUpdate_결제수단변경시_PaymentMethodID가_올바르게_저장된다() {
+	// Given - 결제수단이 등록된 예약에서
+	now := time.Now()
+	existingReservation := &models.Reservation{
+		PaymentMethodID: 1,
+		PaymentMethod: &models.PaymentMethod{
+			CommissionRate: 0.1,
+			Status:         models.PaymentMethodStatusActive,
+		},
+		Price:       100000,
+		StayStartAt: now.Add(24 * time.Hour),
+		StayEndAt:   now.Add(48 * time.Hour),
+	}
+	existingReservation.ID = 1
+	existingReservation.PaymentMethod.ID = 1
+
+	newPaymentMethod := &models.PaymentMethod{
+		CommissionRate: 0.2,
+		Status:         models.PaymentMethodStatusActive,
+	}
+	newPaymentMethod.ID = 3
+
+	updates := map[string]interface{}{
+		"paymentMethodId": uint(3),
+	}
+
+	// 1. 기존 예약 조회 (FindByIDWithDetails)
+	suite.mockReservationRepo.On("FindByIDWithDetails", suite.ctx, uint(1)).Return(existingReservation, nil).Once()
+	// 2. 새 결제수단 조회
+	suite.mockPaymentMethodRepo.On("FindByID", suite.ctx, uint(3)).Return(newPaymentMethod, nil).Once()
+	// 3. 업데이트 수행
+	suite.mockReservationRepo.On("Update", suite.ctx, existingReservation).Return(nil).Once()
+	// 4. 업데이트 후 다시 조회 (FindByIDWithDetails)
+	suite.mockReservationRepo.On("FindByIDWithDetails", suite.ctx, uint(1)).Return(existingReservation, nil).Once()
+
+	// When - 결제수단을 변경하면
+	result, err := suite.service.Update(suite.ctx, 1, updates, nil, false)
+
+	// Then - PaymentMethodID가 변경되어야 하고, preloaded된 PaymentMethod는 초기화되어야 한다
+	assert.NoError(suite.T(), err)
+	assert.NotNil(suite.T(), result)
+	assert.Equal(suite.T(), uint(3), existingReservation.PaymentMethodID)
+	assert.Equal(suite.T(), 20000, existingReservation.BrokerFee) // 100000 * 0.2
+
+	// 이 부분에서 실패할 것으로 예상됨 (버그: PaymentMethod가 nil이 아니면 GORM이 예전 값을 다시 쓸 수 있음)
+	// 서비스 로직에서 reservation.PaymentMethod = nil 처리가 누락되어 있음
+	assert.Nil(suite.T(), existingReservation.PaymentMethod, "결제수단 ID가 변경될 때 기존 preloaded 객체는 제거되어야 함")
+
+	suite.mockReservationRepo.AssertExpectations(suite.T())
+	suite.mockPaymentMethodRepo.AssertExpectations(suite.T())
 }
 
 func (suite *ReservationServiceTestSuite) TestDelete() {

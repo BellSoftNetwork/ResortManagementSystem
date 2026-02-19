@@ -7,6 +7,9 @@ type RevisionType = {
 };
 
 export const REVISION_TYPE_MAP: RevisionType = {
+  CREATE: { name: "생성", color: "primary", icon: "add" } as const,
+  UPDATE: { name: "변경", color: "warning", icon: "edit" } as const,
+  DELETE: { name: "삭제", color: "red", icon: "remove" } as const,
   CREATED: { name: "생성", color: "primary", icon: "add" } as const,
   UPDATED: { name: "변경", color: "warning", icon: "edit" } as const,
   DELETED: { name: "삭제", color: "red", icon: "remove" } as const,

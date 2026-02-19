@@ -133,3 +133,38 @@ func (u *User) IsAdmin() bool {
 func (u *User) IsSuperAdmin() bool {
 	return u.Role == UserRoleSuperAdmin
 }
+
+// GetAuditEntityType implements audit.Auditable interface
+func (u *User) GetAuditEntityType() string {
+	return "user"
+}
+
+// GetAuditEntityID implements audit.Auditable interface
+func (u *User) GetAuditEntityID() uint {
+	return u.ID
+}
+
+// GetAuditFields implements audit.Auditable interface
+func (u *User) GetAuditFields() map[string]interface{} {
+	var email interface{}
+	if u.Email != nil {
+		email = *u.Email
+	}
+
+	var password interface{}
+	if u.Password != "" {
+		password = "비밀번호 변경됨"
+	}
+
+	return map[string]interface{}{
+		"id":        u.ID,
+		"email":     email,
+		"name":      u.Name,
+		"password":  password,
+		"status":    u.Status.String(),
+		"role":      u.Role.String(),
+		"userId":    u.UserID,
+		"createdAt": u.CreatedAt,
+		"updatedAt": u.UpdatedAt,
+	}
+}

@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
 vi.unmock("axios");
-import axios, { AxiosError, AxiosHeaders } from "axios";
+import { AxiosError, AxiosHeaders } from "axios";
 import { getErrorMessage } from "../errorHandler";
 
 describe("errorHandler", () => {

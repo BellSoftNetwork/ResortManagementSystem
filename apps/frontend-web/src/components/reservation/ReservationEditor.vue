@@ -119,6 +119,7 @@ const props = withDefaults(
     mode: "create",
   },
 );
+const emit = defineEmits(["updated"]);
 const typeName = computed(() => {
   if (props.reservationType === "MONTHLY_RENT") return "달방";
   else return "예약";
@@ -313,6 +314,7 @@ function update() {
       });
 
       mode.value = "view";
+      emit("updated");
 
       defaultReservationValue = _.cloneDeep(response.value);
       resetForm();

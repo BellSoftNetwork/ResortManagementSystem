@@ -112,7 +112,24 @@ func (s *historyService) convertToReservationRevision(ctx context.Context, log *
 				Type:            snapshot.Type,
 				CreatedBy:       s.getUserSummary(ctx, snapshot.CreatedBy),
 				UpdatedBy:       s.getUserSummary(ctx, snapshot.UpdatedBy),
-				Rooms:           []dto.RoomResponse{},
+			}
+
+			// rooms 파싱
+			rooms := make([]dto.RoomResponse, len(snapshot.Rooms))
+			for i, room := range snapshot.Rooms {
+				rooms[i] = dto.RoomResponse{
+					ID:     room.ID,
+					Number: room.Number,
+				}
+			}
+			reservationEntity.Rooms = rooms
+
+			// paymentMethod 파싱
+			if snapshot.PaymentMethod != nil {
+				reservationEntity.PaymentMethod = &dto.PaymentMethodResponse{
+					ID:   snapshot.PaymentMethod.ID,
+					Name: snapshot.PaymentMethod.Name,
+				}
 			}
 
 			if stayStartAt, err := time.Parse("2006-01-02", snapshot.StayStartAt); err == nil {

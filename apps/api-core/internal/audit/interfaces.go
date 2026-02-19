@@ -25,6 +25,16 @@ type Auditable interface {
 	GetAuditFields() map[string]interface{}
 }
 
+// AuditLogFilter contains filter criteria for audit log queries
+type AuditLogFilter struct {
+	EntityType string
+	StartDate  *time.Time
+	EndDate    *time.Time
+	Action     string
+	UserID     *uint
+	EntityID   *uint
+}
+
 // AuditService provides methods for audit logging and retrieval
 type AuditService interface {
 	// LogCreate logs a creation action
@@ -35,6 +45,10 @@ type AuditService interface {
 	LogDelete(ctx context.Context, entity Auditable) error
 	// GetHistory retrieves audit history for an entity
 	GetHistory(ctx context.Context, entityType string, entityID uint, page, size int) ([]AuditLog, int64, error)
+	// GetAllHistory retrieves audit logs with filters
+	GetAllHistory(ctx context.Context, filter AuditLogFilter, page, size int) ([]AuditLog, int64, error)
+	// GetByID retrieves a single audit log by ID
+	GetByID(ctx context.Context, id uint) (*AuditLog, error)
 }
 
 // UserContext represents user information for audit logging

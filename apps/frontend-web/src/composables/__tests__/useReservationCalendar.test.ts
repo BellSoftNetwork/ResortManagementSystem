@@ -1,8 +1,7 @@
 import { describe, it, expect } from "vitest";
 import dayjs from "dayjs";
-import { useReservationCalendar, CalendarEvent, DisplayedEvent } from "../useReservationCalendar";
+import { useReservationCalendar, DisplayedEvent } from "../useReservationCalendar";
 import type { Reservation } from "src/schema/reservation";
-import type { Timestamp } from "@quasar/quasar-ui-qcalendar";
 
 const createMockReservation = (
   id: number,

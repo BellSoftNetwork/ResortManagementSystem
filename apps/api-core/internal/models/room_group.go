@@ -28,3 +28,28 @@ func (rg *RoomGroup) BeforeCreate(tx *gorm.DB) error {
 	}
 	return nil
 }
+
+// GetAuditEntityType implements audit.Auditable interface
+func (rg *RoomGroup) GetAuditEntityType() string {
+	return "room_group"
+}
+
+// GetAuditEntityID implements audit.Auditable interface
+func (rg *RoomGroup) GetAuditEntityID() uint {
+	return rg.ID
+}
+
+// GetAuditFields implements audit.Auditable interface
+func (rg *RoomGroup) GetAuditFields() map[string]interface{} {
+	return map[string]interface{}{
+		"id":           rg.ID,
+		"name":         rg.Name,
+		"peekPrice":    rg.PeekPrice,
+		"offPeekPrice": rg.OffPeekPrice,
+		"description":  rg.Description,
+		"createdBy":    rg.CreatedBy,
+		"updatedBy":    rg.UpdatedBy,
+		"createdAt":    rg.CreatedAt,
+		"updatedAt":    rg.UpdatedAt,
+	}
+}

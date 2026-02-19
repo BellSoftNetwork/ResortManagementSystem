@@ -193,6 +193,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import("pages/admin/AccountList.vue"),
       },
       {
+        path: "audit-logs",
+        name: "AuditLogs",
+        component: () => import("pages/admin/AuditLogList.vue"),
+      },
+      {
         path: "dev-test",
         name: "DevTest",
         component: () => import("pages/admin/DevTest.vue"),

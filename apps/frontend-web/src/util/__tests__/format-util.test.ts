@@ -43,7 +43,15 @@ describe("format-util", () => {
   describe("formatDateTime", () => {
     it("날짜와 시간을 포맷한다", () => {
       const result = formatDateTime("2026-01-15T10:30:45");
-      expect(result).toBe("2026-01-15 10:30:45");
+      expect(result).toBe("2026-01-15 19:30:45");
+    });
+
+    it("Z 접미사가 붙은 UTC 문자열도 KST로 변환한다", () => {
+      expect(formatDateTime("2026-01-15T10:30:45Z")).toBe("2026-01-15 19:30:45");
+    });
+
+    it("자정을 넘기는 경우 다음 날 날짜로 표시된다", () => {
+      expect(formatDateTime("2026-01-15T15:30:00Z")).toBe("2026-01-16 00:30:00");
     });
   });
 
@@ -64,7 +72,11 @@ describe("format-util", () => {
   describe("formatTime", () => {
     it("시간을 HH:mm:ss 형식으로 포맷한다", () => {
       const result = formatTime("2026-01-15T10:30:45");
-      expect(result).toBe("10:30:45");
+      expect(result).toBe("19:30:45");
+    });
+
+    it("formatTime도 KST로 변환한다", () => {
+      expect(formatTime("2026-01-15T10:30:45Z")).toBe("19:30:45");
     });
   });
 

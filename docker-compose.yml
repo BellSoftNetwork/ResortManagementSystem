@@ -12,12 +12,13 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       MYSQL_USER: ${MYSQL_USER:-rms}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-rms123}
+      TZ: UTC
     ports:
       - "${MYSQL_PORT:-3306}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./scripts/init-mysql.sql:/docker-entrypoint-initdb.d/01-init.sql
-    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-time-zone=+00:00
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       timeout: 20s
@@ -32,6 +33,8 @@ services:
     platform: linux/amd64  # M1 Mac 호환성을 위한 플랫폼 지정
     container_name: rms-redis
     restart: unless-stopped
+    environment:
+      TZ: UTC
     ports:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
@@ -61,6 +64,7 @@ services:
       - "2345:2345"  # Delve debugger port
     environment:
       PROFILE: ${PROFILE:-local}
+      TZ: UTC
       DATABASE_MYSQL_HOST: ${DATABASE_MYSQL_HOST:-mysql}
       DATABASE_MYSQL_PORT: ${DATABASE_MYSQL_PORT:-3306}
       DATABASE_MYSQL_USER: ${DATABASE_MYSQL_USER:-rms}
@@ -76,6 +80,12 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health/readiness"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     networks:
       - rms-network
 
@@ -104,6 +114,7 @@ services:
       - "5006:5005"  # Java debugger port
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-local}
+      TZ: UTC
       DATABASE_MYSQL_HOST: ${DATABASE_MYSQL_HOST:-mysql}
       DATABASE_MYSQL_PORT: ${DATABASE_MYSQL_PORT:-3306}
       DATABASE_MYSQL_USER: ${MYSQL_LEGACY_USER:-rms}
@@ -145,6 +156,7 @@ services:
       API_CORE_URL: ${API_CORE_URL:-http://api-core:8080}
       API_LEGACY_URL: ${API_LEGACY_URL:-http://api-legacy:8080}
       NODE_ENV: ${NODE_ENV:-development}
+      TZ: UTC
     depends_on:
       - api-core
       - api-legacy
