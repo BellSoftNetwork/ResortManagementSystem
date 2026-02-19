@@ -8,5 +8,6 @@ func AllMigrations() []Migration {
 		Migration003AddAuditCompositeIndex,
 		Migration004DeleteAuditLogSelfReferences,
 		Migration005ConvertKstTimestampsToUtc,
+		Migration006CleanupFalsePaymentMethodAuditLogs,
 	}
 }

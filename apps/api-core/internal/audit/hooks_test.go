@@ -13,9 +13,11 @@ import (
 
 // testParentEntity is a test implementation of Auditable interface (simulates Reservation)
 type testParentEntity struct {
-	ID     uint              `gorm:"primaryKey"`
-	Name   string            `gorm:"size:100"`
-	Childs []testChildEntity `gorm:"foreignKey:ParentID"`
+	ID               uint                      `gorm:"primaryKey"`
+	Name             string                    `gorm:"size:100"`
+	Childs           []testChildEntity         `gorm:"foreignKey:ParentID"`
+	AuditableChildID *uint                     `gorm:"column:auditable_child_id"`
+	AuditableChild   *testAuditableChildEntity `gorm:"foreignKey:AuditableChildID"`
 }
 
 func (testParentEntity) TableName() string {
@@ -47,6 +49,29 @@ type testChildEntity struct {
 
 func (testChildEntity) TableName() string {
 	return "test_child_entities"
+}
+
+// testAuditableChildEntity implements Auditable (simulates PaymentMethod — existing entity)
+type testAuditableChildEntity struct {
+	ID       uint   `gorm:"primaryKey"`
+	ParentID uint   `gorm:"not null"`
+	Name     string `gorm:"size:100"`
+}
+
+func (testAuditableChildEntity) TableName() string {
+	return "test_auditable_child_entities"
+}
+
+func (e *testAuditableChildEntity) GetAuditEntityType() string {
+	return "test_auditable_child"
+}
+
+func (e *testAuditableChildEntity) GetAuditEntityID() uint {
+	return e.ID
+}
+
+func (e *testAuditableChildEntity) GetAuditFields() map[string]interface{} {
+	return map[string]interface{}{"id": e.ID, "name": e.Name}
 }
 
 // mockAuditService tracks all LogCreate calls to detect duplicates
@@ -99,7 +124,7 @@ func setupTestDBWithMockHooks(t *testing.T, mockService *mockAuditService) *gorm
 	require.NoError(t, err)
 
 	// Migrate test tables
-	err = db.AutoMigrate(&testParentEntity{}, &testChildEntity{})
+	err = db.AutoMigrate(&testParentEntity{}, &testChildEntity{}, &testAuditableChildEntity{})
 	require.NoError(t, err)
 
 	// Register hooks with mock audit service
@@ -187,4 +212,41 @@ func TestAfterCreate_신규엔티티생성시_CREATE로그정상생성(t *testin
 		assert.Equal(t, "test_parent", parentCreateCalls[0].GetAuditEntityType())
 		assert.Equal(t, parent.ID, parentCreateCalls[0].GetAuditEntityID())
 	}
+}
+
+func TestAfterCreate_Auditable자식_FullSaveAssociations_허위CREATE방지(t *testing.T) {
+	mockService := &mockAuditService{}
+	db := setupTestDBWithMockHooks(t, mockService)
+	ctx := SetUserContext(context.Background(), &[]uint{123}[0], "testuser")
+
+	// Given: pre-existing auditable child entity
+	existingChild := &testAuditableChildEntity{Name: "ExistingChild"}
+	err := db.WithContext(ctx).Session(&gorm.Session{SkipHooks: true}).Create(existingChild).Error
+	require.NoError(t, err)
+	require.NotZero(t, existingChild.ID, "자식 엔티티 ID가 할당되어야 함")
+
+	// Reset mock — don't count the initial creation above
+	mockService.mu.Lock()
+	mockService.createCalls = nil
+	mockService.mu.Unlock()
+
+	// When: parent entity references existing child via FullSaveAssociations
+	// existingChild already has ID > 0 (it's an existing record)
+	// Simulates: reservation.PaymentMethod = existingPaymentMethod + FullSaveAssociations Create
+	parent := &testParentEntity{
+		Name:             "NewParent",
+		AuditableChildID: &existingChild.ID,
+		AuditableChild:   existingChild, // ID > 0 → BeforeCreate should set audit_skip_create flag
+	}
+	err = db.WithContext(ctx).Session(&gorm.Session{FullSaveAssociations: true}).Create(parent).Error
+	require.NoError(t, err)
+
+	// Then: LogCreate should NOT be called for the existing child
+	childCreateCalls := mockService.getCreateCallsByEntityType("test_auditable_child")
+	t.Logf("LogCreate called %d times for test_auditable_child (expected 0)", len(childCreateCalls))
+	assert.Equal(t, 0, len(childCreateCalls), "기존 Auditable 자식 엔티티에 대한 허위 CREATE 감사 로그가 없어야 함")
+
+	// Parent's LogCreate should still be called once
+	parentCreateCalls := mockService.getCreateCallsByEntityType("test_parent")
+	assert.Equal(t, 1, len(parentCreateCalls), "부모 엔티티의 CREATE 감사 로그는 정상 생성되어야 함")
 }
