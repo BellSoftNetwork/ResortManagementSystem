@@ -364,6 +364,7 @@ const actionOptions = [
 const entityTypeOptions = [
   { label: "전체", value: null },
   { label: "예약", value: "reservation" },
+  { label: "예약 마감", value: "date_block" },
   { label: "객실", value: "room" },
   { label: "객실 그룹", value: "room_group" },
   { label: "결제 수단", value: "payment_method" },
@@ -372,6 +373,7 @@ const entityTypeOptions = [
 
 const ENTITY_TYPE_LABELS: Record<string, string> = {
   reservation: "예약",
+  date_block: "예약 마감",
   room: "객실",
   room_group: "객실 그룹",
   payment_method: "결제 수단",

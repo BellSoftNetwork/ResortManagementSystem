@@ -68,6 +68,7 @@ func main() {
 	roomRepo := repositories.NewRoomRepository(db)
 	roomGroupRepo := repositories.NewRoomGroupRepository(db)
 	reservationRepo := repositories.NewReservationRepository(db)
+	dateBlockRepo := repositories.NewDateBlockRepository(db)
 	paymentMethodRepo := repositories.NewPaymentMethodRepository(db)
 	loginAttemptRepo := repositories.NewLoginAttemptRepository(db)
 	// reservationRoomRepo := repositories.NewReservationRoomRepository(db) // Not used
@@ -81,7 +82,8 @@ func main() {
 	userService := services.NewUserService(userRepo)
 	roomService := services.NewRoomService(roomRepo, roomGroupRepo, auditService)
 	roomGroupService := services.NewRoomGroupService(roomGroupRepo)
-	reservationService := services.NewReservationService(reservationRepo, roomRepo, paymentMethodRepo, auditService)
+	reservationService := services.NewReservationService(reservationRepo, roomRepo, paymentMethodRepo, auditService, dateBlockRepo)
+	dateBlockService := services.NewDateBlockService(dateBlockRepo, auditService)
 	paymentMethodService := services.NewPaymentMethodService(paymentMethodRepo)
 	configService := services.NewConfigService(cfg)
 	developmentService := services.NewDevelopmentServiceV2(db)
@@ -93,6 +95,7 @@ func main() {
 	roomHandler := handlers.NewRoomHandler(roomService, userService, historyService)
 	roomGroupHandler := handlers.NewRoomGroupHandler(roomGroupService, reservationService, userService)
 	reservationHandler := handlers.NewReservationHandler(reservationService, userService, historyService)
+	dateBlockHandler := handlers.NewDateBlockHandler(dateBlockService, historyService)
 	paymentMethodHandler := handlers.NewPaymentMethodHandler(paymentMethodService)
 	developmentHandler := handlers.NewDevelopmentHandler(developmentService)
 	healthHandler := handlers.NewHealthHandler(db, redis)
@@ -118,7 +121,7 @@ func main() {
 		c.File("./public/index.html")
 	})
 
-	setupRoutes(router, authHandler, mainHandler, userHandler, roomHandler, roomGroupHandler, reservationHandler, paymentMethodHandler, developmentHandler, healthHandler, docsHandler, auditHandler, jwtService, cfg)
+	setupRoutes(router, authHandler, mainHandler, userHandler, roomHandler, roomGroupHandler, reservationHandler, dateBlockHandler, paymentMethodHandler, developmentHandler, healthHandler, docsHandler, auditHandler, jwtService, cfg)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", cfg.Server.Port),
@@ -150,6 +153,7 @@ func main() {
 func setupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, mainHandler *handlers.MainHandler,
 	userHandler *handlers.UserHandler, roomHandler *handlers.RoomHandler,
 	roomGroupHandler *handlers.RoomGroupHandler, reservationHandler *handlers.ReservationHandler,
+	dateBlockHandler *handlers.DateBlockHandler,
 	paymentMethodHandler *handlers.PaymentMethodHandler, developmentHandler *handlers.DevelopmentHandler,
 	healthHandler *handlers.HealthHandler, docsHandler *handlers.DocsHandler, auditHandler *handlers.AuditHandler,
 	jwtService *auth.JWTService, cfg *config.Config) {
@@ -233,6 +237,16 @@ func setupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, mainHandler *
 				reservationRoutes.PATCH("/:id", middleware.RoleMiddleware("ADMIN", "SUPER_ADMIN"), reservationHandler.UpdateReservation)
 				reservationRoutes.DELETE("/:id", middleware.RoleMiddleware("ADMIN", "SUPER_ADMIN"), reservationHandler.DeleteReservation)
 				reservationRoutes.GET("/:id/histories", middleware.RoleMiddleware("ADMIN", "SUPER_ADMIN"), reservationHandler.GetReservationHistories)
+			}
+
+			dateBlocks := authenticated.Group("/date-blocks")
+			{
+				dateBlocks.GET("", dateBlockHandler.ListDateBlocks)
+				dateBlocks.GET("/:id", dateBlockHandler.GetDateBlock)
+				dateBlocks.POST("", middleware.RoleMiddleware("ADMIN", "SUPER_ADMIN"), dateBlockHandler.CreateDateBlock)
+				dateBlocks.PATCH("/:id", middleware.RoleMiddleware("ADMIN", "SUPER_ADMIN"), dateBlockHandler.UpdateDateBlock)
+				dateBlocks.DELETE("/:id", middleware.RoleMiddleware("ADMIN", "SUPER_ADMIN"), dateBlockHandler.DeleteDateBlock)
+				dateBlocks.GET("/:id/histories", middleware.RoleMiddleware("ADMIN", "SUPER_ADMIN"), dateBlockHandler.GetDateBlockHistories)
 			}
 
 			reservationStatsRoutes := authenticated.Group("/reservation-statistics")

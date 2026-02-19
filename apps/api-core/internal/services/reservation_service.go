@@ -16,6 +16,7 @@ var (
 	ErrRoomNotAvailable      = errors.New("해당 기간에 예약이 불가능한 객실")
 	ErrInvalidDateRange      = errors.New("잘못된 날짜 범위")
 	ErrPaymentMethodInactive = errors.New("비활성 상태의 결제 수단")
+	ErrDateRangeBlocked      = errors.New("차단된 날짜 범위에는 예약할 수 없습니다")
 )
 
 type ReservationService interface {
@@ -35,15 +36,23 @@ type reservationService struct {
 	roomRepo          repositories.RoomRepository
 	paymentMethodRepo repositories.PaymentMethodRepository
 	auditService      audit.AuditService
+	dateBlockRepo     repositories.DateBlockRepository
 }
 
 func NewReservationService(reservationRepo repositories.ReservationRepository, roomRepo repositories.RoomRepository,
-	paymentMethodRepo repositories.PaymentMethodRepository, auditService audit.AuditService) ReservationService {
+	paymentMethodRepo repositories.PaymentMethodRepository, auditService audit.AuditService,
+	dateBlockRepo ...repositories.DateBlockRepository) ReservationService {
+	var dateBlockRepository repositories.DateBlockRepository
+	if len(dateBlockRepo) > 0 {
+		dateBlockRepository = dateBlockRepo[0]
+	}
+
 	return &reservationService{
 		reservationRepo:   reservationRepo,
 		roomRepo:          roomRepo,
 		paymentMethodRepo: paymentMethodRepo,
 		auditService:      auditService,
+		dateBlockRepo:     dateBlockRepository,
 	}
 }
 
@@ -87,6 +96,16 @@ func (s *reservationService) Create(ctx context.Context, reservation *models.Res
 	reservation.PaymentMethod = paymentMethod // 추가: audit 로깅용
 	if !paymentMethod.IsActive() {
 		return ErrPaymentMethodInactive
+	}
+
+	if s.dateBlockRepo != nil {
+		blocked, err := s.dateBlockRepo.IsDateRangeBlocked(ctx, reservation.StayStartAt, reservation.StayEndAt)
+		if err != nil {
+			return err
+		}
+		if blocked {
+			return ErrDateRangeBlocked
+		}
 	}
 
 	for _, roomID := range roomIDs {
@@ -145,6 +164,18 @@ func (s *reservationService) Update(ctx context.Context, id uint, updates map[st
 
 	if reservation.StayStartAt.After(reservation.StayEndAt) || reservation.StayStartAt.Equal(reservation.StayEndAt) {
 		return nil, ErrInvalidDateRange
+	}
+
+	_, startChanged := updates["stayStartAt"]
+	_, endChanged := updates["stayEndAt"]
+	if (startChanged || endChanged) && s.dateBlockRepo != nil {
+		blocked, err := s.dateBlockRepo.IsDateRangeBlocked(ctx, reservation.StayStartAt, reservation.StayEndAt)
+		if err != nil {
+			return nil, err
+		}
+		if blocked {
+			return nil, ErrDateRangeBlocked
+		}
 	}
 
 	if checkInAt, ok := updates["checkInAt"].(*time.Time); ok {

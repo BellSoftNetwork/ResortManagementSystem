@@ -118,3 +118,24 @@ type ReservationHistorySnapshot struct {
 	CreatedAt       string                 `json:"createdAt"`
 	UpdatedAt       string                 `json:"updatedAt"`
 }
+
+// DateBlockHistorySnapshot represents the date_block entity data stored in audit logs
+type DateBlockHistorySnapshot struct {
+	ID        uint   `json:"id"`
+	StartDate string `json:"startDate"`
+	EndDate   string `json:"endDate"`
+	Reason    string `json:"reason"`
+	CreatedBy uint   `json:"createdBy"`
+	UpdatedBy uint   `json:"updatedBy"`
+	CreatedAt string `json:"createdAt"`
+	UpdatedAt string `json:"updatedAt"`
+}
+
+// DateBlockRevisionResponse is a revision response for DateBlock entity
+type DateBlockRevisionResponse struct {
+	Entity           DateBlockResponse `json:"entity"`
+	HistoryType      HistoryType       `json:"historyType"`
+	HistoryCreatedAt CustomTime        `json:"historyCreatedAt"`
+	UpdatedFields    []string          `json:"updatedFields"`
+	HistoryUsername  string            `json:"historyUsername,omitempty"`
+}

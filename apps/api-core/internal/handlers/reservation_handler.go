@@ -211,6 +211,8 @@ func (h *ReservationHandler) CreateReservation(c *gin.Context) {
 			response.BadRequest(c, "존재하지 않는 결제 수단")
 		case errors.Is(err, services.ErrPaymentMethodInactive):
 			response.BadRequest(c, "비활성화된 결제 수단")
+		case errors.Is(err, services.ErrDateRangeBlocked):
+			response.BadRequest(c, "차단된 날짜 범위에는 예약할 수 없습니다")
 		case errors.Is(err, services.ErrRoomNotAvailable):
 			response.BadRequest(c, "선택한 날짜에 사용할 수 없는 객실이 있습니다")
 		default:
@@ -326,6 +328,8 @@ func (h *ReservationHandler) UpdateReservation(c *gin.Context) {
 			response.BadRequest(c, "존재하지 않는 결제 수단")
 		case errors.Is(err, services.ErrPaymentMethodInactive):
 			response.BadRequest(c, "비활성화된 결제 수단")
+		case errors.Is(err, services.ErrDateRangeBlocked):
+			response.BadRequest(c, "차단된 날짜 범위에는 예약할 수 없습니다")
 		case errors.Is(err, services.ErrRoomNotAvailable):
 			response.BadRequest(c, "선택한 날짜에 사용할 수 없는 객실이 있습니다")
 		default:

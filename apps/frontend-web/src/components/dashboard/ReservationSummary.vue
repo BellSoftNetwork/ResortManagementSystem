@@ -28,15 +28,35 @@
           마지막 갱신: {{ lastRefreshTime }}
           <q-tooltip>페이지 포커스 복귀 시 자동 갱신됩니다.</q-tooltip>
         </div>
-        <q-btn
-          icon="refresh"
-          color="primary"
-          flat
-          dense
-          :loading="status.isLoading"
-          @click="fetchData()"
-          label="새로고침"
-        />
+        <div class="row q-gutter-sm items-center">
+          <q-btn
+            icon="refresh"
+            color="primary"
+            flat
+            dense
+            :loading="status.isLoading"
+            @click="fetchData()"
+            label="새로고침"
+          />
+          <q-btn
+            v-if="authStore.isAdminRole"
+            icon="list_alt"
+            color="primary"
+            flat
+            dense
+            label="예약 마감 관리"
+            :to="{ name: 'DateBlocks' }"
+          />
+          <q-btn
+            v-if="authStore.isAdminRole"
+            icon="block"
+            color="red"
+            flat
+            dense
+            label="예약 마감"
+            @click="dateBlockDialog?.open()"
+          />
+        </div>
       </div>
 
       <ReservationCalendar
@@ -45,6 +65,7 @@
         :selected-date="selectedDate"
         :calendar-year="calendarYear"
         :calendar-month="calendarMonth"
+        :blocked-dates="blockedDatesSet"
         @navigation="changeView"
         @date-select="onDateSelect"
       />
@@ -53,10 +74,13 @@
         :reservations="currentDateReservations"
         :selected-date="selectedDate"
         :check-in-out-counts="checkInOutCounts"
+        :active-blocks="activeBlocksForSelectedDate"
         :columns="columns"
         @prev-date="changeDatePrev"
         @next-date="changeDateNext"
+        @delete-block="handleDeleteBlock"
       />
+      <DateBlockCreateDialog ref="dateBlockDialog" @created="fetchData()" />
     </q-card-section>
   </q-card>
 </template>
@@ -64,15 +88,20 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import dayjs from "dayjs";
+import { useAuthStore } from "stores/auth";
 import { formatDate } from "src/util/format-util";
 import { convertTableColumnDef } from "src/util/table-util";
 import { getReservationFieldDetail, Reservation } from "src/schema/reservation";
+import { DateBlock } from "src/schema/date-block";
 import { fetchReservations } from "src/api/v1/reservation";
+import { fetchDateBlocks, deleteDateBlock } from "src/api/v1/date-block";
 import { useReservationCalendar } from "src/composables/useReservationCalendar";
 import ReservationCalendar from "src/components/dashboard/ReservationCalendar.vue";
 import ReservationDayTable from "src/components/dashboard/ReservationDayTable.vue";
+import DateBlockCreateDialog from "src/components/dashboard/DateBlockCreateDialog.vue";
 
 const { formatReservations, calculateExtendedDateRange, getRoomGroupColor } = useReservationCalendar();
+const authStore = useAuthStore();
 const status = ref({
   isLoading: false,
   isLoaded: false,
@@ -133,9 +162,11 @@ const columns = [
   },
 ];
 const calendar = ref<InstanceType<typeof ReservationCalendar>>();
+const dateBlockDialog = ref<InstanceType<typeof DateBlockCreateDialog>>();
 const selectedDate = ref(formatDate());
 const currentMonth = ref(dayjs());
 const reservationsOfDay = ref({});
+const dateBlocks = ref<DateBlock[]>([]);
 const lastRefreshTime = ref("로딩 중...");
 const refreshTimer = ref<number | null>(null);
 const refreshInterval = ref(5 * 60 * 1000); // 기본값: 5분마다 갱신
@@ -143,6 +174,12 @@ const refreshInterval = ref(5 * 60 * 1000); // 기본값: 5분마다 갱신
 // 현재 선택된 날짜의 예약 정보를 계산하는 속성
 const currentDateReservations = computed((): Reservation[] => {
   return reservationsOfDay.value[selectedDate.value] || [];
+});
+
+const activeBlocksForSelectedDate = computed(() => {
+  return dateBlocks.value.filter(
+    (block) => block.startDate <= selectedDate.value && block.endDate >= selectedDate.value,
+  );
 });
 
 const calendarEvents = computed(() => {
@@ -166,6 +203,19 @@ const calendarEvents = computed(() => {
   });
 
   return events;
+});
+
+const blockedDatesSet = computed(() => {
+  const set = new Set<string>();
+  dateBlocks.value.forEach((block) => {
+    let current = dayjs(block.startDate);
+    const end = dayjs(block.endDate);
+    while (current.isBefore(end) || current.isSame(end, "day")) {
+      set.add(current.format("YYYY-MM-DD"));
+      current = current.add(1, "day");
+    }
+  });
+  return set;
 });
 
 const currentMonthLabel = computed(() => {
@@ -217,15 +267,22 @@ function fetchData() {
   status.value.isLoading = true;
   status.value.isLoaded = false;
 
-  fetchReservations({
-    stayStartAt: filter.value.stayStartAt,
-    stayEndAt: filter.value.stayEndAt,
-    status: "NORMAL",
-    type: "STAY",
-    size: 200, // TODO: 임시 수정
-  })
-    .then((response) => {
-      reservationsOfDay.value = formatReservations(response.values);
+  Promise.all([
+    fetchReservations({
+      stayStartAt: filter.value.stayStartAt,
+      stayEndAt: filter.value.stayEndAt,
+      status: "NORMAL",
+      type: "STAY",
+      size: 200, // TODO: 임시 수정
+    }),
+    fetchDateBlocks({
+      startDate: filter.value.stayStartAt,
+      endDate: filter.value.stayEndAt,
+    }),
+  ])
+    .then(([reservationResponse, dateBlockResponse]) => {
+      reservationsOfDay.value = formatReservations(reservationResponse.values);
+      dateBlocks.value = dateBlockResponse.values;
       status.value.isLoaded = true;
       // 마지막 갱신 시간 업데이트
       lastRefreshTime.value = dayjs().format("YYYY-MM-DD HH:mm:ss");
@@ -246,10 +303,12 @@ function changeView(view) {
   filter.value.stayStartAt = dateRange.startAt;
   filter.value.stayEndAt = dateRange.endAt;
 
-  // 날짜 선택값도 현재 월의 1일로 업데이트
-  selectedDate.value = currentMonth.value.startOf("month").format("YYYY-MM-DD");
-
   fetchData();
+}
+
+async function handleDeleteBlock(id: number) {
+  await deleteDateBlock(id);
+  await fetchData();
 }
 
 function onDateSelect(date) {

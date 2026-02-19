@@ -13,6 +13,7 @@ export interface CalendarEvent {
   end: string;
   bgcolor: string;
   details: string;
+  isBlock?: boolean;
 }
 
 export interface DisplayedEvent {

@@ -19,7 +19,12 @@
         :day-height="0"
         animated
         bordered
+        :day-class="getDayClass"
       >
+        <template #head-day-label="{ scope: { timestamp, dayLabel } }">
+          <span>{{ dayLabel }}</span>
+          <q-icon v-if="blockedDates?.has(timestamp.date)" name="event_busy" color="red-4" size="xs" class="q-ml-xs" />
+        </template>
         <template #week="{ scope: { week } }">
           <template v-for="(displayedEvent, index) in getWeekEvents(week, calendarEvents)" :key="index">
             <div :class="badgeClasses(displayedEvent)" :style="badgeStyles(displayedEvent, week.length)">
@@ -60,6 +65,7 @@ interface Props {
   selectedDate: string;
   calendarYear: number;
   calendarMonth: number;
+  blockedDates?: Set<string>;
 }
 
 interface Emits {
@@ -67,11 +73,17 @@ interface Emits {
   (e: "dateSelect", date: string): void;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 const calendar = ref<QCalendarMonth>();
 const { getWeekEvents, badgeClasses, badgeStyles } = useReservationCalendar();
+
+function getDayClass({ scope }: { scope: { timestamp: { date: string } } }) {
+  return {
+    "blocked-date": !!props.blockedDates?.has(scope.timestamp.date),
+  };
+}
 
 function handleNavigation(view: { year: number; month: number }) {
   emit("navigation", view);
@@ -111,5 +123,9 @@ defineExpose({
 
 .rounded-border {
   border-radius: 6px;
+}
+
+:deep(.blocked-date) {
+  background-color: rgba(239, 83, 80, 0.12) !important;
 }
 </style>

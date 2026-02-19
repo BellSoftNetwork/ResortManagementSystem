@@ -12,6 +12,7 @@ import (
 type HistoryService interface {
 	GetRoomHistory(ctx context.Context, roomID uint, page, size int) ([]dto.RoomRevisionResponse, int64, error)
 	GetReservationHistory(ctx context.Context, reservationID uint, page, size int) ([]dto.ReservationRevisionResponse, int64, error)
+	GetDateBlockHistory(ctx context.Context, dateBlockID uint, page, size int) ([]dto.DateBlockRevisionResponse, int64, error)
 }
 
 type historyService struct {
@@ -49,6 +50,20 @@ func (s *historyService) GetReservationHistory(ctx context.Context, reservationI
 	revisions := make([]dto.ReservationRevisionResponse, len(logs))
 	for i, log := range logs {
 		revisions[i] = s.convertToReservationRevision(ctx, &log)
+	}
+
+	return revisions, total, nil
+}
+
+func (s *historyService) GetDateBlockHistory(ctx context.Context, dateBlockID uint, page, size int) ([]dto.DateBlockRevisionResponse, int64, error) {
+	logs, total, err := s.auditService.GetHistory(ctx, "date_block", dateBlockID, page, size)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	revisions := make([]dto.DateBlockRevisionResponse, len(logs))
+	for i, log := range logs {
+		revisions[i] = s.convertToDateBlockRevision(ctx, &log)
 	}
 
 	return revisions, total, nil
@@ -161,6 +176,38 @@ func (s *historyService) convertToReservationRevision(ctx context.Context, log *
 		HistoryType:      dto.ActionToHistoryType(string(log.Action)),
 		HistoryCreatedAt: dto.CustomTime{Time: log.CreatedAt},
 		UpdatedFields:    dto.ParseChangedFields(log.ChangedFields),
+	}
+}
+
+func (s *historyService) convertToDateBlockRevision(ctx context.Context, log *audit.AuditLog) dto.DateBlockRevisionResponse {
+	var dateBlockEntity dto.DateBlockResponse
+
+	valuesJSON := log.NewValues
+	if log.Action == audit.ActionDelete {
+		valuesJSON = log.OldValues
+	}
+
+	if valuesJSON != nil && len(valuesJSON) > 0 {
+		var snapshot dto.DateBlockHistorySnapshot
+		if err := json.Unmarshal(valuesJSON, &snapshot); err == nil {
+			startDate, _ := time.Parse("2006-01-02", snapshot.StartDate)
+			endDate, _ := time.Parse("2006-01-02", snapshot.EndDate)
+			dateBlockEntity = dto.DateBlockResponse{
+				ID:        snapshot.ID,
+				StartDate: dto.JSONDate{Time: startDate},
+				EndDate:   dto.JSONDate{Time: endDate},
+				Reason:    snapshot.Reason,
+				CreatedBy: s.getUserSummary(ctx, snapshot.CreatedBy),
+			}
+		}
+	}
+
+	return dto.DateBlockRevisionResponse{
+		Entity:           dateBlockEntity,
+		HistoryType:      dto.ActionToHistoryType(string(log.Action)),
+		HistoryCreatedAt: dto.CustomTime{Time: log.CreatedAt},
+		UpdatedFields:    dto.ParseChangedFields(log.ChangedFields),
+		HistoryUsername:  log.Username,
 	}
 }
 

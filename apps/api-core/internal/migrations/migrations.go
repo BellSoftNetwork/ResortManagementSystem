@@ -9,5 +9,6 @@ func AllMigrations() []Migration {
 		Migration004DeleteAuditLogSelfReferences,
 		Migration005ConvertKstTimestampsToUtc,
 		Migration006CleanupFalsePaymentMethodAuditLogs,
+		Migration007AddDateBlocks,
 	}
 }
