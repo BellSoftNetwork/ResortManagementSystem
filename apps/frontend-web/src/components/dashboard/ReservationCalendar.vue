@@ -132,6 +132,7 @@ defineExpose({
   text-overflow: ellipsis;
   overflow: hidden;
   cursor: pointer;
+  pointer-events: auto;
 }
 
 .my-void-event {
@@ -151,5 +152,17 @@ defineExpose({
 :deep(.selected-date) {
   background-color: rgba(25, 118, 210, 0.15) !important;
   border-left: 3px solid #1976d2 !important;
+}
+</style>
+
+<!-- QCalendar 내부 DOM 요소에 대한 CSS 오버라이드.
+  .q-calendar-month__week--events는 QCalendarMonth 자식 컴포넌트가 렌더링하는 요소이므로
+  Vue 3 scoped CSS의 :deep()보다 unscoped 블록으로 선언하는 것이 빌드 환경 안정성을 보장합니다.
+  See: https://vuejs.org/api/sfc-css-features#deep-selectors -->
+<style lang="scss">
+/* 이벤트 오버레이 레이어의 클릭 투과 처리.
+   이 레이어(position: absolute)가 pointer-events: auto이면 하위 날짜 셀 클릭이 차단됩니다. */
+.q-calendar-month__week--events {
+  pointer-events: none;
 }
 </style>
