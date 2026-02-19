@@ -41,6 +41,14 @@ func (m *MockHistoryService) GetReservationHistory(ctx context.Context, reservat
 	return args.Get(0).([]dto.ReservationRevisionResponse), args.Get(1).(int64), args.Error(2)
 }
 
+func (m *MockHistoryService) GetDateBlockHistory(ctx context.Context, dateBlockID uint, page, size int) ([]dto.DateBlockRevisionResponse, int64, error) {
+	args := m.Called(ctx, dateBlockID, page, size)
+	if args.Get(0) == nil {
+		return nil, args.Get(1).(int64), args.Error(2)
+	}
+	return args.Get(0).([]dto.DateBlockRevisionResponse), args.Get(1).(int64), args.Error(2)
+}
+
 // MockRoomService는 RoomService의 모킹 구현
 type MockRoomService struct {
 	mock.Mock

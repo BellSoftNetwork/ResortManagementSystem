@@ -223,6 +223,21 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: "/date-blocks",
+    component: DefaultLayout,
+    meta: {
+      isAuthenticated: true,
+      roles: ["ADMIN", "SUPER_ADMIN"],
+    },
+    children: [
+      {
+        path: "",
+        name: "DateBlocks",
+        component: () => import("pages/date-block/DateBlockList.vue"),
+      },
+    ],
+  },
+  {
     path: "/debug",
     component: DefaultLayout,
     meta: {
