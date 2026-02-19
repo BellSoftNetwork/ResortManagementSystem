@@ -6,6 +6,9 @@
         :model-value="selectedDate"
         @navigation="handleNavigation"
         @update:model-value="handleDateSelect"
+        @click-day="handleDayClick"
+        @click-date="handleDateClick"
+        :selected-dates="selectedDatesArray"
         :year="calendarYear"
         :month="calendarMonth"
         :hoverable="true"
@@ -54,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { QCalendarMonth } from "@quasar/quasar-ui-qcalendar";
 import "@quasar/quasar-ui-qcalendar/dist/index.css";
 import { formatDate } from "src/util/format-util";
@@ -79,9 +82,25 @@ const emit = defineEmits<Emits>();
 const calendar = ref<QCalendarMonth>();
 const { getWeekEvents, badgeClasses, badgeStyles } = useReservationCalendar();
 
+// 선택된 날짜 배열 (QCalendarMonth selected-dates prop용)
+const selectedDatesArray = computed(() => [props.selectedDate]);
+
+// 날짜 셀(day 영역) 클릭 핸들러
+// @click-day payload: { scope: { timestamp: { date: string } }, e: MouseEvent }
+function handleDayClick({ scope }: { scope: { timestamp: { date: string } } }) {
+  emit("dateSelect", scope.timestamp.date);
+}
+
+// 날짜 번호(head 영역) 클릭 핸들러
+// @click-date payload: { scope: { timestamp: { date: string } }, event: MouseEvent }
+function handleDateClick({ scope }: { scope: { timestamp: { date: string } } }) {
+  emit("dateSelect", scope.timestamp.date);
+}
+
 function getDayClass({ scope }: { scope: { timestamp: { date: string } } }) {
   return {
     "blocked-date": !!props.blockedDates?.has(scope.timestamp.date),
+    "selected-date": scope.timestamp.date === props.selectedDate,
   };
 }
 
@@ -127,5 +146,10 @@ defineExpose({
 
 :deep(.blocked-date) {
   background-color: rgba(239, 83, 80, 0.12) !important;
+}
+
+:deep(.selected-date) {
+  background-color: rgba(25, 118, 210, 0.15) !important;
+  border-left: 3px solid #1976d2 !important;
 }
 </style>

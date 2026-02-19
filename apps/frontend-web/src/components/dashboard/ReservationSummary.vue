@@ -71,6 +71,7 @@
       />
 
       <ReservationDayTable
+        ref="dayTable"
         :reservations="currentDateReservations"
         :selected-date="selectedDate"
         :check-in-out-counts="checkInOutCounts"
@@ -86,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref } from "vue";
 import dayjs from "dayjs";
 import { useAuthStore } from "stores/auth";
 import { formatDate } from "src/util/format-util";
@@ -163,6 +164,7 @@ const columns = [
 ];
 const calendar = ref<InstanceType<typeof ReservationCalendar>>();
 const dateBlockDialog = ref<InstanceType<typeof DateBlockCreateDialog>>();
+const dayTable = ref<InstanceType<typeof ReservationDayTable>>();
 const selectedDate = ref(formatDate());
 const currentMonth = ref(dayjs());
 const reservationsOfDay = ref({});
@@ -303,6 +305,9 @@ function changeView(view) {
   filter.value.stayStartAt = dateRange.startAt;
   filter.value.stayEndAt = dateRange.endAt;
 
+  // 월 변경 시 선택 날짜를 해당 월 1일로 초기화
+  selectedDate.value = currentMonth.value.startOf("month").format("YYYY-MM-DD");
+
   fetchData();
 }
 
@@ -327,6 +332,11 @@ function onDateSelect(date) {
 
     fetchData();
   }
+
+  // 달력 클릭 시 하단 테이블로 부드럽게 스크롤
+  nextTick(() => {
+    (dayTable.value?.$el as HTMLElement)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 }
 
 function changeDatePrev() {
