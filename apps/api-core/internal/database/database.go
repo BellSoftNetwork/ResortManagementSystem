@@ -12,7 +12,7 @@ import (
 )
 
 func InitDB(cfg *config.Config) (*gorm.DB, error) {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=UTC",
 		cfg.Database.User,
 		cfg.Database.Password,
 		cfg.Database.Host,
@@ -22,7 +22,7 @@ func InitDB(cfg *config.Config) (*gorm.DB, error) {
 
 	gormConfig := &gorm.Config{
 		NowFunc: func() time.Time {
-			return time.Now().Local()
+			return time.Now().UTC()
 		},
 	}
 
@@ -45,6 +45,7 @@ func InitDB(cfg *config.Config) (*gorm.DB, error) {
 	sqlDB.SetMaxIdleConns(cfg.Database.MaxIdleConns)
 	sqlDB.SetMaxOpenConns(cfg.Database.MaxOpenConns)
 	sqlDB.SetConnMaxLifetime(cfg.Database.ConnMaxLifetime)
+	sqlDB.SetConnMaxIdleTime(cfg.Database.ConnMaxIdleTime)
 
 	// Hooks disabled - manually handle soft delete
 

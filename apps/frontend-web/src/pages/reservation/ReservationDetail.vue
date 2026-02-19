@@ -8,13 +8,18 @@
     <div v-else class="q-gutter-sm">
       <div class="row">
         <div class="col">
-          <ReservationEditor :reservation="reservation" mode="view" reservation-type="STAY" />
+          <ReservationEditor
+            :reservation="reservation"
+            mode="view"
+            reservation-type="STAY"
+            @updated="historyRef?.reloadData()"
+          />
         </div>
       </div>
 
       <div class="row">
         <div class="col">
-          <ReservationHistoryDynamicTable :id="id" />
+          <ReservationHistoryDynamicTable ref="historyRef" :id="id" />
         </div>
       </div>
     </div>
@@ -34,6 +39,7 @@ const router = useRouter();
 
 const id = Number.parseInt(route.params.id as string);
 const reservation = ref<Reservation | null>(null);
+const historyRef = ref();
 
 function fetchData() {
   reservation.value = null;

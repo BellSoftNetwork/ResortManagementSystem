@@ -1,4 +1,9 @@
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export function formatPrice(value: number) {
   return new Intl.NumberFormat("ko-KR", {
@@ -12,7 +17,7 @@ export function formatCommissionRate(value: number) {
 }
 
 export function formatDateTime(value: string | undefined = undefined) {
-  return dayjs(value).format("YYYY-MM-DD HH:mm:ss");
+  return dayjs.utc(value).tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss");
 }
 
 export function formatDate(value: string | undefined = undefined) {
@@ -24,7 +29,7 @@ export function formatSimpleDate(value: string | undefined = undefined) {
 }
 
 export function formatTime(value: string | undefined = undefined) {
-  return dayjs(value).format("HH:mm:ss");
+  return dayjs.utc(value).tz("Asia/Seoul").format("HH:mm:ss");
 }
 
 export function formatDiffDays(startDate: string | null, endDate: string | null): number {

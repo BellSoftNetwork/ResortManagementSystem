@@ -3,7 +3,7 @@ import { setActivePinia, createPinia } from "pinia";
 import { useAuthStore } from "../auth";
 import * as authApi from "src/api/v1/auth";
 import * as mainApi from "src/api/v1/main";
-import { createMockApiResponse, createMockApiError } from "test/vitest/helpers";
+import { createMockApiResponse } from "test/vitest/helpers";
 import type { User } from "src/schema/user";
 import type { LoginResponse, RefreshTokenResponse } from "src/api/v1/auth";
 

@@ -75,13 +75,13 @@ func main() {
 	// Initialize audit service first
 	auditService := audit.NewService(db)
 	// Register audit hooks for GORM - disabled due to JSON depth issue
-	// audit.RegisterHooks(db, auditService)
+	audit.RegisterHooks(db, auditService)
 
 	authService := services.NewAuthService(userRepo, loginAttemptRepo, jwtService, cfg)
 	userService := services.NewUserService(userRepo)
 	roomService := services.NewRoomService(roomRepo, roomGroupRepo, auditService)
 	roomGroupService := services.NewRoomGroupService(roomGroupRepo)
-	reservationService := services.NewReservationService(reservationRepo, roomRepo, paymentMethodRepo)
+	reservationService := services.NewReservationService(reservationRepo, roomRepo, paymentMethodRepo, auditService)
 	paymentMethodService := services.NewPaymentMethodService(paymentMethodRepo)
 	configService := services.NewConfigService(cfg)
 	developmentService := services.NewDevelopmentServiceV2(db)
@@ -97,6 +97,7 @@ func main() {
 	developmentHandler := handlers.NewDevelopmentHandler(developmentService)
 	healthHandler := handlers.NewHealthHandler(db, redis)
 	docsHandler := handlers.NewDocsHandler()
+	auditHandler := handlers.NewAuditHandler(auditService)
 
 	router := gin.New()
 	router.Use(gin.Logger())
@@ -117,7 +118,7 @@ func main() {
 		c.File("./public/index.html")
 	})
 
-	setupRoutes(router, authHandler, mainHandler, userHandler, roomHandler, roomGroupHandler, reservationHandler, paymentMethodHandler, developmentHandler, healthHandler, docsHandler, jwtService, cfg)
+	setupRoutes(router, authHandler, mainHandler, userHandler, roomHandler, roomGroupHandler, reservationHandler, paymentMethodHandler, developmentHandler, healthHandler, docsHandler, auditHandler, jwtService, cfg)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", cfg.Server.Port),
@@ -150,7 +151,8 @@ func setupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, mainHandler *
 	userHandler *handlers.UserHandler, roomHandler *handlers.RoomHandler,
 	roomGroupHandler *handlers.RoomGroupHandler, reservationHandler *handlers.ReservationHandler,
 	paymentMethodHandler *handlers.PaymentMethodHandler, developmentHandler *handlers.DevelopmentHandler,
-	healthHandler *handlers.HealthHandler, docsHandler *handlers.DocsHandler, jwtService *auth.JWTService, cfg *config.Config) {
+	healthHandler *handlers.HealthHandler, docsHandler *handlers.DocsHandler, auditHandler *handlers.AuditHandler,
+	jwtService *auth.JWTService, cfg *config.Config) {
 
 	// Health check endpoints (Spring Boot Actuator compatible)
 	actuator := r.Group("/actuator")
@@ -200,6 +202,8 @@ func setupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, mainHandler *
 					accountRoutes.POST("", userHandler.CreateUser)
 					accountRoutes.PATCH("/:id", userHandler.UpdateUser)
 				}
+				adminRoutes.GET("/audit-logs", auditHandler.ListAuditLogs)
+				adminRoutes.GET("/audit-logs/:id", auditHandler.GetAuditLog)
 			}
 
 			roomRoutes := authenticated.Group("/rooms")

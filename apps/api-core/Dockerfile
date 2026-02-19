@@ -8,7 +8,7 @@ ARG TARGETARCH
 FROM golang:1.23-alpine AS base
 
 # Install base packages
-RUN apk add --no-cache git make bash
+RUN apk add --no-cache git make bash curl
 
 # Set working directory
 WORKDIR /app

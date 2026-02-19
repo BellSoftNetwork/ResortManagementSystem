@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"gitlab.bellsoft.net/rms/api-core/internal/audit"
 	"gitlab.bellsoft.net/rms/api-core/internal/dto"
 	"gitlab.bellsoft.net/rms/api-core/internal/models"
 	"gitlab.bellsoft.net/rms/api-core/internal/repositories"
@@ -33,14 +34,16 @@ type reservationService struct {
 	reservationRepo   repositories.ReservationRepository
 	roomRepo          repositories.RoomRepository
 	paymentMethodRepo repositories.PaymentMethodRepository
+	auditService      audit.AuditService
 }
 
 func NewReservationService(reservationRepo repositories.ReservationRepository, roomRepo repositories.RoomRepository,
-	paymentMethodRepo repositories.PaymentMethodRepository) ReservationService {
+	paymentMethodRepo repositories.PaymentMethodRepository, auditService audit.AuditService) ReservationService {
 	return &reservationService{
 		reservationRepo:   reservationRepo,
 		roomRepo:          roomRepo,
 		paymentMethodRepo: paymentMethodRepo,
+		auditService:      auditService,
 	}
 }
 
@@ -81,6 +84,7 @@ func (s *reservationService) Create(ctx context.Context, reservation *models.Res
 	if err != nil {
 		return ErrPaymentMethodNotFound
 	}
+	reservation.PaymentMethod = paymentMethod // 추가: audit 로깅용
 	if !paymentMethod.IsActive() {
 		return ErrPaymentMethodInactive
 	}
@@ -97,8 +101,13 @@ func (s *reservationService) Create(ctx context.Context, reservation *models.Res
 
 	reservation.Rooms = make([]models.ReservationRoom, len(roomIDs))
 	for i, roomID := range roomIDs {
+		room, err := s.roomRepo.FindByID(ctx, roomID)
+		if err != nil {
+			return ErrRoomNotFound
+		}
 		reservation.Rooms[i] = models.ReservationRoom{
 			RoomID: roomID,
+			Room:   room, // 추가: audit 로깅용
 		}
 	}
 
@@ -187,6 +196,7 @@ func (s *reservationService) Update(ctx context.Context, id uint, updates map[st
 			if !paymentMethod.IsActive() {
 				return nil, ErrPaymentMethodInactive
 			}
+			reservation.PaymentMethod = nil // GORM Save 충돌 방지: Preload된 association을 nil로 설정
 			reservation.PaymentMethodID = paymentMethodID
 			reservation.BrokerFee = int(float64(reservation.Price) * paymentMethod.CommissionRate)
 		}
@@ -209,8 +219,13 @@ func (s *reservationService) Update(ctx context.Context, id uint, updates map[st
 
 		reservation.Rooms = make([]models.ReservationRoom, len(roomIDs))
 		for i, roomID := range roomIDs {
+			room, err := s.roomRepo.FindByID(ctx, roomID)
+			if err != nil {
+				return nil, ErrRoomNotFound
+			}
 			reservation.Rooms[i] = models.ReservationRoom{
 				RoomID: roomID,
+				Room:   room,
 			}
 		}
 	}
@@ -223,12 +238,25 @@ func (s *reservationService) Update(ctx context.Context, id uint, updates map[st
 }
 
 func (s *reservationService) Delete(ctx context.Context, id uint) error {
-	_, err := s.reservationRepo.FindByID(ctx, id)
+	reservation, err := s.reservationRepo.FindByID(ctx, id)
 	if err != nil {
 		return ErrReservationNotFound
 	}
 
-	return s.reservationRepo.Delete(ctx, id)
+	// Perform the deletion
+	if err := s.reservationRepo.Delete(ctx, id); err != nil {
+		return err
+	}
+
+	// Log the deletion manually since soft delete doesn't trigger GORM hooks
+	if s.auditService != nil {
+		if err := s.auditService.LogDelete(ctx, reservation); err != nil {
+			// Log error but don't fail the deletion
+			// The deletion has already succeeded, we just couldn't log it
+		}
+	}
+
+	return nil
 }
 
 func (s *reservationService) GetAvailableRooms(ctx context.Context, startDate, endDate time.Time, excludeReservationID *uint) ([]models.Room, error) {

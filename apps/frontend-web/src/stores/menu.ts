@@ -10,6 +10,7 @@ import {
   fasTableColumns,
   fasUser,
   fasFlask,
+  fasClockRotateLeft as fasHistory,
 } from "@quasar/extras/fontawesome-v6";
 import { useAuthStore } from "stores/auth";
 
@@ -30,6 +31,7 @@ const adminLinks: Link[] = [
   { icon: fasHotel, text: "객실 그룹", to: "RoomGroups" },
   { icon: fasCommentDollar, text: "결제 수단", to: "PaymentMethods" },
   { icon: fasUser, text: "계정 관리", to: "AdminAccounts" },
+  { icon: fasHistory, text: "감사 로그", to: "AuditLogs" },
 ] as const;
 
 const superAdminLinks: Link[] = [{ icon: fasFlask, text: "개발 테스트", to: "DevTest" }] as const;

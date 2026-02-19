@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql/driver"
+	"sort"
 	"time"
 
 	"gorm.io/gorm"
@@ -154,30 +155,61 @@ func (r *Reservation) GetAuditEntityID() uint {
 	return r.ID
 }
 
+func formatTimePtr(t *time.Time) interface{} {
+	if t == nil {
+		return nil
+	}
+	return t.Format(time.RFC3339)
+}
+
 // GetAuditFields implements audit.Auditable interface
 func (r *Reservation) GetAuditFields() map[string]interface{} {
+	rooms := make([]map[string]interface{}, 0)
+	for _, rr := range r.Rooms {
+		roomData := map[string]interface{}{
+			"id":     rr.RoomID,
+			"number": "",
+		}
+		if rr.Room != nil {
+			roomData["number"] = rr.Room.Number
+		}
+		rooms = append(rooms, roomData)
+	}
+	sort.Slice(rooms, func(i, j int) bool {
+		return rooms[i]["id"].(uint) < rooms[j]["id"].(uint)
+	})
+
+	paymentMethod := map[string]interface{}{
+		"id":   r.PaymentMethodID,
+		"name": "",
+	}
+	if r.PaymentMethod != nil {
+		paymentMethod["name"] = r.PaymentMethod.Name
+	}
+
 	return map[string]interface{}{
-		"id":              r.ID,
-		"paymentMethodId": r.PaymentMethodID,
-		"name":            r.Name,
-		"phone":           r.Phone,
-		"peopleCount":     r.PeopleCount,
-		"stayStartAt":     r.StayStartAt,
-		"stayEndAt":       r.StayEndAt,
-		"checkInAt":       r.CheckInAt,
-		"checkOutAt":      r.CheckOutAt,
-		"price":           r.Price,
-		"deposit":         r.Deposit,
-		"paymentAmount":   r.PaymentAmount,
-		"refundAmount":    r.RefundAmount,
-		"brokerFee":       r.BrokerFee,
-		"note":            r.Note,
-		"canceledAt":      r.CanceledAt,
-		"status":          r.Status.String(),
-		"type":            r.Type.String(),
-		"createdBy":       r.CreatedBy,
-		"updatedBy":       r.UpdatedBy,
-		"createdAt":       r.CreatedAt,
-		"updatedAt":       r.UpdatedAt,
+		"id":            r.ID,
+		"rooms":         rooms,
+		"paymentMethod": paymentMethod,
+		"name":          r.Name,
+		"phone":         r.Phone,
+		"peopleCount":   r.PeopleCount,
+		"stayStartAt":   r.StayStartAt.Format("2006-01-02"),
+		"stayEndAt":     r.StayEndAt.Format("2006-01-02"),
+		"checkInAt":     formatTimePtr(r.CheckInAt),
+		"checkOutAt":    formatTimePtr(r.CheckOutAt),
+		"price":         r.Price,
+		"deposit":       r.Deposit,
+		"paymentAmount": r.PaymentAmount,
+		"refundAmount":  r.RefundAmount,
+		"brokerFee":     r.BrokerFee,
+		"note":          r.Note,
+		"canceledAt":    formatTimePtr(r.CanceledAt),
+		"status":        r.Status.String(),
+		"type":          r.Type.String(),
+		"createdBy":     r.CreatedBy,
+		"updatedBy":     r.UpdatedBy,
+		"createdAt":     r.CreatedAt,
+		"updatedAt":     r.UpdatedAt,
 	}
 }

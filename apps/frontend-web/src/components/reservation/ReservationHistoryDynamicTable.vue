@@ -42,6 +42,12 @@
         </div>
       </q-td>
     </template>
+
+    <template #body-cell-modifier="props">
+      <q-td key="modifier" :props="props">
+        {{ getModifierName(props.row) }}
+      </q-td>
+    </template>
   </q-table>
 </template>
 
@@ -87,6 +93,14 @@ const columns = [
     required: true,
   },
   {
+    name: "modifier",
+    field: "modifier",
+    label: "변경자",
+    align: "left",
+    headerStyle: "width: 10%",
+    required: true,
+  },
+  {
     name: "updatedAt",
     field: "historyCreatedAt",
     label: "변경 시각",
@@ -98,6 +112,13 @@ const columns = [
   },
 ];
 const reservationHistories = ref<Revision<Reservation>[]>([]);
+
+function getModifierName(row: Revision<Reservation>): string {
+  if (row.historyType.includes("CREATE")) {
+    return row.entity.createdBy?.name || "-";
+  }
+  return row.entity.updatedBy?.name || "-";
+}
 
 function onRequest(tableProps) {
   const { page, rowsPerPage, sortBy, descending } = tableProps.pagination;
@@ -130,6 +151,10 @@ function onRequest(tableProps) {
 function reloadData() {
   tableRef.value.requestServerInteraction();
 }
+
+defineExpose({
+  reloadData,
+});
 
 onMounted(() => {
   reloadData();

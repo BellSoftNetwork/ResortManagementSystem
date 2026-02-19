@@ -32,6 +32,7 @@ type DatabaseConfig struct {
 	MaxIdleConns    int
 	MaxOpenConns    int
 	ConnMaxLifetime time.Duration
+	ConnMaxIdleTime time.Duration
 }
 
 type RedisConfig struct {
@@ -125,6 +126,7 @@ func Load() *Config {
 			MaxIdleConns:    viper.GetInt("database.mysql.max_idle_conns"),
 			MaxOpenConns:    viper.GetInt("database.mysql.max_open_conns"),
 			ConnMaxLifetime: viper.GetDuration("database.mysql.conn_max_lifetime"),
+			ConnMaxIdleTime: viper.GetDuration("database.mysql.conn_max_idle_time"),
 		},
 		Redis: RedisConfig{
 			Host:     viper.GetString("redis.host"),
@@ -191,6 +193,10 @@ func Load() *Config {
 
 	if cfg.Database.ConnMaxLifetime == 0 {
 		cfg.Database.ConnMaxLifetime = time.Hour
+	}
+
+	if cfg.Database.ConnMaxIdleTime == 0 {
+		cfg.Database.ConnMaxIdleTime = 10 * time.Minute
 	}
 
 	// Set defaults for Redis configuration if not provided

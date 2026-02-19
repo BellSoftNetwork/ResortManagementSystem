@@ -79,28 +79,42 @@ type RoomHistorySnapshot struct {
 	UpdatedAt   string `json:"updatedAt"`
 }
 
+// RoomSnapshot represents a room in audit snapshot (minimal fields for display)
+type RoomSnapshot struct {
+	ID     uint   `json:"id"`
+	Number string `json:"number"`
+}
+
+// PaymentMethodSnapshot represents a payment method in audit snapshot (minimal fields for display)
+type PaymentMethodSnapshot struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+}
+
 // ReservationHistorySnapshot represents the reservation entity data stored in audit logs
 type ReservationHistorySnapshot struct {
-	ID              uint    `json:"id"`
-	PaymentMethodID uint    `json:"paymentMethodId"`
-	Name            string  `json:"name"`
-	Phone           string  `json:"phone"`
-	PeopleCount     int     `json:"peopleCount"`
-	StayStartAt     string  `json:"stayStartAt"`
-	StayEndAt       string  `json:"stayEndAt"`
-	CheckInAt       *string `json:"checkInAt"`
-	CheckOutAt      *string `json:"checkOutAt"`
-	Price           int     `json:"price"`
-	Deposit         int     `json:"deposit"`
-	PaymentAmount   int     `json:"paymentAmount"`
-	RefundAmount    int     `json:"refundAmount"`
-	BrokerFee       int     `json:"brokerFee"`
-	Note            string  `json:"note"`
-	CanceledAt      *string `json:"canceledAt"`
-	Status          string  `json:"status"`
-	Type            string  `json:"type"`
-	CreatedBy       uint    `json:"createdBy"`
-	UpdatedBy       uint    `json:"updatedBy"`
-	CreatedAt       string  `json:"createdAt"`
-	UpdatedAt       string  `json:"updatedAt"`
+	ID              uint                   `json:"id"`
+	PaymentMethodID uint                   `json:"paymentMethodId"`
+	Rooms           []RoomSnapshot         `json:"rooms"`
+	PaymentMethod   *PaymentMethodSnapshot `json:"paymentMethod"`
+	Name            string                 `json:"name"`
+	Phone           string                 `json:"phone"`
+	PeopleCount     int                    `json:"peopleCount"`
+	StayStartAt     string                 `json:"stayStartAt"`
+	StayEndAt       string                 `json:"stayEndAt"`
+	CheckInAt       *string                `json:"checkInAt"`
+	CheckOutAt      *string                `json:"checkOutAt"`
+	Price           int                    `json:"price"`
+	Deposit         int                    `json:"deposit"`
+	PaymentAmount   int                    `json:"paymentAmount"`
+	RefundAmount    int                    `json:"refundAmount"`
+	BrokerFee       int                    `json:"brokerFee"`
+	Note            string                 `json:"note"`
+	CanceledAt      *string                `json:"canceledAt"`
+	Status          string                 `json:"status"`
+	Type            string                 `json:"type"`
+	CreatedBy       uint                   `json:"createdBy"`
+	UpdatedBy       uint                   `json:"updatedBy"`
+	CreatedAt       string                 `json:"createdAt"`
+	UpdatedAt       string                 `json:"updatedAt"`
 }

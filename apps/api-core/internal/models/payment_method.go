@@ -74,3 +74,27 @@ func (pm *PaymentMethod) BeforeUpdate(tx *gorm.DB) error {
 func (pm *PaymentMethod) IsActive() bool {
 	return pm.Status == PaymentMethodStatusActive
 }
+
+// GetAuditEntityType implements audit.Auditable interface
+func (pm *PaymentMethod) GetAuditEntityType() string {
+	return "payment_method"
+}
+
+// GetAuditEntityID implements audit.Auditable interface
+func (pm *PaymentMethod) GetAuditEntityID() uint {
+	return pm.ID
+}
+
+// GetAuditFields implements audit.Auditable interface
+func (pm *PaymentMethod) GetAuditFields() map[string]interface{} {
+	return map[string]interface{}{
+		"id":                       pm.ID,
+		"name":                     pm.Name,
+		"commissionRate":           pm.CommissionRate,
+		"requireUnpaidAmountCheck": bool(pm.RequireUnpaidAmountCheck),
+		"isDefaultSelect":          bool(pm.IsDefaultSelect),
+		"status":                   pm.Status.String(),
+		"createdAt":                pm.CreatedAt,
+		"updatedAt":                pm.UpdatedAt,
+	}
+}

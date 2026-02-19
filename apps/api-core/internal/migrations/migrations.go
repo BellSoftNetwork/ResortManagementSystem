@@ -5,5 +5,8 @@ func AllMigrations() []Migration {
 	return []Migration{
 		Migration001InitialSchema,
 		Migration002AddAuditLogs,
+		Migration003AddAuditCompositeIndex,
+		Migration004DeleteAuditLogSelfReferences,
+		Migration005ConvertKstTimestampsToUtc,
 	}
 }
