@@ -1,6 +1,6 @@
 # Resort Management System 스펙 인덱스
 
-> **마지막 업데이트**: 2026-01-07
+> **마지막 업데이트**: 2026-01-29
 
 모든 스펙을 관리하는 중앙 인덱스입니다.
 
@@ -86,7 +86,7 @@ Kotlin Spring Boot → Golang Gin 마이그레이션 관련 스펙
 | 스펙 | 제목 | Spec | Plan | 우선순위 |
 |------|------|:----:|:----:|:--------:|
 | [history-api-compat](./migration/history-api-compat/) | History API 완전 호환 | completed | - | - |
-| [api-response-compat](./migration/api-response-compat/) | API 응답 완전 호환성 검증 | approved | not-started | 높음 |
+| [api-response-compat](./migration/api-response-compat/) | API 응답 완전 호환성 검증 | completed | done | - |
 | [db-schema-unification](./migration/db-schema-unification/) | DB 스키마 버전 관리 통합 | draft | not-started | 중간 |
 | [production-cutover](./migration/production-cutover/) | 운영 환경 전환 준비 | draft | not-started | 높음 |
 | [legacy-cleanup](./migration/legacy-cleanup/) | 레거시 정리 | draft | not-started | 낮음 |
